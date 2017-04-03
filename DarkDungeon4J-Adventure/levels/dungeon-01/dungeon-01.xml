@@ -1,0 +1,9 @@
+<simstate>
+    <dungeon  path="dungeon-01-graph.xml" />
+    <dungeon  path="dungeon-01-goal.xml" />
+    <dungeon  path="dungeon-01-items.xml" />
+    <dungeon  path="dungeon-01-traps.xml" />
+    <dungeon  path="dungeon-01-monsters.xml" />
+    <dungeon  path="dungeon-01-heroes.xml" />
+    <monsters path="dungeon-01-monster-agents.xml" />
+</simstate>

@@ -1,0 +1,11 @@
+<heroes>
+  <hero id="1">
+    <heroFQCN>cz.dd4j.agents.heroes.HeroRandom</heroFQCN>
+    <!--
+    <config>
+        <key>sumthingKey</key>
+        <value>sumthingValue</value>
+    </config>
+    -->
+  </hero>
+</heroes>

@@ -1,0 +1,5 @@
+<dungeon>
+    <room id="1">    
+        <item id="1" type="SWORD" />
+    </room>
+</dungeon>

@@ -1,0 +1,5 @@
+<dungeon>
+    <room id="2">    
+        <monster id="2" type="MONSTER" />
+    </room>
+</dungeon>
