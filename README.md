@@ -2,12 +2,12 @@
 
 Rogue-like scenario simulator for AI experiments, highly modular implementation.
 
-##IN DEVELOPMENT STATE
+## IN DEVELOPMENT STATE
 
 The best way to interact with the code is to download/clone it completely, import at least DarkDungeon4J-Adventure program
 into favourite IDE of yours (preferably Eclipse), open Dungeon01 file and run it (for IDEA users, you will have to modify some paths within the file...).
 
-##PROJECT STRUCTURE
+## PROJECT STRUCTURE
 
 **DarkDungeon4J** -> main project containing the simulator and visualizer (so far console only) of the game
 
@@ -15,7 +15,7 @@ into favourite IDE of yours (preferably Eclipse), open Dungeon01 file and run it
 
 **DarkDungeon4J=Adventure** -> Project with example DD adventures.
 
-##COMPILATION
+## COMPILATION
 
 Compile any of DarkDungeon4J projects from within its directory by issuing:
 
@@ -27,7 +27,7 @@ Linux (from bash, assuming you have mvn on path):
 
     mvn package
 
-##MAVEN [REPOSITORY](http://diana.ms.mff.cuni.cz:8081/artifactory)
+## MAVEN [REPOSITORY](http://diana.ms.mff.cuni.cz:8081/artifactory)
 
     <repository>
         <id>amis-artifactory</id>
@@ -35,7 +35,7 @@ Linux (from bash, assuming you have mvn on path):
         <url>http://diana.ms.mff.cuni.cz:8081/artifactory/repo</url>
     </repository>
     
-##MAVEN DEPENDENCY
+## MAVEN DEPENDENCY
 
     Compiled with Java 1.8!
 
