@@ -4,7 +4,7 @@ Rogue-like scenario simulator for AI experiments, highly modular implementation.
 
 ## IN DEVELOPMENT STATE
 
-The best way to interact with the code is to download/clone it completely, import at least DarkDungeon4J-Adventure program
+The best way to interact with the code is to download/clone it completely, import at least DarkDungeon4J-Adventure project
 into favourite IDE of yours (preferably Eclipse), open Dungeon01 file and run it (for IDEA users, you will have to modify some paths within the file...).
 
 ## PROJECT STRUCTURE
@@ -13,7 +13,7 @@ into favourite IDE of yours (preferably Eclipse), open Dungeon01 file and run it
 
 **DarkDungeon4J-Loader** -> XML description of DDs including XML loaders.
 
-**DarkDungeon4J=Adventure** -> Project with example DD adventures.
+**DarkDungeon4J-Adventure** -> Project with example DD adventures.
 
 ## COMPILATION
 
