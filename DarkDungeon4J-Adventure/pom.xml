@@ -6,7 +6,6 @@
 		<groupId>cz.cuni.amis</groupId>
 		<artifactId>amis-pom</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../../Poms/AmisPom/pom.xml</relativePath>
 	</parent>
 
 	<groupId>cz.dd4j</groupId>

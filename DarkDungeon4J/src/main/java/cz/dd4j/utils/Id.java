@@ -81,7 +81,7 @@ public class Id {
 	
 	@Override
 	public String toString() {
-		return "Id[" + name + "]";
+		return name;
 	}
 
 }

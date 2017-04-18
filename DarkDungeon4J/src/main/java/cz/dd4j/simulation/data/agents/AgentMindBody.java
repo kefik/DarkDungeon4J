@@ -1,6 +1,5 @@
 package cz.dd4j.simulation.data.agents;
 
-import cz.cuni.amis.utils.eh4j.shortcut.EH;
 import cz.dd4j.agents.IAgent;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Entity;
 
