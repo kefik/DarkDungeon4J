@@ -1,5 +1,5 @@
 <dungeon>
-    <room id="3">    
-        <feature id="3" type="TRAP" />
+    <room id="Room3">    
+        <feature id="Trap1" type="TRAP" />
     </room>
 </dungeon>

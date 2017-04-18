@@ -78,5 +78,10 @@ public class Id {
 		Id other = (Id)obj;
 		return id == other.id;
 	}
+	
+	@Override
+	public String toString() {
+		return "Id[" + name + "]";
+	}
 
 }

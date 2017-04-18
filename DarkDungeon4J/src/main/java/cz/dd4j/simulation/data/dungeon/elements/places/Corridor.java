@@ -1,9 +1,9 @@
 package cz.dd4j.simulation.data.dungeon.elements.places;
 
 import cz.dd4j.domain.EPlace;
-import cz.dd4j.simulation.data.dungeon.Element;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
+import cz.dd4j.utils.Id;
 
 /**
  * Rooms are connected by corridors (dungeon is thus an undirected graph).
@@ -41,7 +41,7 @@ public class Corridor extends Place {
 	public Corridor(Room room1, Room room2) {
 		super(EPlace.CORRIDOR);
 		
-		if (room1.id > room2.id) {
+		if (room1.id.id > room2.id.id) {
 			this.room1 = room2;
 			this.room2 = room1;
 		} else {
@@ -54,7 +54,7 @@ public class Corridor extends Place {
 		return getOtherRoom(room.id);
 	}
 	
-	public Room getOtherRoom(int roomId) {
+	public Room getOtherRoom(Id roomId) {
 		if (roomId == room1.id) return room2;
 		if (roomId == room2.id) return room1;
 		return null;

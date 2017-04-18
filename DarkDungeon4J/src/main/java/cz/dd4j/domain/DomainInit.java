@@ -1,5 +1,7 @@
 package cz.dd4j.domain;
 
+import cz.dd4j.simulation.actions.EAction;
+
 public class DomainInit {
 
 	/**

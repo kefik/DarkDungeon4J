@@ -1,10 +1,10 @@
 package cz.dd4j.simulation.events;
 
-import cz.dd4j.simulation.data.agents.actions.Action;
+import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.data.dungeon.Element;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.features.Feature;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.result.SimResult;
 
@@ -36,7 +36,7 @@ public interface ISimEvents {
 	 * @param who
 	 * @param what
 	 */
-	public void actionSelected(Element who, Action what);
+	public void actionSelected(Element who, Command what);
 	
 	/**
 	 * Action performed by some room's {@link Feature}.
@@ -44,7 +44,7 @@ public interface ISimEvents {
 	 * @param what
 	 * @param valid true == action carried out by the simulator, false == 'who' wanted to perform 'what' but it was invalid and thus did not produce any effect
 	 */
-	public void actionStarted(Element who, Action what);
+	public void actionStarted(Element who, Command what);
 	
 	/**
 	 * Action performed by some room's {@link Feature}.
@@ -52,14 +52,14 @@ public interface ISimEvents {
 	 * @param what
 	 * @param valid true == action carried out by the simulator, false == 'who' wanted to perform 'what' but it was invalid and thus did not produce any effect
 	 */
-	public void actionEnded(Element who, Action what);
+	public void actionEnded(Element who, Command what);
 	
 	/**
 	 * 'who' wanted to perform 'what' but such an action is invalid and was not carried out.
 	 * @param who
 	 * @param what
 	 */
-	public void actionInvalid(Element who, Action what);
+	public void actionInvalid(Element who, Command what);
 	
 	/**
 	 * New {@link Element} appeared within the simulation.

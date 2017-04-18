@@ -10,14 +10,14 @@ public class EPlace extends EElement {
 	// ENUM INSTANCES
 	// ==============
 	
-	public static final EPlace ROOM     = new EPlace(1);
-	public static final EPlace CORRIDOR = new EPlace(2);
+	public static final EPlace ROOM     = new EPlace("EPRoom");
+	public static final EPlace CORRIDOR = new EPlace("EPCorridor");
 	
 	// =================
 	// ENUM CONSTRUCTORS
 	// =================
 	
-	protected EPlace(int id) {
+	protected EPlace(String id) {
 		super(id);
 	}
 

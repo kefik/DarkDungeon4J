@@ -3,11 +3,11 @@ package cz.dd4j.simulation.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.dd4j.simulation.data.agents.actions.Action;
+import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.data.dungeon.Element;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.features.Feature;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.result.SimResult;
 
@@ -46,28 +46,28 @@ public class SimEventsTracker {
 		}
 		
 		@Override
-		public void actionSelected(Element who, Action what) {
+		public void actionSelected(Element who, Command what) {
 			for (ISimEvents handler : handlers) {
 				handler.actionSelected(who, what);
 			}
 		}
 		
 		@Override
-		public void actionStarted(Element who, Action what) {
+		public void actionStarted(Element who, Command what) {
 			for (ISimEvents handler : handlers) {
 				handler.actionStarted(who, what);
 			}
 		}
 
 		@Override
-		public void actionEnded(Element who, Action what) {
+		public void actionEnded(Element who, Command what) {
 			for (ISimEvents handler : handlers) {
 				handler.actionEnded(who, what);
 			}
 		}
 		
 		@Override
-		public void actionInvalid(Element who, Action what) {
+		public void actionInvalid(Element who, Command what) {
 			for (ISimEvents handler : handlers) {
 				handler.actionInvalid(who, what);
 			}

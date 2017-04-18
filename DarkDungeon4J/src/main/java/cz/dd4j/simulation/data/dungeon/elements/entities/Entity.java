@@ -1,7 +1,7 @@
 package cz.dd4j.simulation.data.dungeon.elements.entities;
 
+import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EEntity;
-import cz.dd4j.simulation.data.agents.actions.Action;
 import cz.dd4j.simulation.data.dungeon.Element;
 import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
@@ -16,7 +16,7 @@ public class Entity extends Element {
 	/**
 	 * Current action an entity is executing.
 	 */
-	public Action action;
+	public Command action;
 	
 	/**
 	 * If {@link #alive}, exactly one of {@link #atRoom} and {@link #atCorridor} is always non-null.

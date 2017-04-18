@@ -1,12 +1,14 @@
 package cz.dd4j.simulation;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
+import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.domain.DomainInit;
 import cz.dd4j.domain.EEntity;
-import cz.dd4j.simulation.actions.instant.IInstantActionExecutor;
-import cz.dd4j.simulation.data.agents.actions.EAction;
-import cz.dd4j.simulation.data.agents.heroes.Heroes;
-import cz.dd4j.simulation.data.state.HeroMindBody;
+import cz.dd4j.simulation.actions.EAction;
+import cz.dd4j.simulation.actions.instant.IInstantAction;
+import cz.dd4j.simulation.data.agents.AgentMindBody;
+import cz.dd4j.simulation.data.agents.Agents;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.state.SimState;
 
 public class SimStaticConfig {
@@ -20,8 +22,8 @@ public class SimStaticConfig {
 	// ============
 	
 	private boolean simStateBound = false;
-	private boolean[] entityActionsBound = new boolean[EEntity.LAST_ID+1];
-	private boolean heroesBound = false;
+	private boolean[] entityActionsBound = new boolean[EEntity.LAST_ID+1];	
+	private boolean heroesBound;
 	
 	// ====================
 	// ACTION CONFIGURATION
@@ -33,7 +35,7 @@ public class SimStaticConfig {
 	/**
 	 * [EEntity.id][EAction.id]
 	 */
-	public IInstantActionExecutor[][] actionExecutors;
+	public IInstantAction[][] actionExecutors;
 	
 	// =========
 	// SIM STATE
@@ -61,7 +63,7 @@ public class SimStaticConfig {
 	
 	public boolean isEntityActionsBound(EEntity entity) {
 		if (actionExecutors == null) return false;
-		return entityActionsBound[entity.id];
+		return entityActionsBound[entity.entityId];
 	}
 
 	public String getMissingInitDescription() {
@@ -92,30 +94,30 @@ public class SimStaticConfig {
 	
 	private void ensureActionExecutors() {
 		if (actionExecutors == null) {
-			this.actionExecutors = new IInstantActionExecutor[EEntity.LAST_ID+1][EAction.LAST_ID+1];
+			this.actionExecutors = new IInstantAction[EEntity.LAST_ID+1][EAction.LAST_ID+1];
 		}
 	}
 	
-	public void bindActions(EEntity type, IInstantActionExecutor... actionExecutors) {
-		if (entityActionsBound[type.id]) throw new RuntimeException("You cannot bindActions() for EEntity." + EH.getEnumObject(type).name + " twice!");
+	public void bindActions(EEntity type, IInstantAction... actionExecutors) {
+		if (entityActionsBound[type.entityId]) throw new RuntimeException("You cannot bindActions() for EEntity." + EH.getEnumObject(type).name + " twice!");
 		
 		ensureActionExecutors();
 		
-		for (IInstantActionExecutor executor : actionExecutors) {
-			this.actionExecutors[type.id][executor.getType().id] = executor;
+		for (IInstantAction executor : actionExecutors) {
+			this.actionExecutors[type.entityId][executor.getType().id] = executor;
 		}
 		
-		this.entityActionsBound[type.id] = true;
+		this.entityActionsBound[type.entityId] = true;
 	}
 	
-	public void bindHeroes(Heroes heroes) {
+	public void bindHeroes(Agents<IHeroAgent> heroes) {
 		if (heroesBound) throw new RuntimeException("You cannot bindHeroes() twice!");
 		
-		for (HeroMindBody hero : state.heroes.values()) {
-			if (!heroes.heroes.containsKey(hero.body.id)) {
+		for (AgentMindBody<Hero, IHeroAgent> hero : state.heroes.values()) {
+			if (!heroes.agents.containsKey(hero.body.id)) {
 				throw new RuntimeException("Cannot bind mind into hero body for Hero[id=" + hero.body.id + "], " + hero.body.id + " not found in 'heroes'.");
 			}
-			hero.mind = heroes.heroes.get(hero.body.id);
+			hero.mind = heroes.agents.get(hero.body.id);
 		}
 		
 		heroesBound = true;		

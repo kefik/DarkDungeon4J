@@ -10,13 +10,13 @@ public class EFeature extends EEntity {
 	// ENUM INSTANCES
 	// ==============
 	
-	public static final EFeature TRAP = new EFeature(1);
+	public static final EFeature TRAP = new EFeature("EFTrap");
 	
 	// =================
 	// ENUM CONSTRUCTORS
 	// =================
 	
-	protected EFeature(int id) {
+	protected EFeature(String id) {
 		super(id);
 	}
 	

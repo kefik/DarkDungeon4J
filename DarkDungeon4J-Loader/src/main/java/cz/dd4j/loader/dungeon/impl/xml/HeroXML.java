@@ -6,11 +6,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+import cz.dd4j.utils.Id;
+
 @XStreamAlias("hero")
 public class HeroXML {
 	
 	@XStreamAsAttribute
-	public int id;
+	public Id id;
 	
 	@XStreamAsAttribute
 	public String name;

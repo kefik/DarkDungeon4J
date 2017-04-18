@@ -10,13 +10,13 @@ public class ERoomLabel extends ELabel {
 	// ENUM INSTANCES
 	// ==============
 	
-	public static final ERoomLabel GOAL = new ERoomLabel(1);
+	public static final ERoomLabel GOAL = new ERoomLabel("ERLGoal");
 	
 	// =================
 	// ENUM CONSTRUCTORS
 	// =================
 	
-	protected ERoomLabel(int id) {
+	protected ERoomLabel(String id) {
 		super(id);
 	}
 	

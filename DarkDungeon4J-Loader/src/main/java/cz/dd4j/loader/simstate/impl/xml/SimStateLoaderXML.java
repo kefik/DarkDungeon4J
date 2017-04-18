@@ -5,23 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cz.dd4j.agents.IAgent;
+import cz.dd4j.agents.IFeatureAgent;
+import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.agents.IMonsterAgent;
+import cz.dd4j.loader.LoaderXML;
+import cz.dd4j.loader.agents.AgentsLoader;
 import cz.dd4j.loader.dungeon.DungeonLoader;
-import cz.dd4j.loader.monsters.MonstersLoader;
 import cz.dd4j.loader.simstate.ISimStateLoaderImpl;
-import cz.dd4j.simulation.data.agents.monsters.Monsters;
+import cz.dd4j.simulation.data.agents.AgentMindBody;
+import cz.dd4j.simulation.data.agents.Agents;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.features.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
-import cz.dd4j.simulation.data.state.HeroMindBody;
-import cz.dd4j.simulation.data.state.MonsterMindBody;
 import cz.dd4j.simulation.data.state.SimState;
-import cz.dd4j.utils.xstream.XStreamLoader;
+import cz.dd4j.utils.Id;
 
-public class SimStateLoaderXML extends XStreamLoader<SimStateXML> implements ISimStateLoaderImpl {
+public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimStateLoaderImpl {
 	
 	public SimStateLoaderXML() {
 		super(SimStateXML.class);
@@ -36,23 +39,24 @@ public class SimStateLoaderXML extends XStreamLoader<SimStateXML> implements ISi
 		}
 		
 		List<File> dungeonXMLFiles = new ArrayList<File>(simStateXML.dungeons.size());
-		List<File> monstersXMLFiles = new ArrayList<File>(simStateXML.monsters.size());
+		List<File> agentsXMLFiles = new ArrayList<File>(simStateXML.agents.size());
 		
 		for (FileXML dungeon : simStateXML.dungeons) {
 			dungeonXMLFiles.add(new File(xmlFile.getParent(), dungeon.path));			
 		}
 		
-		for (FileXML monstes : simStateXML.monsters) {
-			monstersXMLFiles.add(new File(xmlFile.getParent(), monstes.path));			
+		for (FileXML agents : simStateXML.agents) {
+			agentsXMLFiles.add(new File(xmlFile.getParent(), agents.path));			
 		}
 		
-		return loadSimState(dungeonXMLFiles, monstersXMLFiles);
+		return loadSimState(dungeonXMLFiles, agentsXMLFiles);
 	}
 	
 	public SimState loadSimState(List<File> dungeonXMLFiles, List<File> agentsXMLFiles) {
 		
 		Dungeon dungeon = new Dungeon();
-		Monsters agents = new Monsters();
+		Agents<IMonsterAgent> monsters = new Agents<IMonsterAgent>();
+		Agents<IFeatureAgent> features = new Agents<IFeatureAgent>();
 				
 		// LOAD DUNGEON FILES, ADDITIVELY BLEND LATER ONES OVER EARLIER ONES...
 		DungeonLoader dungeonLoader = new DungeonLoader();		
@@ -62,10 +66,10 @@ public class SimStateLoaderXML extends XStreamLoader<SimStateXML> implements ISi
 		}
 		
 		// LOAD AGENT FILES, ADDITIVELY BLEND LATER ONES OVER EARLIER ONES...
-		MonstersLoader agentsLoader = new MonstersLoader();
+		AgentsLoader agentsLoader = new AgentsLoader();
 		for (File agentsXMLFile : agentsXMLFiles) {
-			Monsters append = agentsLoader.loadAgents(agentsXMLFile);
-			blend(agents, append);
+			Agents append = agentsLoader.loadAgents(agentsXMLFile);
+			blend(monsters, features, append);
 		}
 		
 		// SET UP THE SimState
@@ -75,29 +79,37 @@ public class SimStateLoaderXML extends XStreamLoader<SimStateXML> implements ISi
 		
 		// TINKER THE SimState
 		
-		// search for heroes and monsters...
+		// search for heroes and monsters and features...
 		// ...create their MindBodies...
 		for (Room room : state.dungeon.rooms.values()) {
 			if (room.hero != null) {
 				if (state.heroes.containsKey(room.hero.id)) throw new RuntimeException("There are more than one Hero[id=" + room.hero.id + "] within the state!");
-				HeroMindBody hero = new HeroMindBody();
+				AgentMindBody<Hero, IHeroAgent> hero = new AgentMindBody<Hero, IHeroAgent>();
 				hero.body = room.hero;
 				hero.body.atRoom = room;
 				state.heroes.put(hero.body.id, hero);					
 			}
 			if (room.monster != null) {
-				if (state.monsters.containsKey(room.monster.id)) throw new RuntimeException("There are more than one Monster[id=" + room.hero.id + "] within the state!");
-				MonsterMindBody monster = new MonsterMindBody();
+				if (state.monsters.containsKey(room.monster.id)) throw new RuntimeException("There are more than one Monster[id=" + room.monster.id + "] within the state!");
+				AgentMindBody<Monster, IMonsterAgent> monster = new AgentMindBody<Monster, IMonsterAgent>();
 				monster.body = room.monster;
 				monster.body.atRoom = room;
-				monster.mind = agents.monsters.get(monster.body.id);
+				monster.mind = monsters.agents.get(monster.body.id);
 				if (monster.mind == null) {
 					throw new RuntimeException("Monster agent not specified for the Monster[id=" + monster.body.id +"].");
 				}
 				state.monsters.put(monster.body.id, monster);					
 			}
 			if (room.feature != null) {
-				room.feature.atRoom = room;
+				if (state.features.containsKey(room.feature.id)) throw new RuntimeException("There are more than one Feature[id=" + room.feature.id + "] within the state!");
+				AgentMindBody<Feature, IFeatureAgent> feature = new AgentMindBody<Feature, IFeatureAgent>();
+				feature.body = room.feature;
+				feature.body.atRoom = room;
+				feature.mind = features.agents.get(feature.body.id);
+				if (feature.mind == null) {
+					throw new RuntimeException("Feature agent not specified for the Feature[id=" + feature.body.id +"].");
+				}
+				state.features.put(feature.body.id, feature);	
 			}
 		}
 		
@@ -107,7 +119,7 @@ public class SimStateLoaderXML extends XStreamLoader<SimStateXML> implements ISi
 	}
 	
 	public static void blend(Dungeon target, Dungeon append) {
-		for (Map.Entry<Integer, Room> entry : append.rooms.entrySet()) {
+		for (Map.Entry<Id, Room> entry : append.rooms.entrySet()) {
 			Room targetRoom = target.rooms.get(entry.getKey());
 			if (targetRoom == null) {
 				target.rooms.put(entry.getKey(), entry.getValue());
@@ -160,7 +172,7 @@ public class SimStateLoaderXML extends XStreamLoader<SimStateXML> implements ISi
 		if (append.hand != null) {
 			blend(target.hand, append.hand);
 		}
-		for (Map.Entry<Integer, Item> entry : append.inventory.getData().entrySet()) {
+		for (Map.Entry<Id, Item> entry : append.inventory.getData().entrySet()) {
 			Item targetItem = target.inventory.get(entry.getKey());
 			if (targetItem == null) {
 				target.inventory.add(entry.getValue());
@@ -172,15 +184,20 @@ public class SimStateLoaderXML extends XStreamLoader<SimStateXML> implements ISi
 	}
 
 	private static void blend(Feature target, Feature append) {
-		throw new RuntimeException("Features cannot be blended! Clash in Feature[id=" + target.id + "].");
 	}
 
 	private static void blend(Monster target, Monster append) {		
 	}
 
-	public static void blend(Monsters target, Monsters append) {
-		for (Map.Entry<Integer, IMonsterAgent> entry : append.monsters.entrySet()) {
-			target.monsters.put(entry.getKey(), entry.getValue());
+	public static void blend(Agents<IMonsterAgent> monsters, Agents<IFeatureAgent> features, Agents append) {
+		for (Object entryObj : append.agents.entrySet()) {
+			Map.Entry<Id, IAgent> entry = (Map.Entry<Id, IAgent>)entryObj;
+			if (entry.getValue() instanceof IMonsterAgent) {
+				monsters.agents.put(entry.getKey(), (IMonsterAgent)entry.getValue());
+			}
+			if (entry.getValue() instanceof IFeatureAgent) {
+				features.agents.put(entry.getKey(), (IFeatureAgent)entry.getValue());
+			}
 		}
 	}
 

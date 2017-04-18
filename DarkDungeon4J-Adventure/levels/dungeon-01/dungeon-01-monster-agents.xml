@@ -1,11 +1,11 @@
-<monsters>
-  <monster id="2">
-    <monsterFQCN>cz.dd4j.agents.monsters.StaticMonster</monsterFQCN>
+<agents>
+  <agent id="Monster1">
+    <agentFQCN>cz.dd4j.agents.monsters.StaticMonsterAgent</agentFQCN>
     <!--
     <config>    
         <key>nothing</key>
         <value>none</value>
     </config>
     -->
-  </monster>
-</monsters>
+  </agent>
+</agents>

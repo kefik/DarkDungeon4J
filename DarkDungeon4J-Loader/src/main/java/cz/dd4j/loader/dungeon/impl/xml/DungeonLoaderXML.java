@@ -5,24 +5,22 @@ import java.util.HashMap;
 
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.domain.EFeature;
+import cz.dd4j.loader.LoaderXML;
 import cz.dd4j.loader.dungeon.IDungeonLoaderImpl;
-import cz.dd4j.loader.utils.EnumTypeConverter;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.features.Feature;
-import cz.dd4j.simulation.data.dungeon.elements.features.Trap;
+import cz.dd4j.simulation.data.dungeon.elements.entities.features.Trap;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
 import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
-import cz.dd4j.utils.xstream.XStreamLoader;
+import cz.dd4j.utils.Id;
 
-public class DungeonLoaderXML extends XStreamLoader<DungeonXML> implements IDungeonLoaderImpl {
+public class DungeonLoaderXML extends LoaderXML<DungeonXML> implements IDungeonLoaderImpl {
 
 	public DungeonLoaderXML() {
-		super(DungeonXML.class);
-		xstream.registerConverter(new EnumTypeConverter());
-		
+		super(DungeonXML.class);		
 	}
 
 	@Override
@@ -30,7 +28,7 @@ public class DungeonLoaderXML extends XStreamLoader<DungeonXML> implements IDung
 		DungeonXML dungeonXML = load(xmlFile);
 		
 		Dungeon result = new Dungeon();
-		result.rooms = new HashMap<Integer, Room>(); 
+		result.rooms = new HashMap<Id, Room>(); 
 		
 		if (dungeonXML.rooms != null) {
 			for (RoomXML room : dungeonXML.rooms) {

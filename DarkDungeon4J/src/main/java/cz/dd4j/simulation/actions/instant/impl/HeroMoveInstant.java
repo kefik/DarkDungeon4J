@@ -1,14 +1,17 @@
 package cz.dd4j.simulation.actions.instant.impl;
 
+import java.util.List;
+
+import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EEntity;
-import cz.dd4j.simulation.actions.instant.IHeroInstantActionExecutor;
-import cz.dd4j.simulation.data.agents.actions.Action;
-import cz.dd4j.simulation.data.agents.actions.EAction;
+import cz.dd4j.simulation.actions.EAction;
+import cz.dd4j.simulation.actions.instant.IHeroInstantAction;
+import cz.dd4j.simulation.actions.instant.InstantActionBase;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 
-public class HeroMoveInstant implements IHeroInstantActionExecutor {
+public class HeroMoveInstant extends InstantActionBase<Hero> implements IHeroInstantAction {
 
 	@Override
 	public EEntity getEntity() {
@@ -21,7 +24,9 @@ public class HeroMoveInstant implements IHeroInstantActionExecutor {
 	}
 
 	@Override
-	public boolean isValid(Hero hero, Action action) {
+	public boolean isValid(Hero hero, Command action) {
+		if (!super.isValid(hero, action)) return false;
+		
 		if (action.target == null) return false;
 		if (!(action.target.isOf(Room.class))) return false;		
 		if (hero.atCorridor != null) {
@@ -43,7 +48,7 @@ public class HeroMoveInstant implements IHeroInstantActionExecutor {
 	}
 
 	@Override
-	public void run(Hero hero, Action action) {
+	public void run(Hero hero, Command action) {
 		if (hero.atCorridor != null) {
 			hero.atCorridor.hero = null;
 			hero.atCorridor = null;
@@ -62,6 +67,17 @@ public class HeroMoveInstant implements IHeroInstantActionExecutor {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public boolean generateActionsFor(Hero hero, List<Command> actionStore) {
+		if (hero.atRoom != null) {
+			for (Corridor corridor : hero.atRoom.corridors) {
+				actionStore.add(new Command(EAction.MOVE, corridor.getOtherRoom(hero.atRoom)));
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -2,14 +2,16 @@ package cz.dd4j.ui.console;
 
 import java.io.PrintStream;
 
-import cz.dd4j.simulation.data.agents.actions.Action;
+import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.data.dungeon.Element;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.features.Feature;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.events.ISimEvents;
 import cz.dd4j.simulation.result.SimResult;
+import cz.dd4j.utils.Const;
+import cz.dd4j.utils.ExceptionToString;
 
 public class VisConsole implements ISimEvents {
 
@@ -61,7 +63,7 @@ public class VisConsole implements ISimEvents {
 		return who.name + "-" + who.id;
 	}
 	
-	protected void actionPerforming(String state, Element who, Action what) {
+	protected void actionPerforming(String state, Element who, Command what) {
 		String description = "";
 		if (what != null) {
 			description += what;
@@ -72,23 +74,23 @@ public class VisConsole implements ISimEvents {
 	}
 	
 	@Override
-	public void actionSelected(Element who, Action what) {
+	public void actionSelected(Element who, Command what) {
 		if (what == null) return;
 		actionPerforming("ACTION-SELECTED", who, what);
 	}
 	
 	@Override
-	public void actionStarted(Element who, Action what) {
+	public void actionStarted(Element who, Command what) {
 		actionPerforming("ACTION-STARTED", who, what);
 	}
 
 	@Override
-	public void actionEnded(Element who, Action what) {
+	public void actionEnded(Element who, Command what) {
 		actionPerforming("ACTION-ENDED", who, what);
 	}
 	
 	@Override
-	public void actionInvalid(Element who, Action what) {
+	public void actionInvalid(Element who, Command what) {
 		actionPerforming("ACTION-INVALID", who, what);
 	}
 
@@ -115,7 +117,7 @@ public class VisConsole implements ISimEvents {
 
 	private String getResultDescription(SimResult result) {
 		switch (result.resultType) {
-		case HERO_EXCEPTION: return result.resultType + "[Hero code exception.]";
+		case AGENT_EXCEPTION: return result.resultType + "[Agent code exception.]" + Const.NEW_LINE + ExceptionToString.process(result.exception);
 		case HERO_WIN: return result.resultType + "[" + getName(result.winner.body) + "]";
 		case HEROES_LOSE: return result.resultType + "[All heroes are dead.]";
 		case SIMULATION_EXCEPTION: return result.resultType + "[Simulation code exception.]";

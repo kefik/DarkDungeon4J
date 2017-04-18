@@ -2,7 +2,13 @@ package cz.dd4j.utils.config;
 
 import java.util.Collection;
 
+import cz.dd4j.utils.Const;
+
 public class Configure {
+	
+	public static boolean isConfigurable(Object object) {
+		return object instanceof IConfigurable;
+	}
 	
 	public static void configure(Object object, Collection<ConfigXML> configuration) {
 		if (configuration != null && !configuration.isEmpty()) {
@@ -19,10 +25,8 @@ public class Configure {
 	}
 	
 	public static void configure(Object object, ConfigMap configuration) {
+		if (!isConfigurable(object)) return;
 		if (configuration != null && configuration.size() > 0) {
-			if (!(IConfigurable.class.isAssignableFrom(object.getClass()))) {
-				throw new RuntimeException("Cannot configure " + object.toString() + " that is instance of class " + object.getClass().getName() + " as it is not implementing IConfigurable interface.");
-			}
 			IConfigurable e = (IConfigurable)object;
 			configure(e, configuration);
 		}
@@ -32,7 +36,7 @@ public class Configure {
 		try {
 			object.configure(configuration);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to configure instance of class: " + object.getClass().getName(), e);
+			throw new RuntimeException("Failed to configure instance of class: " + object.getClass().getName() + Const.NEW_LINE + "With values:" + Const.NEW_LINE + configuration.describe(), e);
 		}
 	}
 

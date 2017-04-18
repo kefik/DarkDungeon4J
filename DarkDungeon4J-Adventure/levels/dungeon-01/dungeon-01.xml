@@ -5,5 +5,6 @@
     <dungeon  path="dungeon-01-traps.xml" />
     <dungeon  path="dungeon-01-monsters.xml" />
     <dungeon  path="dungeon-01-heroes.xml" />
-    <monsters path="dungeon-01-monster-agents.xml" />
+    <agents path="dungeon-01-monster-agents.xml" />
+    <agents path="dungeon-01-trap-agents.xml" />
 </simstate>

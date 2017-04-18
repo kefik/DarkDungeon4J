@@ -11,7 +11,7 @@ public class SimStateXML {
 	@XStreamImplicit(itemFieldName="dungeon")
 	public List<FileXML> dungeons;
 	
-	@XStreamImplicit(itemFieldName="monsters")
-	public List<FileXML> monsters;
+	@XStreamImplicit(itemFieldName="agents")
+	public List<FileXML> agents;
 	
 }

@@ -1,0 +1,11 @@
+<agents>
+  <agent id="Trap1">
+    <agentFQCN>cz.dd4j.agents.features.TrapAgent</agentFQCN>
+    <!--
+    <config>    
+        <key>nothing</key>
+        <value>none</value>
+    </config>
+    -->
+  </agent>
+</agents>

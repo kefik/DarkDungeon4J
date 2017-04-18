@@ -5,6 +5,7 @@ import cz.cuni.amis.utils.eh4j.AsEnumObject;
 import cz.cuni.amis.utils.eh4j.EnumObject;
 import cz.cuni.amis.utils.eh4j.Enums;
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
+import cz.dd4j.utils.Id;
 
 @AsEnumClass
 public class EElement {
@@ -28,13 +29,21 @@ public class EElement {
 	// ENUM VARIABLES
 	// ==============
 	
-	public final int id;
+	public final Id id;
 	
 	// =================
 	// ENUM CONSTRUCTORS
 	// =================
 
+	protected EElement(String id) {
+		this.id = Id.get(id);
+	}
+	
 	protected EElement(int id) {
+		this.id = Id.get(id);
+	}
+	
+	protected EElement(Id id) {
 		this.id = id;
 	}
 	

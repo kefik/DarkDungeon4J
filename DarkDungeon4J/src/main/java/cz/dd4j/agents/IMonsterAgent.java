@@ -1,10 +1,10 @@
 package cz.dd4j.agents;
 
-import cz.dd4j.simulation.data.agents.actions.Action;
+import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 
-public interface IMonsterAgent {
+public interface IMonsterAgent extends IAgent {
 
 	/**
 	 * Exactly one parameter is non-null and vice versa.
@@ -13,6 +13,6 @@ public interface IMonsterAgent {
 	 * @param corridor
 	 * @return
 	 */
-	public Action act(Room room, Corridor corridor);
+	public Command act(Room room, Corridor corridor);
 	
 }

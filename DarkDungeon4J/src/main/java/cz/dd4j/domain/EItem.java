@@ -10,13 +10,13 @@ public class EItem extends EElement {
 	// ENUM INSTANCES
 	// ==============
 	
-	public static final EItem SWORD = new EItem(1);
+	public static final EItem SWORD = new EItem("EISword");
 	
 	// =================
 	// ENUM CONSTRUCTORS
 	// =================
 	
-	protected EItem(int id) {
+	protected EItem(String id) {
 		super(id);
 	}
 	

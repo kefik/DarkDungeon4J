@@ -2,10 +2,11 @@ package cz.dd4j.simulation.data.dungeon;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
 import cz.dd4j.domain.EElement;
+import cz.dd4j.utils.Id;
 
 public class Element {
 
-	public int id;
+	public Id id;
 	
 	/**
 	 * Human-readable name of the entity; w/o id, that can be appended if required.

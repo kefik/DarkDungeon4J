@@ -12,13 +12,13 @@ public class ELabel extends EElement {
 	// ==============
 	
 	@AsEnumObject(childClass=ERoomLabel.class)
-	public static final ELabel ROOM_LABEL = new ELabel(1);
+	public static final ELabel ROOM_LABEL = new ELabel("ELRoomLabel");
 	
 	// =================
 	// ENUM CONSTRUCTORS
 	// =================
 
-	protected ELabel(int id) {
+	protected ELabel(String id) {
 		super(id);
 	}
 	

@@ -4,12 +4,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import cz.dd4j.domain.EFeature;
+import cz.dd4j.utils.Id;
 
 @XStreamAlias("feature")
 public class FeatureXML {
 
 	@XStreamAsAttribute
-	public int id;
+	public Id id;
 	
 	@XStreamAsAttribute
 	public String name;

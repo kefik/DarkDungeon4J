@@ -1,10 +1,10 @@
 package cz.dd4j.agents;
 
-import cz.dd4j.simulation.data.agents.actions.Action;
-import cz.dd4j.simulation.data.dungeon.elements.places.Room;
+import cz.dd4j.agents.commands.Command;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 
-public interface IFeatureAgent {
+public interface IFeatureAgent extends IAgent {
 
-	public Action act();
+	public Command act(Feature feature);
 	
 }

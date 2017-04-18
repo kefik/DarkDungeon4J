@@ -7,6 +7,7 @@ import java.util.Map;
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.domain.EItem;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
+import cz.dd4j.utils.Id;
 
 public class Hero extends Entity {
 	
@@ -15,13 +16,13 @@ public class Hero extends Entity {
 		/**
 		 * Inventory of the player.
 		 */
-		private Map<Integer, Item> inventory = new HashMap<Integer, Item>();
+		private Map<Id, Item> inventory = new HashMap<Id, Item>();
 		
-		public Map<Integer, Item> getData() {
+		public Map<Id, Item> getData() {
 			return inventory;
 		}
 		
-		public boolean has(int itemId) {		
+		public boolean has(Id itemId) {		
 			return inventory.containsKey(itemId);
 		}
 		
@@ -36,7 +37,7 @@ public class Hero extends Entity {
 			return false;
 		}
 		
-		public Item get(int itemId) {
+		public Item get(Id itemId) {
 			return inventory.get(itemId);
 		}
 		
@@ -47,7 +48,7 @@ public class Hero extends Entity {
 			return null;
 		}
 		
-		public Item remove(int itemId) {
+		public Item remove(Id itemId) {
 			return inventory.remove(itemId);
 		}
 		

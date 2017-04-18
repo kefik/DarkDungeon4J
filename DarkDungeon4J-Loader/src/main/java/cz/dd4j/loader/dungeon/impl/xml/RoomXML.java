@@ -4,12 +4,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import cz.dd4j.domain.ERoomLabel;
+import cz.dd4j.utils.Id;
 
 @XStreamAlias("room")
 public class RoomXML {
 
 	@XStreamAsAttribute
-	public int id;
+	public Id id;
 	
 	@XStreamAsAttribute
 	public String name;

@@ -5,9 +5,9 @@ import java.util.List;
 
 import cz.dd4j.domain.EPlace;
 import cz.dd4j.domain.ERoomLabel;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.features.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
 
 /**

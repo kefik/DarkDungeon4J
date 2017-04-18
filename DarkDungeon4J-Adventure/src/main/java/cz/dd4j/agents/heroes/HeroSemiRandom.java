@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import cz.dd4j.agents.HeroAgentBase;
 import cz.dd4j.agents.IHeroAgent;
+import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EFeature;
 import cz.dd4j.domain.EItem;
-import cz.dd4j.simulation.data.agents.actions.Action;
-import cz.dd4j.simulation.data.agents.actions.EAction;
+import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
@@ -24,11 +25,9 @@ import cz.dd4j.simulation.data.dungeon.elements.places.Room;
  * 
  * @author Jimmy
  */
-public class HeroSemiRandom implements IHeroAgent {
+public class HeroSemiRandom extends HeroAgentBase {
 
 	private Random random;
-	
-	private Hero hero;
 	
 	public HeroSemiRandom() {
 		random = new Random();
@@ -39,56 +38,41 @@ public class HeroSemiRandom implements IHeroAgent {
 	}
 	
 	@Override
-	public void observeBody(Hero hero, long timestampMillis) {
-		this.hero = hero;
-	}
-
-	@Override
-	public void observeDungeon(Dungeon dungeon, boolean full, long timestampMillis) {
-	}
-
-	@Override
-	public Action act() {
-		List<Action> actions = generateActions(hero);		
+	public Command act() {
+		List<Command> actions = generateActions(hero);	
+		if (actions.size() == 0) return null;
 		return actions.get(random.nextInt(actions.size()));
 	}
 	
-	private List<Action> generateActions(Hero hero) {
-		List<Action> result = new ArrayList<Action>();
+	private List<Command> generateActions(Hero hero) {
+		List<Command> result = new ArrayList<Command>();
 		
 		// MOVE ACTIONS
 		for (Corridor corridor : hero.atRoom.corridors) {
 			Room otherRoom = corridor.getOtherRoom(hero.atRoom);
 			if (otherRoom.monster != null && (hero.hand == null || hero.hand.type != EItem.SWORD)) continue;
 			if (otherRoom.feature != null && otherRoom.feature.type == EFeature.TRAP && hero.hand != null) continue;
-			result.add(new Action(EAction.MOVE, corridor.getOtherRoom(hero.atRoom)));
+			result.add(new Command(EAction.MOVE, corridor.getOtherRoom(hero.atRoom)));
 		}
 		
 		// ATTACK ACTIONS
 		if (hero.atRoom.monster != null && hero.hand != null && hero.hand.type == EItem.SWORD) {
-			result.add(new Action(EAction.ATTACK, hero.atRoom.monster));
+			result.add(new Command(EAction.ATTACK, hero.atRoom.monster));
 		}
 		
 		// DISARM ACTIONS
 		if (hero.hand == null && hero.atRoom.feature != null && hero.atRoom.feature.type == EFeature.TRAP) {
-			result.add(new Action(EAction.DISARM, hero.atRoom.feature));
+			result.add(new Command(EAction.DISARM, hero.atRoom.feature));
 		}
-		
-		// EQUIP ACTIONS
-		if (hero.inventory.values().size() > 0) {
-			for (Item item : hero.inventory.values()) {
-				result.add(new Action(EAction.EQUIP, null, item));
-			}
-		}
-		
-		// UNEQUIP
+				
+		// DROP
 		if (hero.hand != null) {
-			result.add(new Action(EAction.EQUIP, null));
-		}		
+			result.add(new Command(EAction.DROP, hero.hand));
+		}
 		
 		// PICKUP
 		if (hero.atRoom.item != null) {
-			result.add(new Action(EAction.PICKUP, hero.atRoom.item));
+			result.add(new Command(EAction.PICKUP, hero.atRoom.item));
 		}
 		
 		return result;
