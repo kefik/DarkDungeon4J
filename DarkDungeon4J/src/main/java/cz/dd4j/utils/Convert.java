@@ -1,5 +1,7 @@
 package cz.dd4j.utils;
 
+import java.io.File;
+
 public class Convert {
 
 	public static Integer toInt(Object obj) {
@@ -29,6 +31,12 @@ public class Convert {
 	public static String toString(Object obj) {
 		if (obj == null) return null;
 		return obj.toString();
+	}
+	
+	public static File toFile(Object obj) {
+		if (obj == null) return null;
+		if (obj instanceof File) return (File)obj;
+		return new File(toString(obj));
 	}
 	
 	public static Boolean toBoolean(Object obj) {

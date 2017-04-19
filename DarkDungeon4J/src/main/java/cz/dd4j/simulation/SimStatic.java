@@ -18,7 +18,10 @@ import cz.dd4j.domain.EEntity;
 import cz.dd4j.domain.EItem;
 import cz.dd4j.domain.ERoomLabel;
 import cz.dd4j.simulation.actions.EAction;
+import cz.dd4j.simulation.actions.IActionsGenerator;
+import cz.dd4j.simulation.actions.IActionsValidator;
 import cz.dd4j.simulation.actions.instant.IInstantAction;
+import cz.dd4j.simulation.actions.instant.InstantActions;
 import cz.dd4j.simulation.data.agents.AgentMindBody;
 import cz.dd4j.simulation.data.dungeon.Element;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Entity;
@@ -41,6 +44,10 @@ public class SimStatic {
 	// ========================
 	
 	private SimStaticConfig config;
+
+	private IActionsGenerator actionGenerator;
+	
+	private IActionsValidator actionValidator;
 	
 	// ========================
 	// SIMULATION EVENTS
@@ -61,6 +68,8 @@ public class SimStatic {
 	private long timeDeltaMillis;
 	
 	private SimResult resultException;
+	
+	private SimResult simulationResult;
 	
 	private List<Room> roomsBFSOrdered;
 	
@@ -95,15 +104,14 @@ public class SimStatic {
 		
 		try {
 		
-			prepareSimulation();		
+			prepareSimulation();
 			
-			eventsTracker.event().simulationBegin(config.state);
+			startSimulation();
 			
 			while (true) {			
 				if (isEnd()) {
-					SimResult result = end();
-					eventsTracker.event().simulationEnd(result);
-					return result;
+					simulationResult = createSimulationResult();					
+					return simulationResult;
 				}
 				
 				++frameNumber;
@@ -118,11 +126,13 @@ public class SimStatic {
 				eventsTracker.event().simulationFrameEnd(frameNumber);
 			}
 		} catch (SimulationException e1) {
-			return exception(e1, SimResultType.SIMULATION_EXCEPTION);
+			return simulationResult = exception(e1, SimResultType.SIMULATION_EXCEPTION);
 		} catch (AgentException e2) {
-			return exception(e2, SimResultType.AGENT_EXCEPTION);
+			return simulationResult = exception(e2, SimResultType.AGENT_EXCEPTION);
 		} catch (Exception e3) {
-			return exception(e3, SimResultType.SIMULATION_EXCEPTION);
+			return simulationResult = exception(e3, SimResultType.SIMULATION_EXCEPTION);
+		} finally {
+			endSimulation();
 		}
 	}
 
@@ -130,12 +140,20 @@ public class SimStatic {
 		frameNumber = 0;
 		simulationStartMillis = System.currentTimeMillis();
 		resultException = null;
+		simulationResult = null;
 		
 		entityScheduledNonMoveActions = new ArrayList<Entity>();
-		entityScheduledMoveActions    = new LinkedList<Entity>();		
+		entityScheduledMoveActions    = new LinkedList<Entity>();	
+		
+		actionGenerator = new InstantActions(config.actionExecutors);
+		actionValidator = new InstantActions(config.actionExecutors);
 		
 		// ORDER ROOMS IN BFS MANNER
 		dungeonBFSNumbering();
+		
+		// PREPARE AGENTS
+		injectAgents();
+		prepareAgents();
 	}
 
 	private void dungeonBFSNumbering() {
@@ -163,6 +181,133 @@ public class SimStatic {
 		}
 		
 		// DONE!		
+	}
+	
+	private void injectAgents() {
+		if (actionGenerator == null) throw new RuntimeException("Cannot agnet.setActionGenerator() as actionGenerator is null.");
+		if (actionValidator == null) throw new RuntimeException("Cannot agnet.setActionValidator() as actionValidator is null.");
+		
+		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
+			try {
+				hero.mind.setActionGenerator(actionGenerator);
+			} catch (Exception e) {
+				throw new AgentException(hero, hero + " setActionGenerator() failed.", e);
+			}
+			try {
+				hero.mind.setActionValidator(actionValidator);
+			} catch (Exception e) {
+				throw new AgentException(hero, hero + " setActionValidator() failed.", e);
+			}
+		}
+		for (AgentMindBody<Monster, IMonsterAgent> monster : config.state.monsters.values()) {
+			try {
+				monster.mind.setActionGenerator(actionGenerator);
+			} catch (Exception e) {
+				throw new AgentException(monster, monster + " setActionGenerator() failed.", e);
+			}	
+			try {
+				monster.mind.setActionValidator(actionValidator);
+			} catch (Exception e) {
+				throw new AgentException(monster, monster + " setActionValidator() failed.", e);
+			}	
+		}
+		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
+			try {
+				feature.mind.setActionGenerator(actionGenerator);
+			} catch (Exception e) {
+				throw new AgentException(feature, feature + " setActionGenerator() failed.", e);
+			}	
+			try {
+				feature.mind.setActionValidator(actionValidator);
+			} catch (Exception e) {
+				throw new AgentException(feature, feature + " setActionValidator() failed.", e);
+			}
+		}
+	}
+	
+	private void prepareAgents() {
+		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
+			try {
+				hero.mind.prepareAgent();
+			} catch (Exception e) {
+				throw new AgentException(hero, hero + " prepareAgent() failed.", e);
+			}
+		}
+		for (AgentMindBody<Monster, IMonsterAgent> monster : config.state.monsters.values()) {
+			try {
+				monster.mind.prepareAgent();
+			} catch (Exception e) {
+				throw new AgentException(monster, monster + " prepareAgent() failed.", e);
+			}			
+		}
+		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
+			try {
+				feature.mind.prepareAgent();
+			} catch (Exception e) {
+				throw new AgentException(feature, feature + " prepareAgent() failed.", e);
+			}	
+		}
+	}
+	
+	private void startSimulation() {
+		eventsTracker.event().simulationBegin(config.state);
+		startAgents();
+	}
+	
+	private void startAgents() {
+		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
+			try {
+				hero.mind.simulationStarted();
+			} catch (Exception e) {
+				throw new AgentException(hero, hero + " simulationStarted() failed.", e);
+			}
+		}
+		for (AgentMindBody<Monster, IMonsterAgent> monster : config.state.monsters.values()) {
+			try {
+				monster.mind.simulationStarted();
+			} catch (Exception e) {
+				throw new AgentException(monster, monster + " simulationStarted() failed.", e);
+			}			
+		}
+		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
+			try {
+				feature.mind.simulationStarted();
+			} catch (Exception e) {
+				throw new AgentException(feature, feature + " simulationStarted() failed.", e);
+			}	
+		}
+	}
+	
+	private void endSimulation() {
+		try {
+			endAgents();
+		} catch (Exception e) {			
+		}
+		try {
+			eventsTracker.event().simulationEnd(simulationResult);
+		} catch (Exception e) {			
+		}		
+	}
+	
+	private void endAgents() {
+		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
+			try {
+				hero.mind.simulationEnded();
+			} catch (Exception e) {
+			}
+		}
+		for (AgentMindBody<Monster, IMonsterAgent> monster : config.state.monsters.values()) {
+			try {
+				monster.mind.simulationEnded();
+			} catch (Exception e) {
+			}			
+		}
+		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
+			try {
+				feature.mind.simulationEnded();
+			} catch (Exception e) {
+			}	
+		}
 	}
 
 	private void tick() {
@@ -197,7 +342,7 @@ public class SimStatic {
 				// ACT
 				hero.body.action = hero.mind.act();
 			} catch (Exception e) {
-				throw new AgentException("Hero[" + hero.body.id + ",mind=" + hero.mind.getClass() + "] failed.", e);
+				throw new AgentException(hero, hero + " observe/act failed.", e);
 			}
 			if (hero.body.action != null) {
 				hero.body.action.who = hero.body;				
@@ -221,7 +366,7 @@ public class SimStatic {
 					monster.body.action.who = monster.body;
 				}
 			} catch (Exception e) {
-				throw new AgentException("Monster[" + monster.body.id + ",mind=" + monster.mind.getClass() + "] failed.", e);
+				throw new AgentException(monster, monster + " observe/act failed.", e);
 			}
 			// SUBSCRIBE
 			subscribeAction(monster.body);		
@@ -245,7 +390,7 @@ public class SimStatic {
 					feature.body.action.who = feature.body;
 				}
 			} catch (Exception e) {
-				throw new AgentException("Feature[" + feature.body.id + ",mind=" + feature.mind.getClass() + "] failed.", e);
+				throw new AgentException(feature, feature + " act() failed.", e);
 			}
 			// SUBSCRIBE
 			subscribeAction(feature.body);
@@ -506,7 +651,7 @@ public class SimStatic {
 		return hero.body.alive && hero.body.atRoom != null && hero.body.atRoom.label != null && hero.body.atRoom.label == ERoomLabel.GOAL;
 	}
 	
-	private SimResult end() {
+	private SimResult createSimulationResult() {
 		if (isVictory()) {
 			return victory();
 		}
@@ -553,14 +698,6 @@ public class SimStatic {
 	
 	private boolean isException() {
 		return resultException != null;
-	}
-	
-	private SimResult simException(Throwable exception, SimResultType type) {
-		return exception(exception, SimResultType.SIMULATION_EXCEPTION);
-	}
-	
-	private SimResult agentException(Throwable exception, SimResultType type) {
-		return exception(exception, SimResultType.AGENT_EXCEPTION);
 	}
 	
 	private SimResult exception(Throwable exception, SimResultType type) {

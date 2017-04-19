@@ -1,5 +1,6 @@
 package cz.dd4j.utils.config;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
@@ -97,6 +98,19 @@ public class ConfigMap extends HashMap<String, Object> {
 		if (containsKey(key)) return Convert.toBoolean(get(key));
 		return defaultValue;
 	}
+	
+	public File getFile(String key) {
+		return getFile(key, null);
+	}
+	
+	public File getFile(String key, File defaultValue) {
+		if (containsKey(key)) {
+			File value = Convert.toFile(get(key));
+			if (value == null) return defaultValue;
+			return value;
+		}
+		return defaultValue;
+	}
 
 	public String describe() {
 		StringBuffer sb = new StringBuffer();
@@ -122,6 +136,13 @@ public class ConfigMap extends HashMap<String, Object> {
 		autoConfig(object, cls);
 	}
 	
+	/**
+	 * Tries to auto-config 'object'. Auto-configs all {@link Configurable} annotated field (class hierarchy-wise); recursively auto-configures fields that are of class
+	 * annotated with {@link AutoConfig} as well. Fields are configured ONLY IFF we have corresponding entry (based on field names) within the map.
+	 * 
+	 * @param object
+	 * @param classInfo
+	 */
 	public void autoConfig(Object object, Class classInfo) {
 		if (classInfo == null) return;
 		if (classInfo == Object.class) return;
@@ -129,6 +150,15 @@ public class ConfigMap extends HashMap<String, Object> {
 		for (Field field : classInfo.getDeclaredFields()) {
 			if (field.isAnnotationPresent(Configurable.class)) {
 				autoConfigField(object, classInfo, field);
+			} else 
+			if (field.getType().isAnnotationPresent(AutoConfig.class)) {
+				try {
+					field.setAccessible(true);
+					Object fieldValue = field.get(object);
+					autoConfig(fieldValue);
+				} catch (Exception e) {
+					throw new RuntimeException("Failed to recursively auto-configure field '" + field.getName() + "' of class " + classInfo + " on object " + object + ".", e);
+				}
 			}
 		}
 		
@@ -150,12 +180,15 @@ public class ConfigMap extends HashMap<String, Object> {
 		} else
 		if (field.getType() == double.class || field.getType() == Double.class) {
 			autoConfigFieldDouble(object, classInfo, field, fieldName);
-		} else
+		} else		
 		if (field.getType() == long.class || field.getType() == Long.class) {
 			autoConfigFieldLong(object, classInfo, field, fieldName);
 		} else
 		if (field.getType() == float.class || field.getType() == Float.class) {
 			autoConfigFieldFloat(object, classInfo, field, fieldName);
+		} else
+		if (field.getType() == File.class) {
+			autoConfigFieldFile(object, classInfo, field, fieldName);
 		} else {
 			throw new RuntimeException("Auto-configuration of field of type " + field.getType() + " is unsupported, failed to auto-configure field '" + fieldName + "' of class " + classInfo + " on object " + object + ".");
 		}
@@ -215,6 +248,16 @@ public class ConfigMap extends HashMap<String, Object> {
 		try {
 			field.setAccessible(true);
 			float value = getFloat(fieldName);
+			field.set(object, value);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to auto-configure field '" + fieldName + "' of class " + classInfo + " on object " + object + ".", e);
+		}
+	}
+	
+	private void autoConfigFieldFile(Object object, Class classInfo, Field field, String fieldName) {		
+		try {
+			field.setAccessible(true);
+			File value = getFile(fieldName);
 			field.set(object, value);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to auto-configure field '" + fieldName + "' of class " + classInfo + " on object " + object + ".", e);

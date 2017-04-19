@@ -8,9 +8,10 @@ import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.actions.IActionsGenerator;
+import cz.dd4j.simulation.actions.IActionsValidator;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Entity;
 
-public class InstantActionsGenerator implements IActionsGenerator {
+public class InstantActions implements IActionsGenerator, IActionsValidator {
 
 	/**
 	 * [EEntity.id][EAction.id]
@@ -20,7 +21,7 @@ public class InstantActionsGenerator implements IActionsGenerator {
 	/**
 	 * @param actionExecutors [EEntity.id][EAction.id]
 	 */
-	public InstantActionsGenerator(IInstantAction[][] actionExecutors) {
+	public InstantActions(IInstantAction[][] actionExecutors) {
 		this.actionExecutors = actionExecutors;
 	}
 
@@ -63,6 +64,19 @@ public class InstantActionsGenerator implements IActionsGenerator {
 		actionExecutors[entityType.entityId][actionType.id].generateActionsFor(entity, result);
 		
 		return result;
+	}
+
+	@Override
+	public boolean isValid(Entity entity, Command action) {
+		if (entity == null) return false;
+		if (entity.type == null) return false;
+		EEntity entityType = EH.getAs(entity.type, EEntity.class);
+		
+		if (action == null) return false;
+		if (action.type == null) return false;		
+		if (action.type.id < 0 || action.type.id > actionExecutors[entityType.entityId].length) return false;
+		
+		return actionExecutors[entityType.entityId][action.type.id].isValid(entity, action);		
 	}
 	
 }

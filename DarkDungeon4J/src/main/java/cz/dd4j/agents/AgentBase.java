@@ -7,6 +7,7 @@ import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.actions.IActionsGenerator;
+import cz.dd4j.simulation.actions.IActionsValidator;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Entity;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.ConfigMap;
@@ -18,6 +19,7 @@ public class AgentBase implements IAgent, IConfigurable {
 	
 	protected Random random;
 	protected IActionsGenerator actionsGenerator;
+	protected IActionsValidator actionValidator;
 	
 
 	public AgentBase(EEntity agentType) {
@@ -28,6 +30,10 @@ public class AgentBase implements IAgent, IConfigurable {
 	public EEntity getAgentType() {
 		return agentType;
 	}
+	
+	// =============
+	// CONFIGURATION
+	// =============
 	
 	@Override
 	public void setRandom(Random random) {
@@ -40,9 +46,38 @@ public class AgentBase implements IAgent, IConfigurable {
 	}
 	
 	@Override
+	public void setActionValidator(IActionsValidator actionValidator) {
+		this.actionValidator = actionValidator;
+	}
+	
+	@Override
 	public void configure(ConfigMap config) {
 		if (getClass().isAnnotationPresent(AutoConfig.class)) config.autoConfig(this);
 	}
+	
+	// =====================
+	// SIMULATION LIFE-CYCLE
+	// =====================
+	
+	@Override
+	public void prepareAgent() {
+	}
+	
+	@Override
+	public void simulationStarted() {
+	}
+	
+	@Override
+	public void agentDead() {
+	}
+	
+	@Override
+	public void simulationEnded() {		
+	}
+	
+	// ===========
+	// AGENT UTILS
+	// ===========
 	
 	/**
 	 * Generates random action for the entity given its 'body' state using {@link #actionsGenerator} provided by the simulation through {@link #setActionGenerator(IActionsGenerator)}.

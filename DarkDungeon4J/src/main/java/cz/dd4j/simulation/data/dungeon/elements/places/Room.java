@@ -3,6 +3,7 @@ package cz.dd4j.simulation.data.dungeon.elements.places;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.amis.utils.eh4j.shortcut.EH;
 import cz.dd4j.domain.EPlace;
 import cz.dd4j.domain.ERoomLabel;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
@@ -45,6 +46,10 @@ public class Room extends Place {
 	
 	public Room() {
 		super(EPlace.ROOM);
+	}
+	
+	public boolean isGoalRoom() {
+		return EH.isA(label, ERoomLabel.GOAL);
 	}
 	
 	@Override

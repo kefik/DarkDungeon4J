@@ -46,27 +46,27 @@ public class HeroSemiRandom extends HeroAgentBase {
 			Room otherRoom = corridor.getOtherRoom(hero.atRoom);
 			if (otherRoom.monster != null && (hero.hand == null || hero.hand.type != EItem.SWORD)) continue;
 			if (otherRoom.feature != null && otherRoom.feature.type == EFeature.TRAP && hero.hand != null) continue;
-			result.add(new Command(EAction.MOVE, corridor.getOtherRoom(hero.atRoom)));
+			result.add(actions.move(corridor.getOtherRoom(hero.atRoom)));
 		}
 		
 		// ATTACK ACTIONS
 		if (hero.atRoom.monster != null && hero.hand != null && hero.hand.type == EItem.SWORD) {
-			result.add(new Command(EAction.ATTACK, hero.atRoom.monster));
+			result.add(actions.attack());
 		}
 		
 		// DISARM ACTIONS
 		if (hero.hand == null && hero.atRoom.feature != null && hero.atRoom.feature.type == EFeature.TRAP) {
-			result.add(new Command(EAction.DISARM, hero.atRoom.feature));
+			result.add(actions.disarm());
 		}
 				
 		// DROP
 		if (hero.hand != null) {
-			result.add(new Command(EAction.DROP, hero.hand));
+			result.add(actions.drop());
 		}
 		
 		// PICKUP
 		if (hero.atRoom.item != null) {
-			result.add(new Command(EAction.PICKUP, hero.atRoom.item));
+			result.add(actions.pickup());
 		}
 		
 		return result;

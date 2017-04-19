@@ -81,6 +81,8 @@ public interface ISimEvents {
 	
 	/**
 	 * Simulation has ended with {@link SimResult}.
+	 * 
+	 * WARNING: all exceptions thrown by this are ignored and not logged!
 	 * @param result
 	 */
 	public void simulationEnd(SimResult result);

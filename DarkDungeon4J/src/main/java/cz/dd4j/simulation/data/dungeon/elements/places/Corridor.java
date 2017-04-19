@@ -50,6 +50,20 @@ public class Corridor extends Place {
 		}
 	}
 	
+	public boolean leadsTo(Room room) {
+		return room1 == room || room2 == room;
+	}
+	
+	public boolean leadsTo(Id roomId) {
+		return room1.id == roomId || room2.id == roomId;
+	}
+	
+	public Room getRoom(Id roomId) {
+		if (room1.id == roomId) return room1;
+		if (room2.id == roomId) return room2;
+		return null;
+	}
+	
 	public Room getOtherRoom(Room room) {
 		return getOtherRoom(room.id);
 	}
