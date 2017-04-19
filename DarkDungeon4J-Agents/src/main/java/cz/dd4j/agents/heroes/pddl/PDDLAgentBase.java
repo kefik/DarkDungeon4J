@@ -30,7 +30,7 @@ import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
 @AutoConfig
-public abstract class PDDLAgent extends HeroAgentBase {
+public abstract class PDDLAgentBase extends HeroAgentBase {
 	
 	// =============
 	// CONFIGURATION
@@ -43,7 +43,7 @@ public abstract class PDDLAgent extends HeroAgentBase {
 	protected String domainName = "DarkDungeon";
 	
 	@Configurable
-	protected File agentWorkingDir = new File("./temp");
+	protected File agentWorkingDirBase = new File("./temp");
 		
 	// ============
 	// PDDL RUNTIME
@@ -53,6 +53,8 @@ public abstract class PDDLAgent extends HeroAgentBase {
 	 * Used to generate temporary files worked with by the agent...
 	 */
 	protected UUID uuid;
+	
+	protected File agentWorkingDir;
 	
 	protected boolean workingDirExisted = true;
 	
@@ -78,7 +80,12 @@ public abstract class PDDLAgent extends HeroAgentBase {
 	@Override
 	public void prepareAgent() {
 		super.prepareAgent();
+				
 		uuid = UUID.randomUUID();
+		
+		agentWorkingDir = new File(agentWorkingDirBase, uuid.toString());
+		agentWorkingDir.deleteOnExit();
+		
 		if (!agentWorkingDir.exists()) {
 			workingDirExisted = false;
 			agentWorkingDir.mkdirs();
@@ -271,7 +278,7 @@ public abstract class PDDLAgent extends HeroAgentBase {
 		try {
 			// we have domainFile and problemFile
 			// => EXECUTE THE PLANNER			
-			plannerResult = execPlanner(domainFile, problemFile);
+			return execPlanner(domainFile, problemFile);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to execute the planner.", e);
 		} finally {
@@ -280,18 +287,6 @@ public abstract class PDDLAgent extends HeroAgentBase {
 			} catch (Exception e) {				
 			}
 		}
-		
-		if (plannerResult == null || plannerResult.trim().length() == 0) {
-			return null;
-		}
-		
-		String[] lines = plannerResult.split("\n");
-		List<PDDLAction> result = new ArrayList<PDDLAction>(lines.length);
-		for (String line : lines) {
-			result.add(PDDLAction.parse(line));
-		}	
-
-		return result;
 	}
 	
 	/**
@@ -300,14 +295,14 @@ public abstract class PDDLAgent extends HeroAgentBase {
 	 * @param problemFile
 	 * @return
 	 */
-	protected abstract String execPlanner(File domainFile, File problemFile) throws Exception;
+	protected abstract List<PDDLAction> execPlanner(File domainFile, File problemFile) throws Exception;
 	
 	// =======================
 	// PDDL PROBLEM GENERATION
 	// =======================
 
 	protected File generateProblemFile() {
-		File targetFile = getTempFile("problem.pddl");
+		File targetFile = getWorkingFile("problem.pddl");
 		FileOutputStream outStream = null;
 		PrintWriter print = null;
 		try {
@@ -417,8 +412,25 @@ public abstract class PDDLAgent extends HeroAgentBase {
 	// UTILS
 	// =====
 	
-	protected File getTempFile(String name) {
-		return new File(agentWorkingDir, uuid.toString() + "." + name);
+	protected File getWorkingFile(String name) {
+		return new File(agentWorkingDir, name);
+	}
+	
+	protected List<PDDLAction> parseLines(String lines) {
+		if (lines == null || lines.trim().length() == 0) {
+			return null;
+		}
+		
+		String[] parts = lines.split("\n");
+		List<PDDLAction> result = new ArrayList<PDDLAction>(parts.length);
+		for (String line : parts) {
+			PDDLAction action = PDDLAction.parseSOL(line);
+			if (action != null) {
+				result.add(action);
+			}
+		}	
+
+		return result;
 	}
 
 }

@@ -32,7 +32,7 @@ public class PDDLAction {
 	
 	private static Pattern actionPattern = Pattern.compile("[^(]*\\(\\s*(\\w*)\\s*(\\w*)?\\s*(\\w*)?\\s*\\)\\s*");
 	
-	public static PDDLAction parse(String line) {
+	public static PDDLAction parseSOL(String line) {
 		PDDLAction result = new PDDLAction();
 		
 		Matcher matcher = actionPattern.matcher(line);
@@ -43,7 +43,7 @@ public class PDDLAction {
 		}
 		
 		if (result.action == null) {
-			throw new RuntimeException("Cannot parse PDDLAction from string: " + line);
+			return null;
 		}
 		
 		return result;
