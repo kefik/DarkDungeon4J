@@ -2,29 +2,15 @@ package cz.dd4j.agents;
 
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EEntity;
-import cz.dd4j.simulation.actions.IActionsGenerator;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
-import cz.dd4j.utils.config.ConfigMap;
-import cz.dd4j.utils.config.IConfigurable;
 
-public class HeroAgentBase implements IHeroAgent, IConfigurable {
-
-	protected IActionsGenerator actionsGenerator;
+public abstract class HeroAgentBase extends AgentBase implements IHeroAgent {
+	
 	protected Hero hero;
 
-	@Override
-	public EEntity getAgentType() {
-		return EEntity.HERO;
-	}
-	
-	@Override
-	public void configure(ConfigMap config) {
-	}
-	
-	@Override
-	public void setActionGenerator(IActionsGenerator actionGenerator) {
-		this.actionsGenerator = actionGenerator;
+	public HeroAgentBase() {
+		super(EEntity.HERO);
 	}
 
 	@Override
@@ -37,8 +23,6 @@ public class HeroAgentBase implements IHeroAgent, IConfigurable {
 	}
 
 	@Override
-	public Command act() {
-		return null;
-	}
+	public abstract Command act();
 
 }

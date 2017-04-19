@@ -27,21 +27,15 @@ import cz.dd4j.simulation.data.dungeon.elements.places.Room;
  */
 public class HeroSemiRandom extends HeroAgentBase {
 
-	private Random random;
-	
 	public HeroSemiRandom() {
 		random = new Random();
 	}
-	
-	public HeroSemiRandom(long seed) {
-		random = new Random(seed);
-	}
-	
+		
 	@Override
 	public Command act() {
 		List<Command> actions = generateActions(hero);	
 		if (actions.size() == 0) return null;
-		return actions.get(random.nextInt(actions.size()));
+		return getRandomAction(actions, true);
 	}
 	
 	private List<Command> generateActions(Hero hero) {

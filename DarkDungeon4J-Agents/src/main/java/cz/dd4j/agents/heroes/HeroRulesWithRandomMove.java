@@ -25,18 +25,8 @@ import cz.dd4j.simulation.data.dungeon.elements.places.Room;
  */
 public class HeroRulesWithRandomMove extends HeroAgentBase implements IHeroAgent {
 
-	private Random random;
-	
 	private Command moveIntention;
 	
-	public HeroRulesWithRandomMove() {
-		random = new Random();
-	}
-	
-	public HeroRulesWithRandomMove(long seed) {
-		random = new Random(seed);
-	}	
-
 	@Override
 	public Command act() {
 		if (hero.atRoom.monster != null && hero.hand != null && hero.hand.type == EItem.SWORD) return new Command(EAction.ATTACK, hero.atRoom.monster);

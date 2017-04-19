@@ -194,7 +194,7 @@ public class SimStatic {
 				// OBSERVE
 				hero.mind.observeBody(hero.body, currentTickMillis);
 				hero.mind.observeDungeon(config.state.dungeon, true, currentTickMillis);			
-				// GET ACT
+				// ACT
 				hero.body.action = hero.mind.act();
 			} catch (Exception e) {
 				throw new AgentException("Hero[" + hero.body.id + ",mind=" + hero.mind.getClass() + "] failed.", e);
@@ -213,8 +213,10 @@ public class SimStatic {
 		for (AgentMindBody<Monster, IMonsterAgent> monster : config.state.monsters.values()) {
 			if (!monster.body.alive) continue;
 			try {
-				// OBSERVE+ACT
-				monster.body.action = monster.mind.act(monster.body.atRoom, monster.body.atCorridor);
+				// OBSERVE
+				monster.mind.observeBody(monster.body, currentTickMillis);
+				// ACT
+				monster.body.action = monster.mind.act();
 				if (monster.body.action != null) {
 					monster.body.action.who = monster.body;
 				}

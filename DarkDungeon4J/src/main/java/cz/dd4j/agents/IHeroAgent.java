@@ -17,14 +17,6 @@ public interface IHeroAgent extends IAgent {
 	// zamyslet se i nad scoringem?
 	
 	/**
-	 * Binds action generator into the agent; a generator can be used to easily implement random/semi-random agents
-	 * or eases automated learning.
-	 * 
-	 * @param actionGenerator
-	 */
-	public void setActionGenerator(IActionsGenerator actionGenerator);
-	
-	/**
 	 * Hero's body update.
 	 * @param hero
 	 */
@@ -37,6 +29,13 @@ public interface IHeroAgent extends IAgent {
 	 */
 	public void observeDungeon(Dungeon dungeon, boolean full, long timestampMillis);
 	
+	/**
+	 * Hero should decide what to do.
+	 * 
+	 * Return null for no-action.
+	 * 
+	 * @return
+	 */
 	public Command act();
 	
 }

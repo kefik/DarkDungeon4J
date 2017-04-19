@@ -1,18 +1,26 @@
 package cz.dd4j.agents;
 
 import cz.dd4j.agents.commands.Command;
-import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
-import cz.dd4j.simulation.data.dungeon.elements.places.Room;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 
 public interface IMonsterAgent extends IAgent {
 
 	/**
-	 * Exactly one parameter is non-null and vice versa.
+	 * Monster's body update.
 	 * 
-	 * @param room
-	 * @param corridor
+	 * @param monster
+	 * @param currentTickMillis 
 	 * @return
 	 */
-	public Command act(Room room, Corridor corridor);
+	public void observeBody(Monster monster, long currentTickMillis);
+	
+	/**
+	 * Monster should decide what to do.
+	 * 
+	 * Return null for no-action.
+	 * 
+	 * @return
+	 */
+	public Command act();
 	
 }

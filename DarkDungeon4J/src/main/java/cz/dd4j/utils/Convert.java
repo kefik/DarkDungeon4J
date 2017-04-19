@@ -8,10 +8,22 @@ public class Convert {
 		return Integer.parseInt(obj.toString());
 	}
 	
+	public static Long toLong(Object obj) {
+		if (obj == null) return null;
+		if (obj instanceof Long) return (Long)(obj);
+		return Long.parseLong(obj.toString());
+	}
+	
 	public static Double toDouble(Object obj) {
 		if (obj == null) return null;
 		if (obj instanceof Double) return (Double)(obj);
 		return Double.parseDouble(obj.toString());
+	}
+	
+	public static Float toFloat(Object obj) {
+		if (obj == null) return null;
+		if (obj instanceof Float) return (Float)(obj);
+		return Float.parseFloat(obj.toString());
 	}
 	
 	public static String toString(Object obj) {
@@ -35,5 +47,7 @@ public class Convert {
 		
 		return false;
 	}
+
+	
 	
 }
