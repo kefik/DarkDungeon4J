@@ -1,5 +1,5 @@
 <agents>
-  <agent id="Trap1">
+  <agent id="trap1">
     <agentFQCN>cz.dd4j.agents.features.TrapAgent</agentFQCN>
     <!--
     <config>    

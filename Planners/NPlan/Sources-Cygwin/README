@@ -1,0 +1,12 @@
+
+2010, 2011, 2012 (C) Jussi Rintanen
+
+
+Compilation:
+   Choose between M and Mp by commenting/uncommenting the lines for
+   VERSION and EXECUTABLE in Makefile
+   make
+
+The command line for the executables consist of a number of options and
+the names of input file names. With an empty command line you get the list
+of options together with information on the default configuration.

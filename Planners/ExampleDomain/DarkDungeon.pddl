@@ -1,0 +1,76 @@
+(define (domain DarkDungeon)
+(:requirements :typing :negative-preconditions :conditional-effects)
+(:types room item - object
+        sword - item
+)
+
+(:predicates (hero_at ?r - room)
+             (monster_at ?r - room)
+             (trap_at ?r - room)
+             ;(item_at ?i - item ?r - room)
+             ;(carries ?i - item)
+             (sword_at ?r - room)
+             (has_sword)
+             (connected ?r1 ?r2 - room)
+             (alive)
+)
+
+(:action move
+:parameters (?r1 ?r2 - room)
+:precondition (and (alive)
+                   (connected ?r1 ?r2)
+                   (hero_at ?r1))
+:effect (and (not (hero_at ?r1))
+             (hero_at ?r2)
+             (when (and (not (has_sword))(monster_at ?r2))(not (alive)))
+             (when (trap_at ?r1)(not (alive))))
+)
+
+(:action pickup_sword
+:parameters (?r - room)
+:precondition (and (alive)
+                   (hero_at ?r)
+                   (sword_at ?r)
+              )
+:effect (and (not (sword_at ?r))
+             (has_sword)
+             (when (trap_at ?r)(not (alive)))
+        )
+)
+
+(:action drop_sword
+:parameters (?r - room)
+:precondition (and (alive)
+                   (hero_at ?r)
+                   (has_sword)
+              )
+:effect (and (sword_at ?r)
+             (not (has_sword))
+             (when (trap_at ?r)(not (alive)))
+             (when (monster_at ?r)(not (alive)))
+        )
+)
+
+(:action disarm
+:parameters (?r - room)
+:precondition (and (alive)
+                   (hero_at ?r)
+                   (trap_at ?r)
+                   (not (has_sword))
+              )
+:effect (and (not (trap_at ?r)))
+)
+
+(:action kill
+:parameters (?r - room)
+:precondition (and (alive)
+                   (hero_at ?r)
+                   (monster_at ?r)
+                   (has_sword)
+              )
+:effect (and (not (monster_at ?r))
+             (when (trap_at ?r)(not (alive)))
+               )
+)
+
+)

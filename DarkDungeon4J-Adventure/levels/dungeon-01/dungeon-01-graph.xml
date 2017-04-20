@@ -1,10 +1,10 @@
 <dungeon>
-    <room id="Room1" />    
-    <room id="Room2" />    
-    <room id="Room3" />    
-    <room id="Room4" />    
+    <room id="room1" />    
+    <room id="room2" />    
+    <room id="room3" />    
+    <room id="room4" />    
     
-    <corridor room1Id="Room1" room2Id="Room2" />
-    <corridor room1Id="Room2" room2Id="Room3" />
-    <corridor room1Id="Room3" room2Id="Room4" />
+    <corridor room1Id="room1" room2Id="room2" />
+    <corridor room1Id="room2" room2Id="room3" />
+    <corridor room1Id="room3" room2Id="room4" />
 </dungeon>

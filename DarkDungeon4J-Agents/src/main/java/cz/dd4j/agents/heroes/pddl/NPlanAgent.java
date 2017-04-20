@@ -45,7 +45,6 @@ public class NPlanAgent extends PDDLAgentBase {
 	@Override
 	protected List<PDDLAction> execPlanner(File domainFile, File problemFile) throws Exception {
 		// ./nplan domain.pddl problem.pddl -o plan.SOL -Q
-		// SEE: https://www.overleaf.com/9055139bwywfzfxppbk
 		
 		File resultFile = new File(nplanWorkingDir, "plan.SOL");
 		

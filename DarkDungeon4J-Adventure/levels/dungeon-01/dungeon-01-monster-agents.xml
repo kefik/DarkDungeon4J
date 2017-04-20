@@ -1,5 +1,5 @@
 <agents>
-  <agent id="Monster1">
+  <agent id="monster1">
     <agentFQCN>cz.dd4j.agents.monsters.StaticMonsterAgent</agentFQCN>
     <!--
     <config>    

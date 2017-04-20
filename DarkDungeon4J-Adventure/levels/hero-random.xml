@@ -1,5 +1,5 @@
 <agents>
-  <agent id="Hero1">
+  <agent id="hero1">
     <agentFQCN>cz.dd4j.agents.heroes.HeroRandom</agentFQCN>
     <!--
     <config>

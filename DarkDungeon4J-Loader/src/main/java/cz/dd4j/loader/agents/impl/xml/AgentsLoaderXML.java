@@ -25,12 +25,12 @@ public class AgentsLoaderXML<AGENT extends IAgent> extends LoaderXML<AgentsXML> 
 		
 		Agents<AGENT> result = new Agents<AGENT>();
 		
-		for (AgentXML featureXML : agents.agents) {
-			if (result.agents.containsKey(featureXML.id)) {
-				throw new RuntimeException("There are two Feature[id=" + featureXML.id + "] defined within: " + xmlFile.getAbsolutePath());
+		for (AgentXML agentXML : agents.agents) {
+			if (result.agents.containsKey(agentXML.id)) {
+				throw new RuntimeException("There are two Feature[id=" + agentXML.id + "] defined within: " + xmlFile.getAbsolutePath());
 			}
-			AGENT agent = createAgent(featureXML);
-			result.agents.put(featureXML.id, agent);
+			AGENT agent = createAgent(agentXML);
+			result.agents.put(agentXML.id, agent);
 		}
 		
 		return result;

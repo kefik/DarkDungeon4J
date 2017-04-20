@@ -1,0 +1,25 @@
+<agents>
+  <agent id="hero1">
+    <agentFQCN>cz.dd4j.agents.heroes.pddl.NPlanCygwinAgent</agentFQCN>
+    <config>
+        <key>nplanFolder</key>
+        <value>../Planners/NPlan/Bin-Cygwin</value>        
+    </config>    
+    <config>
+        <key>nplanBatchFile</key>
+        <value>nplan.bat</value>
+    </config>
+    <config>
+        <key>domainFile</key>
+        <value>./levels/DarkDungeon.pddl</value>
+    </config>
+    <config>
+        <key>domainName</key>
+        <value>DarkDungeon</value>
+    </config>
+    <config>
+        <key>agentWorkingDirBase</key>
+        <value>./temp</value>
+    </config>    
+  </agent>
+</agents>

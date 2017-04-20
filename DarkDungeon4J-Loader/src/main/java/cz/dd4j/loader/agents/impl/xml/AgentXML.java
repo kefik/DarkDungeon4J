@@ -23,5 +23,10 @@ public class AgentXML {
 	
 	@XStreamImplicit(itemFieldName="config")
 	public List<ConfigXML> config;
+	
+	@Override
+	public String toString() {
+		return "AgentXML[id=" + id + ",name=" + name + ",agentFQCN=" + agentFQCN + ",#config=" + (config == null ? "null" : config.size()) + "]";
+	}
 
 }
