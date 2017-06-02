@@ -18,8 +18,14 @@ public class Main {
 		
 		Generator generator = new Generator(config);
 		
-		//generator.generateRooms(4, 16);
-		generator.generateGrid(4, 16);
+		//generator.generateRooms(4, 100);
+		
+		//generator.generateGrid(4, 100);
+			
+		//generator.generateSphere(4, 100);
+		
+		// Mazes 5x5 -> 10x10, 5 random mazes per dimension, 0-3 extra junctions (0 == no circles in the graph)
+		generator.generateMazes(5, 5, 10, 10, 10, 5);
 		
 	}
 	

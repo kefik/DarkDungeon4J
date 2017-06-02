@@ -7,6 +7,7 @@ import cz.dd4j.generator.GeneratorBase;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
 import cz.dd4j.loader.dungeon.impl.xml.RoomXML;
+import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Id;
 
 
@@ -39,7 +40,7 @@ public class RoomsGenerator extends GeneratorBase<RoomsGeneratorConfig> {
 			dungeon.rooms.add(GeneratorUtils.generateRoom(i));
 		}
 		
-		write(targetFile, dungeon, DungeonLoaderXML.class);
+		write(targetFile, dungeon, DungeonLoaderXML.class, "#Rooms: " + roomCount + Const.NEW_LINE + "Room id format: " + GeneratorUtils.roomId(1) + ", " + GeneratorUtils.roomId(2) + ", ..., " + GeneratorUtils.roomId(roomCount));
 	}
 
 	

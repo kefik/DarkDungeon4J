@@ -2,6 +2,7 @@ package cz.dd4j.generator;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -9,6 +10,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import cz.dd4j.loader.LoaderXML;
 import cz.dd4j.loader.meta.MetaInfo;
+import cz.dd4j.utils.Const;
 
 public abstract class GeneratorBase<CONFIG extends GeneratorConfig> {
 
@@ -42,6 +44,10 @@ public abstract class GeneratorBase<CONFIG extends GeneratorConfig> {
 	}
 	
 	protected void write(File targetFile, Object data, Class loaderClass) {
+		write(targetFile, data, loaderClass, null);
+	}
+	
+	protected void write(File targetFile, Object data, Class loaderClass, String comment) {
 		ensureDirsForFile(targetFile);
 		
 		config.log.info(getClass().getSimpleName() + ".write(): writing file " + targetFile.getAbsolutePath());
@@ -50,6 +56,13 @@ public abstract class GeneratorBase<CONFIG extends GeneratorConfig> {
 		
 		try {
 			out = new FileOutputStream(targetFile);
+			if (comment != null) {
+				PrintWriter writer = new PrintWriter(out);
+				writer.print("<!--" + Const.NEW_LINE);
+				writer.print(formatComment(comment));
+				writer.print(" -->" + Const.NEW_LINE);
+				writer.flush();				
+			}
 			xstream.toXML(data, out);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save data into: " + targetFile.getAbsolutePath());
@@ -65,6 +78,19 @@ public abstract class GeneratorBase<CONFIG extends GeneratorConfig> {
 		writeLoaderMeta(targetFile, loaderClass);
 	}
 	
+	private String formatComment(String comment) {
+		String[] parts = comment.split(Const.NEW_LINE_WIN);
+		if (parts.length == 1) parts = comment.split(Const.NEW_LINE_LINUX);
+		StringBuffer result = new StringBuffer();
+		
+		for (String line : parts) {
+			result.append("    " + line);
+			result.append(Const.NEW_LINE);
+		}
+		
+		return result.toString();
+	}
+
 	protected void writeLoaderMeta(File forFile, Class loaderClass) {
 		if (forFile == null) throw new RuntimeException("forFile is NULL");
 		if (loaderClass == null) throw new RuntimeException("loaderClass is NULL");

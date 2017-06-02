@@ -8,11 +8,12 @@ import cz.dd4j.loader.dungeon.impl.xml.CorridorXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
 import cz.dd4j.loader.dungeon.impl.xml.RoomXML;
+import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Id;
 
-public class GridCorridorsGenerator extends GeneratorBase<GridCorridorsGeneratorConfig> {
+public class GridCorridorsGenerator extends GeneratorBase<CorridorsGeneratorConfig> {
 
-	public GridCorridorsGenerator(GridCorridorsGeneratorConfig config) {
+	public GridCorridorsGenerator(CorridorsGeneratorConfig config) {
 		super(DungeonXML.class, config);
 	}
 
@@ -59,7 +60,7 @@ public class GridCorridorsGenerator extends GeneratorBase<GridCorridorsGenerator
 			}
 		}
 		
-		write(targetFile, dungeon, DungeonLoaderXML.class);
+		write(targetFile, dungeon, DungeonLoaderXML.class, "Grid (Width x Height): " + width + " x " + height + (width * height != roomCount ? " (incomplete)" : "") + Const.NEW_LINE + "Requires: Rooms" + roomCount + ".xml");
 	}
 	
 	private boolean isValidRoom(int room, int roomCount) {

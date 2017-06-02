@@ -7,7 +7,7 @@ import cz.dd4j.utils.Id;
 public class GeneratorUtils {
 
 	public static Id roomId(int roomNumber) {
-		return Id.get("Room" + roomNumber);
+		return Id.get("room" + roomNumber);
 	}
 	
 	public static RoomXML generateRoom(int roomId) {
