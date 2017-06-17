@@ -1,14 +1,28 @@
 package cz.dd4j.generator;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import cz.dd4j.generator.dungeon.CorridorsGeneratorConfig;
-import cz.dd4j.generator.dungeon.GridCorridorsGenerator;
-import cz.dd4j.generator.dungeon.RoomsGenerator;
-import cz.dd4j.generator.dungeon.RoomsGeneratorConfig;
-import cz.dd4j.generator.dungeon.SphereCorridorsGenerator;
-import cz.dd4j.generator.dungeon.corridors.maze.MazeCorridorsGenerator;
+import cz.dd4j.generator.agents.AgentsGenerator;
+import cz.dd4j.generator.agents.AgentsGeneratorConfig;
+import cz.dd4j.generator.dungeon.corridors.CorridorsGeneratorConfig;
+import cz.dd4j.generator.dungeon.corridors.GridCorridorsGenerator;
+import cz.dd4j.generator.dungeon.corridors.TorusCorridorsGenerator;
+import cz.dd4j.generator.dungeon.corridors.maze.MazeGenerator;
 import cz.dd4j.generator.dungeon.corridors.maze.MazeGeneratorConfig;
+import cz.dd4j.generator.dungeon.goals.GoalsGenerator;
+import cz.dd4j.generator.dungeon.goals.GoalsGeneratorConfig;
+import cz.dd4j.generator.dungeon.heroes.HeroesGenerator;
+import cz.dd4j.generator.dungeon.heroes.HeroesGeneratorConfig;
+import cz.dd4j.generator.dungeon.items.SwordsGenerator;
+import cz.dd4j.generator.dungeon.items.SwordsGeneratorConfig;
+import cz.dd4j.generator.dungeon.monsters.MonstersGenerator;
+import cz.dd4j.generator.dungeon.monsters.MonstersGeneratorConfig;
+import cz.dd4j.generator.dungeon.rooms.RoomsGenerator;
+import cz.dd4j.generator.dungeon.rooms.RoomsGeneratorConfig;
+import cz.dd4j.generator.dungeon.traps.TrapsGenerator;
+import cz.dd4j.generator.dungeon.traps.TrapsGeneratorConfig;
+import cz.dd4j.loader.agents.impl.xml.AgentXML;
 
 public class Generator {
 
@@ -31,6 +45,17 @@ public class Generator {
 		generator.generate();
 	}
 	
+	public void generateGoals(int roomsCount) {
+		GoalsGeneratorConfig config = new GoalsGeneratorConfig();
+		
+		config.roomsCount = roomsCount;		
+		config.assign(rootConfig);
+		
+		GoalsGenerator generator = new GoalsGenerator(config);
+		
+		generator.generate();
+	}
+	
 	public void generateGrid(int roomsCountFrom, int roomsCountTo) {
 		CorridorsGeneratorConfig config = new CorridorsGeneratorConfig();		
 		config.assign(rootConfig);
@@ -43,14 +68,14 @@ public class Generator {
 		generator.generate();
 	}
 	
-	public void generateSphere(int roomsCountFrom, int roomsCountTo) {
+	public void generateTorus(int roomsCountFrom, int roomsCountTo) {
 		CorridorsGeneratorConfig config = new CorridorsGeneratorConfig();		
 		config.assign(rootConfig);
 		
 		config.roomsCountFrom = roomsCountFrom;
 		config.roomsCountTo = roomsCountTo;
 		
-		SphereCorridorsGenerator generator = new SphereCorridorsGenerator(config);
+		TorusCorridorsGenerator generator = new TorusCorridorsGenerator(config);
 		
 		generator.generate();
 	}
@@ -59,10 +84,75 @@ public class Generator {
 		MazeGeneratorConfig config = new MazeGeneratorConfig(xFrom, xTo, yFrom, yTo, numberMazesPerDimension, maxExtraJunctions);		
 		config.assign(rootConfig);
 		
-		MazeCorridorsGenerator generator = new MazeCorridorsGenerator(config);
+		MazeGenerator generator = new MazeGenerator(config);
+		
+		generator.generate();		
+	}
+	
+	public void generateMonsters(int monstersCount, int roomsCount) {
+		MonstersGeneratorConfig config = new MonstersGeneratorConfig();
+		
+		config.monstersCount = monstersCount;
+		config.roomsCount = roomsCount;		
+		config.assign(rootConfig);
+		
+		MonstersGenerator generator = new MonstersGenerator(config);
+		
+		generator.generate();		
+	}
+	
+	public void generateHeroes(int heroesCount, int roomsCount) {
+		HeroesGeneratorConfig config = new HeroesGeneratorConfig();
+		
+		config.heroesCount = heroesCount;		
+		config.roomsCount = roomsCount;		
+		config.assign(rootConfig);
+		
+		HeroesGenerator generator = new HeroesGenerator(config);
+		
+		generator.generate();		
+	}
+	
+	public void generateTraps(int trapsCount, int roomsCount) {
+		TrapsGeneratorConfig config = new TrapsGeneratorConfig();
+				
+		config.trapsCount = trapsCount;
+		config.roomsCount = roomsCount;
+		config.assign(rootConfig);
+		
+		TrapsGenerator generator = new TrapsGenerator(config);
 		
 		generator.generate();
+	}
+	
+	public void generateSwords(int swordsCount) {
+		SwordsGeneratorConfig config = new SwordsGeneratorConfig();
 		
+		config.swordCount = swordsCount;		
+		config.assign(rootConfig);
+		
+		SwordsGenerator generator = new SwordsGenerator(config);
+		
+		generator.generate();
+	}
+	
+	public void generateAgents(String agentIdPrefix, String directory, int agentsCount, AgentXML... agentPrototypes) {
+		if (agentPrototypes == null || agentPrototypes.length == 0) return;
+		
+		AgentsGeneratorConfig config = new AgentsGeneratorConfig();
+		
+		config.agentIdPrefix = agentIdPrefix;
+		config.directory = directory;
+		config.agentsCount = agentsCount;	
+		config.agentPrototypes = new ArrayList<AgentXML>(agentPrototypes.length);
+		for (AgentXML agentPrototype : agentPrototypes) {
+			config.agentPrototypes.add(agentPrototype);
+		}
+		config.assign(rootConfig);
+		
+		AgentsGenerator generator = new AgentsGenerator(config);
+		
+		generator.generate();
 	}
 	
 	

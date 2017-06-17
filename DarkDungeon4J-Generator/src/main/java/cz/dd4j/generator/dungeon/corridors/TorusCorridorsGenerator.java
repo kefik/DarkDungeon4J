@@ -1,9 +1,10 @@
-package cz.dd4j.generator.dungeon;
+package cz.dd4j.generator.dungeon.corridors;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import cz.dd4j.generator.GeneratorBase;
+import cz.dd4j.generator.dungeon.GeneratorUtils;
 import cz.dd4j.loader.dungeon.impl.xml.CorridorXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
@@ -11,27 +12,27 @@ import cz.dd4j.loader.dungeon.impl.xml.RoomXML;
 import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Id;
 
-public class SphereCorridorsGenerator extends GeneratorBase<CorridorsGeneratorConfig> {
+public class TorusCorridorsGenerator extends GeneratorBase<CorridorsGeneratorConfig> {
 
-	public SphereCorridorsGenerator(CorridorsGeneratorConfig config) {
+	public TorusCorridorsGenerator(CorridorsGeneratorConfig config) {
 		super(DungeonXML.class, config);
 	}
 
 	@Override
 	public void generate() {
-		config.log.info("SphereCorridorsGenerator.generate()");
+		config.log.info("TorusCorridorsGenerator.generate()");
 		
 		for (int i = config.roomsCountFrom; i <= config.roomsCountTo; ++i) {
 			generate(i);
 		}
 		
-		config.log.info("SphereCorridorsGenerator.generate(): DONE!");
+		config.log.info("TorusCorridorsGenerator.generate(): DONE!");
 	}
 
 	private void generate(int roomCount) {
-		File targetFile = config.getTargetFile("/corridors/sphere", "Sphere" + roomCount + ".xml");
+		File targetFile = config.getTargetFile("/corridors/torus", "Torus" + roomCount + ".xml");
 		
-		config.log.info("SphereCorridorsGenerator.generate(" + roomCount + "): generating...");
+		config.log.info("TorusCorridorsGenerator.generate(" + roomCount + "): generating...");
 		
 		DungeonXML dungeon = new DungeonXML();
 		dungeon.corridors = new ArrayList<CorridorXML>();
@@ -66,7 +67,7 @@ public class SphereCorridorsGenerator extends GeneratorBase<CorridorsGeneratorCo
 			}
 		}
 		
-		write(targetFile, dungeon, DungeonLoaderXML.class, "Sphere (Width x Height): " + width + " x " + height + (width * height != roomCount ? " (incomplete)" : "") + Const.NEW_LINE + "Requires: Rooms" + roomCount + ".xml");
+		write(targetFile, dungeon, DungeonLoaderXML.class, "Torus (Width x Height): " + width + " x " + height + (width * height != roomCount ? " (incomplete)" : "") + Const.NEW_LINE + "Requires: Rooms" + roomCount + ".xml");
 	}
 	
 	private boolean isValidRoom(int room, int roomCount) {

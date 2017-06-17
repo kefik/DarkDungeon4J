@@ -21,6 +21,15 @@ public class GeneratorConfig {
 		return new File(targetDir.getAbsolutePath() + "/" + dirSuffix + "/" + (filePrefix == null ? "" : filePrefix + "-") + fileName);
 	}
 	
+	/**
+	 * Result File("targetDir/dirSuffix")
+	 * @param dirSuffix
+	 * @return
+	 */
+	public File getTargetDir(String dirSuffix) {
+		return new File(targetDir.getAbsolutePath() + "/" + dirSuffix);
+	}
+	
 	public void assign(GeneratorConfig from) {
 		if (from.targetDir != null) targetDir = from.targetDir;
 		if (from.filePrefix != null) filePrefix = from.filePrefix;

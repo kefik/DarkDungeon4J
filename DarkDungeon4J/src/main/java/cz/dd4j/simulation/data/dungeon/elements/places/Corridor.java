@@ -4,6 +4,8 @@ import cz.dd4j.domain.EPlace;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.utils.Id;
+import cz.dd4j.utils.astar.graph.ILink;
+import cz.dd4j.utils.astar.graph.LinkType;
 
 /**
  * Rooms are connected by corridors (dungeon is thus an undirected graph).
@@ -16,7 +18,8 @@ import cz.dd4j.utils.Id;
  * 
  * @author Jimmy
  */
-public class Corridor extends Place {
+public class Corridor extends Place implements ILink<Room> 
+{
 
 	/**
 	 * We make sure: room1.id &lt; room2.id
@@ -73,6 +76,44 @@ public class Corridor extends Place {
 		if (roomId == room2.id) return room1;
 		return null;
 	}
+	
+	// ===============
+	// ILink Interface
+	// ===============
+	
+	@Override
+	public LinkType getType() {
+		return LinkType.BOTH_WAYS;
+	}
+	
+	@Override
+	public Room getNode1() {
+		return room1;
+	}
+	
+	@Override
+	public Room getNode2() {
+		return room2;
+	}
+	
+	@Override
+	public int getCost() {
+		return 1;
+	}
+	
+	@Override
+	public boolean mayTravelFrom(Room room) {
+		return room1 == room || room2 == room;
+	}
+	
+	@Override
+	public Room getOther(Room room) {
+		return getOtherRoom(room); 
+	}
+	
+	// ========
+	// ToString
+	// ========
 	
 	@Override
 	public String toString() {

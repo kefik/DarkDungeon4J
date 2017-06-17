@@ -360,6 +360,33 @@ public class Maze {
 		return output;
 	}
 	
+	public String getDescriptionCompactWithRoomsV2() {
+		String output = "";
+		for (int y = 0; y < gridDimensionY; y++) {
+			for (int x = 0; x < gridDimensionX; x+=2) {
+				if ((x/2) % 2 == 1 && y % 2 == 1) {
+					output += "R";
+				} else {
+					if (grid[x][y] == ' ') {
+						if (y % 2 == 0) {
+							output += "|";
+						} else
+						if ((x / 2) % 2 == 0) {
+							output += "-";
+						} else {
+							output += " ";
+						}
+					} else {
+						output += " ";
+					}
+					//output += grid[x][y];
+				}
+			}
+			output += Const.NEW_LINE;
+		}
+		return output;
+	}
+	
 	
 	public String getDescriptionCompact2() {
 		String output = "";

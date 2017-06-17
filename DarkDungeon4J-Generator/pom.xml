@@ -22,6 +22,11 @@
 			<artifactId>dd4j-loader</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>cz.dd4j</groupId>
+			<artifactId>dd4j-agents</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 
 	<repositories>

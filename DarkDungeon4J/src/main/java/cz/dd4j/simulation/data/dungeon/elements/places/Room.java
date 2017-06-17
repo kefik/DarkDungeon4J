@@ -1,6 +1,7 @@
 package cz.dd4j.simulation.data.dungeon.elements.places;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
@@ -10,6 +11,8 @@ import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
+import cz.dd4j.utils.astar.graph.ILink;
+import cz.dd4j.utils.astar.graph.INode;
 
 /**
  * Every room within the dungeon is defined by:
@@ -24,7 +27,7 @@ import cz.dd4j.simulation.data.dungeon.elements.items.Item;
  * 
  * @author Jimmy
  */
-public class Room extends Place {
+public class Room extends Place implements INode<Room> {
 
 	public ERoomLabel label;
 	
@@ -55,6 +58,11 @@ public class Room extends Place {
 	@Override
 	public String toString() {
 		return "Room[id=" + id + "]";
+	}
+
+	@Override
+	public Collection<ILink<Room>> getLinks() {
+		return (List<ILink<Room>>)(List)corridors;
 	}
 	
 }

@@ -2,7 +2,7 @@ package cz.dd4j.domain;
 
 import cz.dd4j.simulation.actions.EAction;
 
-public class DomainInit {
+public class DD4JDomainInit {
 
 	/**
 	 * Forces initialization of ENUMs

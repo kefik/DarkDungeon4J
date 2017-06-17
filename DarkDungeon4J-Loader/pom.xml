@@ -21,7 +21,7 @@
             <groupId>cz.dd4j</groupId>
             <artifactId>dd4j</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+        </dependency>        
 	
 		<!--
 			WORLD DEPENDENCIES 

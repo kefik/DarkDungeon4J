@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
@@ -38,91 +39,93 @@ import cz.dd4j.simulation.result.SimResult;
 import cz.dd4j.simulation.result.SimResultType;
 
 public class SimStatic {
-	
+
 	// ========================
 	// SIMULATION CONFIGURATION
 	// ========================
-	
+
 	private SimStaticConfig config;
 
 	private IActionsGenerator actionGenerator;
-	
+
 	private IActionsValidator actionValidator;
-	
+
 	// ========================
 	// SIMULATION EVENTS
 	// ========================
-	
+
 	private SimEventsTracker eventsTracker = new SimEventsTracker();
-	
+
 	// ===========
 	// SIM RUNNING
 	// ===========
-	
+
 	private long frameNumber;
-	
+
 	private long simulationStartMillis;
-	
+
 	private long currentTickMillis;
-	
+
 	private long timeDeltaMillis;
-	
+
 	private SimResult resultException;
-	
+
 	private SimResult simulationResult;
-	
+
 	private List<Room> roomsBFSOrdered;
-	
+
 	private List<Corridor> corridorsBFSOrdered;
-	
+
 	private List<Entity> entityScheduledNonMoveActions;
-	
+
 	private List<Entity> entityScheduledMoveActions;
-	
+
 	public SimStatic(SimStaticConfig config) {
-		this.config = config;		
+		this.config = config;
 	}
-	
+
 	// ======
 	// EVENTS
 	// ======
-	
+
 	public SimEventsHandlers getEvents() {
 		return eventsTracker.handlers();
 	}
-	
+
 	// ======================
 	// SIMULATION MAIN METHOD
 	// ======================
-	
+
 	/**
 	 * Starts the simulation synchronously.
+	 * 
 	 * @return
 	 */
 	public SimResult simulate() {
-		if (!config.isReady()) throw new RuntimeException("Simulation is not configured properly: " + config.getMissingInitDescription());
-		
+		if (!config.isReady())
+			throw new RuntimeException("Simulation is not configured properly: " + config.getMissingInitDescription());
+
 		try {
-		
+
 			prepareSimulation();
-			
+
 			startSimulation();
-			
-			while (true) {			
+
+			while (true) {
 				if (isEnd()) {
-					simulationResult = createSimulationResult();					
+					simulationResult = createSimulationResult();
 					return simulationResult;
 				}
-				
+
 				++frameNumber;
 				long lastTickMillis = currentTickMillis;
 				currentTickMillis = System.currentTimeMillis();
 				timeDeltaMillis = currentTickMillis - lastTickMillis;
-				
+
 				eventsTracker.event().simulationFrameBegin(frameNumber, currentTickMillis - simulationStartMillis);
-							
+
 				tick();
-				
+
 				eventsTracker.event().simulationFrameEnd(frameNumber);
 			}
 		} catch (SimulationException e1) {
@@ -141,16 +144,16 @@ public class SimStatic {
 		simulationStartMillis = System.currentTimeMillis();
 		resultException = null;
 		simulationResult = null;
-		
+
 		entityScheduledNonMoveActions = new ArrayList<Entity>();
-		entityScheduledMoveActions    = new LinkedList<Entity>();	
-		
+		entityScheduledMoveActions = new LinkedList<Entity>();
+
 		actionGenerator = new InstantActions(config.actionExecutors);
 		actionValidator = new InstantActions(config.actionExecutors);
-		
+
 		// ORDER ROOMS IN BFS MANNER
 		dungeonBFSNumbering();
-		
+
 		// PREPARE AGENTS
 		injectAgents();
 		prepareAgents();
@@ -159,9 +162,9 @@ public class SimStatic {
 	private void dungeonBFSNumbering() {
 		roomsBFSOrdered = new ArrayList<Room>(config.state.dungeon.rooms.size());
 		corridorsBFSOrdered = new ArrayList<Corridor>();
-		
+
 		// INIT BFS
-		List<Room> queue = new LinkedList<Room>();		
+		List<Room> queue = new LinkedList<Room>();
 		queue.add(config.state.dungeon.rooms.values().iterator().next());
 		Set<Room> visited = new HashSet<Room>();
 
@@ -169,25 +172,56 @@ public class SimStatic {
 		while (!queue.isEmpty()) {
 			Room room = queue.remove(0);
 			visited.add(room);
-			
+
 			roomsBFSOrdered.add(room);
-			
+
 			for (Corridor corridor : room.corridors) {
 				Room other = corridor.getOtherRoom(room);
-				if (visited.contains(other)) continue;
+				if (visited.contains(other))
+					continue;
 				corridorsBFSOrdered.add(corridor);
 				queue.add(other);
 			}
 		}
-		
-		// DONE!		
+
+		// DONE!
 	}
-	
+
 	private void injectAgents() {
 		if (actionGenerator == null) throw new RuntimeException("Cannot agnet.setActionGenerator() as actionGenerator is null.");
 		if (actionValidator == null) throw new RuntimeException("Cannot agnet.setActionValidator() as actionValidator is null.");
 		
-		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
+		List<AgentMindBody<Hero, IHeroAgent>>       heroes   = new ArrayList<AgentMindBody<Hero, IHeroAgent>>();
+		List<AgentMindBody<Monster, IMonsterAgent>> monsters = new ArrayList<AgentMindBody<Monster, IMonsterAgent>>();
+		List<AgentMindBody<Feature, IFeatureAgent>> features = new ArrayList<AgentMindBody<Feature, IFeatureAgent>>();
+		
+		heroes.addAll(config.state.heroes.values());
+		monsters.addAll(config.state.monsters.values());
+		features.addAll(config.state.features.values());
+		
+		Collections.sort(heroes, new Comparator<AgentMindBody<Hero, IHeroAgent>>() {
+			@Override
+			public int compare(AgentMindBody<Hero, IHeroAgent> o1, AgentMindBody<Hero, IHeroAgent> o2) {
+				return o1.body.id.name.compareTo(o2.body.id.name);
+			}
+		});
+		
+		Collections.sort(monsters, new Comparator<AgentMindBody<Monster, IMonsterAgent>>() {
+			@Override
+			public int compare(AgentMindBody<Monster, IMonsterAgent> o1, AgentMindBody<Monster, IMonsterAgent> o2) {
+				return o1.body.id.name.compareTo(o2.body.id.name);
+			}
+		});
+		
+		Collections.sort(features, new Comparator<AgentMindBody<Feature, IFeatureAgent>>() {
+			@Override
+			public int compare(AgentMindBody<Feature, IFeatureAgent> o1, AgentMindBody<Feature, IFeatureAgent> o2) {
+				return o1.body.id.name.compareTo(o2.body.id.name);
+			}
+		});
+		
+		
+		for (AgentMindBody<Hero, IHeroAgent> hero : heroes) {
 			try {
 				hero.mind.setActionGenerator(actionGenerator);
 			} catch (Exception e) {
@@ -198,8 +232,13 @@ public class SimStatic {
 			} catch (Exception e) {
 				throw new AgentException(hero, hero + " setActionValidator() failed.", e);
 			}
+			try {
+				hero.mind.setRandom(new Random(config.random.nextInt()));
+			} catch (Exception e) {
+				throw new AgentException(hero, hero + " setRandom() failed.", e);
+			}
 		}
-		for (AgentMindBody<Monster, IMonsterAgent> monster : config.state.monsters.values()) {
+		for (AgentMindBody<Monster, IMonsterAgent> monster : monsters) {
 			try {
 				monster.mind.setActionGenerator(actionGenerator);
 			} catch (Exception e) {
@@ -210,8 +249,13 @@ public class SimStatic {
 			} catch (Exception e) {
 				throw new AgentException(monster, monster + " setActionValidator() failed.", e);
 			}	
+			try {
+				monster.mind.setRandom(new Random(config.random.nextInt()));
+			} catch (Exception e) {
+				throw new AgentException(monster, monster + " setRandom() failed.", e);
+			}
 		}
-		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
+		for (AgentMindBody<Feature, IFeatureAgent> feature : features) {
 			try {
 				feature.mind.setActionGenerator(actionGenerator);
 			} catch (Exception e) {
@@ -222,9 +266,14 @@ public class SimStatic {
 			} catch (Exception e) {
 				throw new AgentException(feature, feature + " setActionValidator() failed.", e);
 			}
+			try {
+				feature.mind.setRandom(new Random(config.random.nextInt()));
+			} catch (Exception e) {
+				throw new AgentException(feature, feature + " setRandom() failed.", e);
+			}
 		}
 	}
-	
+
 	private void prepareAgents() {
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
 			try {
@@ -238,22 +287,22 @@ public class SimStatic {
 				monster.mind.prepareAgent();
 			} catch (Exception e) {
 				throw new AgentException(monster, monster + " prepareAgent() failed.", e);
-			}			
+			}
 		}
 		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
 			try {
 				feature.mind.prepareAgent();
 			} catch (Exception e) {
 				throw new AgentException(feature, feature + " prepareAgent() failed.", e);
-			}	
+			}
 		}
 	}
-	
+
 	private void startSimulation() {
 		eventsTracker.event().simulationBegin(config.state);
 		startAgents();
 	}
-	
+
 	private void startAgents() {
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
 			try {
@@ -267,28 +316,28 @@ public class SimStatic {
 				monster.mind.simulationStarted();
 			} catch (Exception e) {
 				throw new AgentException(monster, monster + " simulationStarted() failed.", e);
-			}			
+			}
 		}
 		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
 			try {
 				feature.mind.simulationStarted();
 			} catch (Exception e) {
 				throw new AgentException(feature, feature + " simulationStarted() failed.", e);
-			}	
+			}
 		}
 	}
-	
+
 	private void endSimulation() {
 		try {
 			endAgents();
-		} catch (Exception e) {			
+		} catch (Exception e) {
 		}
 		try {
 			eventsTracker.event().simulationEnd(simulationResult);
-		} catch (Exception e) {			
-		}		
+		} catch (Exception e) {
+		}
 	}
-	
+
 	private void endAgents() {
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
 			try {
@@ -300,52 +349,52 @@ public class SimStatic {
 			try {
 				monster.mind.simulationEnded();
 			} catch (Exception e) {
-			}			
+			}
 		}
 		for (AgentMindBody<Feature, IFeatureAgent> feature : config.state.features.values()) {
 			try {
 				feature.mind.simulationEnded();
 			} catch (Exception e) {
-			}	
+			}
 		}
 	}
 
 	private void tick() {
-		gatherActions();		
-		
+		gatherActions();
+
 		sortNonMoveActions();
 		executeNonMoveActions();
-		
+
 		resolveConflictingMoveActions();
-		executeMoveActions();		
+		executeMoveActions();
 	}
 
 	// =================
 	// GATHERING ACTIONS
 	// =================
-	
+
 	private void gatherActions() {
 		entityScheduledMoveActions.clear();
 		entityScheduledNonMoveActions.clear();
-		
+
 		gatherActionsFromHeroes();
 		gatherActionsFromMonsters();
 		gatherActionsFromFeatures();
 	}
-	
+
 	private void gatherActionsFromHeroes() {
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
 			try {
 				// OBSERVE
 				hero.mind.observeBody(hero.body, currentTickMillis);
-				hero.mind.observeDungeon(config.state.dungeon, true, currentTickMillis);			
+				hero.mind.observeDungeon(config.state.dungeon, true, currentTickMillis);
 				// ACT
 				hero.body.action = hero.mind.act();
 			} catch (Exception e) {
 				throw new AgentException(hero, hero + " observe/act failed.", e);
 			}
 			if (hero.body.action != null) {
-				hero.body.action.who = hero.body;				
+				hero.body.action.who = hero.body;
 			}
 			// SUBSCRIBE
 			subscribeAction(hero.body);
@@ -353,13 +402,15 @@ public class SimStatic {
 			eventsTracker.event().actionSelected(hero.body, hero.body.action);
 		}
 	}
-	
+
 	private void gatherActionsFromMonsters() {
 		for (AgentMindBody<Monster, IMonsterAgent> monster : config.state.monsters.values()) {
-			if (!monster.body.alive) continue;
+			if (!monster.body.alive)
+				continue;
 			try {
 				// OBSERVE
 				monster.mind.observeBody(monster.body, currentTickMillis);
+				monster.mind.observeDungeon(config.state.dungeon, true, currentTickMillis);
 				// ACT
 				monster.body.action = monster.mind.act();
 				if (monster.body.action != null) {
@@ -369,19 +420,23 @@ public class SimStatic {
 				throw new AgentException(monster, monster + " observe/act failed.", e);
 			}
 			// SUBSCRIBE
-			subscribeAction(monster.body);		
+			subscribeAction(monster.body);
 			// INFORM EVENT
 			eventsTracker.event().actionSelected(monster.body, monster.body.action);
 		}
 	}
-	
+
 	private void gatherActionsFromFeatures() {
 		// TICK ONLY FEATURES THAT ARE IN THE ROOM WITH A HERO
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
-			if (!hero.body.alive) continue;
-			if (hero.body.atRoom == null) continue;
-			if (hero.body.atRoom.feature == null) continue;
-			if (!hero.body.atRoom.feature.alive) continue;
+			if (!hero.body.alive)
+				continue;
+			if (hero.body.atRoom == null)
+				continue;
+			if (hero.body.atRoom.feature == null)
+				continue;
+			if (!hero.body.atRoom.feature.alive)
+				continue;
 			// OBSERVE+ACT
 			AgentMindBody<Feature, IFeatureAgent> feature = config.state.features.get(hero.body.atRoom.feature.id);
 			try {
@@ -398,48 +453,51 @@ public class SimStatic {
 			eventsTracker.event().actionSelected(feature.body, feature.body.action);
 		}
 	}
-	
+
 	private void subscribeAction(Entity entity) {
-		if (entity.action == null) return;
+		if (entity.action == null)
+			return;
 		if (entity.action.type == EAction.MOVE) {
 			entityScheduledMoveActions.add(entity);
 		} else {
 			entityScheduledNonMoveActions.add(entity);
-		}		
+		}
 	}
-	
+
 	// ===============
 	// SORTING ACTIONS
 	// ===============
-	
+
 	private static Comparator<Entity> comparator = new Comparator<Entity>() {
 
 		@Override
 		public int compare(Entity o1, Entity o2) {
 			return o1.action.type.priority - o2.action.type.priority;
 		}
-		
+
 	};
-	
+
 	private void sortNonMoveActions() {
-		if (entityScheduledNonMoveActions.size() < 2) return;
+		if (entityScheduledNonMoveActions.size() < 2)
+			return;
 		Collections.sort(entityScheduledNonMoveActions, comparator);
 	}
-	
+
 	// ================================
 	// RESOLVE CONFLICTING MOVE ACTIONS
 	// ================================
-	
+
 	private Set<Room> heroesMoveTo = new HashSet<Room>();
 	private Set<Room> monstersMoveTo = new HashSet<Room>();
-	
+
 	private void resolveConflictingMoveActions() {
-		if (entityScheduledMoveActions.size() < 2) return;
+		if (entityScheduledMoveActions.size() < 2)
+			return;
 		Collections.shuffle(entityScheduledMoveActions);
-		
+
 		heroesMoveTo.clear();
 		monstersMoveTo.clear();
-		
+
 		Iterator<Entity> iter = entityScheduledMoveActions.iterator();
 		while (iter.hasNext()) {
 			Entity entity = iter.next();
@@ -461,17 +519,16 @@ public class SimStatic {
 					invalidateAction(entity);
 					iter.remove();
 				} else {
-					heroesMoveTo.add((Room)entity.action.target);
+					heroesMoveTo.add((Room) entity.action.target);
 				}
-			} else
-			if (entity.isA(EEntity.MONSTER)) {
+			} else if (entity.isA(EEntity.MONSTER)) {
 				if (monstersMoveTo.contains(entity.action.target)) {
 					// ACTION CONFLICT
 					// => INVALIDATE
 					invalidateAction(entity);
 					iter.remove();
 				} else {
-					monstersMoveTo.add((Room)entity.action.target);
+					monstersMoveTo.add((Room) entity.action.target);
 				}
 			} else {
 				// NEITHER A HERO, NOR MONSTER
@@ -481,7 +538,7 @@ public class SimStatic {
 			}
 		}
 	}
-	
+
 	private void invalidateAction(Entity entity) {
 		eventsTracker.event().actionInvalid(entity, entity.action);
 		entity.action = null;
@@ -490,20 +547,24 @@ public class SimStatic {
 	// =======================
 	// EXECUTING ACTIONS
 	// =======================
-	
+
 	/**
 	 * Tries to execute {@link Entity#action}.
+	 * 
 	 * @param entity
-	 * @return NULL == no action planned or entity dead, TRUE == action executed, FALSE == action invalid
+	 * @return NULL == no action planned or entity dead, TRUE == action
+	 *         executed, FALSE == action invalid
 	 */
 	private Boolean executeAction(Entity entity) {
-		if (!entity.alive) return null;
-		if (entity.action == null) return null;		
-		EEntity entityType = EH.getAs(entity.type, EEntity.class);		
+		if (!entity.alive)
+			return null;
+		if (entity.action == null)
+			return null;
+		EEntity entityType = EH.getAs(entity.type, EEntity.class);
 		IInstantAction[] entityActions = config.actionExecutors[entityType.entityId];
 		IInstantAction executor = entityActions[entity.action.type.id];
 		boolean valid = executor != null && executor.isValid(entity, entity.action);
-		if (valid) { 
+		if (valid) {
 			Command action = entity.action;
 			eventsTracker.event().actionStarted(entity, entity.action);
 			executor.run(entity, entity.action);
@@ -516,116 +577,119 @@ public class SimStatic {
 			return false;
 		}
 	}
-	
+
 	// ==========================
 	// EXECUTING NON-MOVE ACTIONS
 	// ==========================
-	
+
 	private void executeNonMoveActions() {
 		for (Entity entity : entityScheduledNonMoveActions) {
 			executeAction(entity);
 		}
 	}
-	
+
 	// ======================
 	// EXECUTING MOVE ACTIONS
 	// ======================
-	
+
 	private void executeMoveActions() {
-		if (entityScheduledMoveActions.isEmpty()) return;
-		
+		if (entityScheduledMoveActions.isEmpty())
+			return;
+
 		// MOVE IS DONE IN TWO PHASES
-		
+
 		// 1. move to corridors
 		for (Entity entity : entityScheduledMoveActions) {
 			executeAction(entity);
 		}
 		// entities now in corridors...
-		
+
 		// 2. check hero x monster clashes within corridors
 		checkHeroesInCorridors();
-		
+
 		// 3. move out of corridors
 		for (Entity entity : entityScheduledMoveActions) {
 			executeAction(entity);
 		}
 	}
-	
+
 	private void checkHeroesInCorridors() {
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
 			if (hero.body.atCorridor != null && hero.body.atCorridor.monster != null) {
 				// HERO IS IN A CORRIDOR WITH SOME MONSTER
-				
+
 				// TRIGGER AUTO-ATTACK ACTIONS
 				if (hero.body.hand != null && hero.body.hand.type == EItem.SWORD) {
 					// HERO AUTO-ATTACK
-					
+
 					// SAVE THE ACTION
 					Command origHeroMoveAction = hero.body.action;
-					
+
 					// CREATE NEW ACTION
 					hero.body.action = new Command(EAction.ATTACK, hero.body.atCorridor.monster);
 					hero.body.action.who = hero.body;
-					
+
 					// PERFORM THE ACTION
 					executeAction(hero.body);
-					
+
 					// RESTORE ORIG MOVE ACTION
 					hero.body.action = origHeroMoveAction;
 				} else {
 					// MONSTER AUTO-ATTACK
 					Monster monster = hero.body.atCorridor.monster;
-					
+
 					// SAVE THE ACTION
 					Command origMonsterMoveAction = monster.action;
-					
+
 					// CREATE NEW ACTION
 					monster.action = new Command(EAction.ATTACK, hero.body);
 					monster.action.who = monster;
-					
+
 					// PERFORM THE ACTION
 					executeAction(monster);
-					
+
 					// RESTORE ORIG MOVE ACTION
 					monster.action = origMonsterMoveAction;
 				}
 			}
-		}		
+		}
 	}
 
 	// ============
 	// ELEMENT DEAD
 	// ============
-	
+
 	private void checkDead(Element element) {
-		if (element == null) return;
+		if (element == null)
+			return;
 		if (element instanceof Hero) {
-			checkHeroDead((Hero)element);
-		} else
-		if (element instanceof Monster) {
-			checkMonsterDead((Monster)element);
-		} else			
-		if (element instanceof Feature) {
-			checkFeatureDead((Feature)element);
+			checkHeroDead((Hero) element);
+		} else if (element instanceof Monster) {
+			checkMonsterDead((Monster) element);
+		} else if (element instanceof Feature) {
+			checkFeatureDead((Feature) element);
 		}
 	}
-	
+
 	private void checkHeroDead(Hero hero) {
-		if (hero.alive) return;
+		if (hero.alive)
+			return;
 		config.state.heroes.remove(hero.id);
 		hero.atRoom.hero = null;
 		eventsTracker.event().elementDead(hero);
 	}
-	
+
 	private void checkMonsterDead(Monster monster) {
-		if (monster.alive) return;
+		if (monster.alive)
+			return;
 		config.state.monsters.remove(monster.id);
 		monster.atRoom.monster = null;
 		eventsTracker.event().elementDead(monster);
 	}
-	
+
 	private void checkFeatureDead(Feature feature) {
-		if (feature.alive) return;
+		if (feature.alive)
+			return;
 		feature.atRoom.feature = null;
 		eventsTracker.event().elementDead(feature);
 	}
@@ -646,11 +710,12 @@ public class SimStatic {
 		}
 		return false;
 	}
-	
-	private boolean isHeroVictory(AgentMindBody<Hero, IHeroAgent> hero) {		
-		return hero.body.alive && hero.body.atRoom != null && hero.body.atRoom.label != null && hero.body.atRoom.label == ERoomLabel.GOAL;
+
+	private boolean isHeroVictory(AgentMindBody<Hero, IHeroAgent> hero) {
+		return hero.body.alive && hero.body.atRoom != null && hero.body.atRoom.label != null
+				&& hero.body.atRoom.label == ERoomLabel.GOAL;
 	}
-	
+
 	private SimResult createSimulationResult() {
 		if (isVictory()) {
 			return victory();
@@ -663,7 +728,7 @@ public class SimStatic {
 		}
 		throw new RuntimeException("isVictory() is false, isLose() is false, isException() is false ...???");
 	}
-	
+
 	private SimResult newSimResult() {
 		SimResult result = new SimResult();
 		result.frameNumber = frameNumber;
@@ -672,7 +737,7 @@ public class SimStatic {
 	}
 
 	private SimResult victory() {
-		SimResult result = newSimResult();		
+		SimResult result = newSimResult();
 		result.resultType = SimResultType.HERO_WIN;
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
 			if (isHeroVictory(hero)) {
@@ -682,26 +747,27 @@ public class SimStatic {
 		}
 		return result;
 	}
-	
+
 	private boolean isLose() {
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
-			if (hero.body.alive) return false;
+			if (hero.body.alive)
+				return false;
 		}
 		return true;
 	}
-	
+
 	private SimResult lose() {
-		SimResult result = newSimResult();		
+		SimResult result = newSimResult();
 		result.resultType = SimResultType.HEROES_LOSE;
 		return result;
 	}
-	
+
 	private boolean isException() {
 		return resultException != null;
 	}
-	
+
 	private SimResult exception(Throwable exception, SimResultType type) {
-		SimResult result = newSimResult();		
+		SimResult result = newSimResult();
 		result.resultType = type;
 		result.exception = exception;
 		return resultException = result;

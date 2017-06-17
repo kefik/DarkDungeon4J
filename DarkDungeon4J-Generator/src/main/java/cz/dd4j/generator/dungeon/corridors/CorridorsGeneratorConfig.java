@@ -1,4 +1,4 @@
-package cz.dd4j.generator.dungeon;
+package cz.dd4j.generator.dungeon.corridors;
 
 import cz.dd4j.generator.GeneratorConfig;
 

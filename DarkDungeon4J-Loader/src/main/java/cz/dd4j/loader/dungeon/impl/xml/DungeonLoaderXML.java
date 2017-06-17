@@ -25,8 +25,11 @@ public class DungeonLoaderXML extends LoaderXML<DungeonXML> implements IDungeonL
 
 	@Override
 	public Dungeon loadDungeon(File xmlFile) {
-		DungeonXML dungeonXML = load(xmlFile);
-		
+		DungeonXML dungeonXML = load(xmlFile);		
+		return loadDungeon(dungeonXML);
+	}
+	
+	public Dungeon loadDungeon(DungeonXML dungeonXML) {
 		Dungeon result = new Dungeon();
 		result.rooms = new HashMap<Id, Room>(); 
 		
@@ -43,7 +46,7 @@ public class DungeonLoaderXML extends LoaderXML<DungeonXML> implements IDungeonL
 		
 		return result;
 	}
-	
+
 	protected void createRoom(Dungeon dungeon, RoomXML room) {
 		Room result = new Room();
 		

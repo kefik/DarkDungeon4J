@@ -1,4 +1,4 @@
-package cz.dd4j.generator.dungeon;
+package cz.dd4j.generator.dungeon.rooms;
 
 import cz.dd4j.generator.GeneratorConfig;
 

@@ -33,9 +33,9 @@ import cz.dd4j.utils.Const;
  * 
  * @author Jimmy
  */
-public class MazeCorridorsGenerator extends GeneratorBase<MazeGeneratorConfig> {
+public class MazeGenerator extends GeneratorBase<MazeGeneratorConfig> {
 
-	public MazeCorridorsGenerator(MazeGeneratorConfig config) {
+	public MazeGenerator(MazeGeneratorConfig config) {
 		super(DungeonXML.class, config);
 	}
 
@@ -62,14 +62,6 @@ public class MazeCorridorsGenerator extends GeneratorBase<MazeGeneratorConfig> {
 		Maze maze = new Maze(width, height);					
 		
 		for (int extraJunctions = 0; extraJunctions <= maxExtraJunctions; ++extraJunctions) {
-			config.log.info(getClass().getSimpleName() + ".generate(" + width + "x" + height + "-" + number + "): generating extra junctions " + extraJunctions + " / " + maxExtraJunctions + " ...");
-			
-			// GENERATE EXTRA JUNCTIONS
-			if (!maze.placeExtraJunction()) {
-				config.log.info(getClass().getSimpleName() + ".generate(" + width + "x" + height + "-" + number + "): no extra junctions possible, skipping.");
-				break;
-			}
-			
 			// TARGET FILE TO SAVE
 			File targetFile = config.getTargetFile("/corridors/maze", "Maze-" + width + "x" + height +"-V" + number + "-EJ" + extraJunctions + ".xml");
 			
@@ -104,14 +96,14 @@ public class MazeCorridorsGenerator extends GeneratorBase<MazeGeneratorConfig> {
 					// CORRIDOR DOWN
 					if (!maze.isWall(cellX, cellY) && !maze.isWall(cellX, cellY+1) && !maze.isWallBetween(cellX, cellY, cellX, cellY+1)) {
 						int roomDown = rooms.get(new Tuple2(x, y+1));					
-						dungeon.corridors.add(GeneratorUtils.generateCorridor(roomNumber, roomDown, GeneratorUtils.roomId(roomNumber).name + " == [" + x + "," + y + "] -- link RIGHT -- [" + x + "," + (y+1) + "] == " + GeneratorUtils.roomId(roomDown).name));
+						dungeon.corridors.add(GeneratorUtils.generateCorridor(roomNumber, roomDown, GeneratorUtils.roomId(roomNumber).name + " == [" + x + "," + y + "] -- link DOWN -- [" + x + "," + (y+1) + "] == " + GeneratorUtils.roomId(roomDown).name));
 					}				
 				}
 			}
 			
 			// SAVE IT!
 			
-			String mazeDesc = maze.getDescriptionCompactWithRooms(); 
+			String mazeDesc = maze.getDescriptionCompactWithRoomsV2(); 
 			
 			String comment = "Maze (Width x Height): " + width + " x " + height + Const.NEW_LINE;
 			comment += "Extra junctions: " + extraJunctions + Const.NEW_LINE;
@@ -121,6 +113,16 @@ public class MazeCorridorsGenerator extends GeneratorBase<MazeGeneratorConfig> {
 			write(targetFile, dungeon, DungeonLoaderXML.class, comment);
 			
 			config.log.info("Generated maze (#rooms = " + roomsRequired + ") ---v" + Const.NEW_LINE + mazeDesc);
+			
+			if (extraJunctions < maxExtraJunctions) {
+				config.log.info(getClass().getSimpleName() + ".generate(" + width + "x" + height + "-" + number + "): generating extra junctions " + (1+extraJunctions) + " / " + maxExtraJunctions + " ...");
+				
+				// GENERATE EXTRA JUNCTIONS
+				if (!maze.placeExtraJunction()) {
+					config.log.info(getClass().getSimpleName() + ".generate(" + width + "x" + height + "-" + number + "): no extra junctions possible, skipping.");
+					break;
+				}
+			}
 		}
 	}
 

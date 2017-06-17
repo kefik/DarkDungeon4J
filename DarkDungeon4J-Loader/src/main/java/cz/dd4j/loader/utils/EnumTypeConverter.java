@@ -17,7 +17,14 @@ public class EnumTypeConverter extends AbstractSingleValueConverter {
 	public Object fromString(String str) {
 		if (str == null || str.length() == 0) return null;
 		EnumObject enumObject = Enums.getInstance().getEnumObject(str);
-		if (enumObject == null) return null;
+		if (enumObject == null) {
+			// check for Type.Name
+			String[] parts = str.split("\\.");
+			if (parts.length == 2) {
+				enumObject = Enums.getInstance().getEnumObject(parts[1]);
+			}
+			if (enumObject == null) return null;
+		}
 		return enumObject.enumInstance;
 	}
 

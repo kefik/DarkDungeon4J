@@ -1,9 +1,10 @@
-package cz.dd4j.generator.dungeon;
+package cz.dd4j.generator.dungeon.rooms;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import cz.dd4j.generator.GeneratorBase;
+import cz.dd4j.generator.dungeon.GeneratorUtils;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
 import cz.dd4j.loader.dungeon.impl.xml.RoomXML;

@@ -1,8 +1,10 @@
 package cz.dd4j.simulation;
 
+import java.util.Random;
+
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
 import cz.dd4j.agents.IHeroAgent;
-import cz.dd4j.domain.DomainInit;
+import cz.dd4j.domain.DD4JDomainInit;
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.actions.instant.IInstantAction;
@@ -14,7 +16,7 @@ import cz.dd4j.simulation.data.state.SimState;
 public class SimStaticConfig {
 	
 	static {
-		DomainInit.init();
+		DD4JDomainInit.init();
 	}
 
 	// ============
@@ -28,6 +30,11 @@ public class SimStaticConfig {
 	// ====================
 	// ACTION CONFIGURATION
 	// ====================
+	
+	/**
+	 * Master random - used for generating all other random generators.
+	 */
+	public Random random = new Random(1);
 	
 	// DO NOT MODIFY FROM THE OUTSIDE!
 	// Always use bind...() methods!
