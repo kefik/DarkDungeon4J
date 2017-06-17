@@ -11,9 +11,15 @@ into favourite IDE of yours (preferably Eclipse), open Dungeon01 file and run it
 
 **DarkDungeon4J** -> main project containing the simulator and visualizer (so far console only) of the game
 
+**DarkDungeon4J-Adventure** -> Project with example DD adventures.
+
+**DarkDungeon4J-Agents** -> Hero/Monster/Trap agent (mind) implementations.
+
+**DarkDungeon4J-Generator** -> PCG routines for DD.
+
 **DarkDungeon4J-Loader** -> XML description of DDs including XML loaders.
 
-**DarkDungeon4J-Adventure** -> Project with example DD adventures.
+**DarkDungeon4J-Utils** -> Various utilities used by other projects.
 
 ## COMPILATION
 
