@@ -73,28 +73,28 @@ public class Main {
 //			"monster",  // agent id prefix
 //			"monsters", // sub-directory
 //			10,         // monsters count
-//			new AgentXML("Static",     StaticMonsterAgent.class.getName()),
-//			new AgentXML("Dynamic0",   DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.0d)),
-//			new AgentXML("Dynamic10",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.1d)),
-//			new AgentXML("Dynamic20",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.2d)),
-//			new AgentXML("Dynamic30",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.3d)),
-//			new AgentXML("Dynamic40",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.4d)),
-//			new AgentXML("Dynamic50",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.5d)),
-//			new AgentXML("Dynamic60",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.6d)),
-//			new AgentXML("Dynamic70",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.7d)),
-//			new AgentXML("Dynamic80",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.8d)),
-//			new AgentXML("Dynamic90",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.9d)),
+//			new AgentXML("AStatic",     StaticMonsterAgent.class.getName()),
+//			new AgentXML("Dynamic000",   DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.0d)),
+//			new AgentXML("Dynamic010",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.1d)),
+//			new AgentXML("Dynamic020",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.2d)),
+//			new AgentXML("Dynamic030",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.3d)),
+//			new AgentXML("Dynamic040",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.4d)),
+//			new AgentXML("Dynamic050",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.5d)),
+//			new AgentXML("Dynamic060",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.6d)),
+//			new AgentXML("Dynamic070",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.7d)),
+//			new AgentXML("Dynamic080",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.8d)),
+//			new AgentXML("Dynamic090",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.9d)),
 //			new AgentXML("Dynamic100", DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 1.0d)),
-//			new AgentXML("Killer0",    KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.0d)),
-//			new AgentXML("Killer10",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.1d)),
-//			new AgentXML("Killer20",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.2d)),
-//			new AgentXML("Killer30",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.3d)),
-//			new AgentXML("Killer40",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.4d)),
-//			new AgentXML("Killer50",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.5d)),
-//			new AgentXML("Killer60",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.6d)),
-//			new AgentXML("Killer70",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.7d)),
-//			new AgentXML("Killer80",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.8d)),
-//			new AgentXML("Killer90",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.9d)),
+//			new AgentXML("Killer000",    KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.0d)),
+//			new AgentXML("Killer010",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.1d)),
+//			new AgentXML("Killer020",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.2d)),
+//			new AgentXML("Killer030",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.3d)),
+//			new AgentXML("Killer040",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.4d)),
+//			new AgentXML("Killer050",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.5d)),
+//			new AgentXML("Killer060",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.6d)),
+//			new AgentXML("Killer070",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.7d)),
+//			new AgentXML("Killer080",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.8d)),
+//			new AgentXML("Killer090",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.9d)),
 //			new AgentXML("Killer100",  KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 1.0d))
 //		);
 		
@@ -105,6 +105,9 @@ public class Main {
 //			10,      // traps count
 //			new AgentXML("Trap", TrapAgent.class.getName())
 //		);
+		
+		// Generate adventures
+		generator.generateAdventures("adventures/grid");
 		
 	}
 	

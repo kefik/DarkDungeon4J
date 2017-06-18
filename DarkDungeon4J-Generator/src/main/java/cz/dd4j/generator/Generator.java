@@ -3,6 +3,8 @@ package cz.dd4j.generator;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import cz.dd4j.generator.adventure.AdventureGenerator;
+import cz.dd4j.generator.adventure.AdventureGeneratorConfig;
 import cz.dd4j.generator.agents.AgentsGenerator;
 import cz.dd4j.generator.agents.AgentsGeneratorConfig;
 import cz.dd4j.generator.dungeon.corridors.CorridorsGeneratorConfig;
@@ -151,6 +153,20 @@ public class Generator {
 		config.assign(rootConfig);
 		
 		AgentsGenerator generator = new AgentsGenerator(config);
+		
+		generator.generate();
+	}
+	
+	/**
+	 * @param resultDirSuffix must not include ".." or ".", must not end with "/"
+	 */
+	public void generateAdventures(String resultDirSuffix) {
+		AdventureGeneratorConfig config = new AdventureGeneratorConfig();
+		
+		config.resultDir =  resultDirSuffix;
+		config.assign(rootConfig);
+		
+		AdventureGenerator generator = new AdventureGenerator(config);
 		
 		generator.generate();
 	}

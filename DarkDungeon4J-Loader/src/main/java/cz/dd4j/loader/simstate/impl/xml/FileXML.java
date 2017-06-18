@@ -8,5 +8,10 @@ public class FileXML {
 	
 	@XStreamAsAttribute
 	public String path;
+	
+	@Override
+	public String toString() {
+		return "FileXML[path=" + path + "]";
+	}
 
 }

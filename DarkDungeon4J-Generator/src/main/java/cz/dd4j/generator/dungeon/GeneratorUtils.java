@@ -63,7 +63,7 @@ public class GeneratorUtils {
 	}
 	
 	public static Id trapId(int trapRoom) {
-		return Id.get("hero" + trapRoom);
+		return Id.get("trap" + trapRoom);
 	}
 	
 	public static FeatureXML generateTrap(int trapRoom) {
