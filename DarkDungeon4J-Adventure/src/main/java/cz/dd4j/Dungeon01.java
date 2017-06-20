@@ -53,10 +53,11 @@ public class Dungeon01 {
 		// CREATE THE HERO!
 
 		// WARNING: this assumes use of Eclipse of NetBeans that starts the code within the project folder itself!		
-		File heroesFile = new File("./levels/hero-random.xml");
+		//File heroesFile = new File("./levels/hero-random.xml");
 		//File heroesFile = new File("./levels/hero-semi-random.xml");
 		//File heroesFile = new File("./levels/hero-rules-with-random-move.xml");
 		//File heroesFile = new File("./levels/nplan-cygwin.xml");
+		File heroesFile = new File("./levels/hero-rules-with-clever-move.xml");
 		
 		AgentsLoader<IHeroAgent> heroesLoader = new AgentsLoader<IHeroAgent>();
 		Agents<IHeroAgent> heroes = heroesLoader.loadAgents(heroesFile);
