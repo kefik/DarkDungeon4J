@@ -43,11 +43,11 @@ public abstract class GeneratorBase<CONFIG extends GeneratorConfig> {
 		}
 	}
 	
-	protected void write(File targetFile, Object data, Class loaderClass) {
+	public void write(File targetFile, Object data, Class loaderClass) {
 		write(targetFile, data, loaderClass, null);
 	}
 	
-	protected void write(File targetFile, Object data, Class loaderClass, String comment) {
+	public void write(File targetFile, Object data, Class loaderClass, String comment) {
 		ensureDirsForFile(targetFile);
 		
 		config.log.info(getClass().getSimpleName() + ".write(): writing file " + targetFile.getAbsolutePath());

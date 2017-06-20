@@ -23,6 +23,53 @@ import cz.dd4j.utils.files.DirCrawler;
 import cz.dd4j.utils.files.DirCrawlerCallback;
 
 public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
+	
+	public static class AdventureContext {
+		
+		public int adventureNumber;
+		
+		public int roomsCount;
+		
+		public String roomsFile;
+		
+		public String heroesFile;
+		
+		public String goalsFile;
+		
+		public String corridorsFile;
+		
+		public String resultDirRootRelativePath;
+		
+		public List<String> allMonsterTypes = new ArrayList<String>();
+		
+		public List<String> allTrapTypes = new ArrayList<String>();
+		
+		public List<String> allItemTypes = new ArrayList<String>();
+
+		public List<String> itemTypes;
+
+		public List<String> trapTypes;
+
+		public List<String> monsterTypes;
+		
+		public int monstersCount;
+
+		public List<Integer> roomIds;
+		
+		public void reset() {
+			adventureNumber = 0;
+			roomsCount = 0;
+			roomsFile = null;
+			heroesFile = null;
+			goalsFile = null;
+			corridorsFile = null;		
+			resultDirRootRelativePath = null;
+			allMonsterTypes.clear();
+			allTrapTypes.clear();
+			allItemTypes.clear();
+		}
+		
+	}
 
 	private static final Pattern ROOMS_PATTERN = Pattern.compile("Requires: Rooms([0-9]*)\\.xml"); 
 	
@@ -32,43 +79,14 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 	
 	private static final Pattern ITEM_PATTERN = Pattern.compile("([a-zA-Z_]*)[0-9]*-Room[0-9]*\\.xml$");
 	
-	private int adventureNumber;
-	
-	private int roomsCount;
-	
-	private String roomsFile;
-	
-	private String heroesFile;
-	
-	private String goalsFile;
-	
-	private String corridorsFile;
-	
-	private String resultDirRootRelativePath;
-	
-	private List<String> allMonsterTypes = new ArrayList<String>();
-	
-	private List<String> allTrapTypes = new ArrayList<String>();
-	
-	private List<String> allItemTypes = new ArrayList<String>();
-	
-	
+	private AdventureContext ctx = new AdventureContext();	
 	
 	public AdventureGenerator(AdventureGeneratorConfig config) {
 		super(SimStateXML.class, config);
 	}
 	
 	private void reset() {
-		adventureNumber = 0;
-		roomsCount = 0;
-		roomsFile = null;
-		heroesFile = null;
-		goalsFile = null;
-		corridorsFile = null;		
-		resultDirRootRelativePath = null;
-		allMonsterTypes.clear();
-		allTrapTypes.clear();
-		allItemTypes.clear();
+		ctx.reset();
 	}
 
 	@Override
@@ -97,21 +115,21 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 	}
 	
 	private void probeMonsterTypes() {
-		allMonsterTypes.clear();
+		ctx.allMonsterTypes.clear();
 		File dir = config.getTargetDir(config.agentMonstersDir);
-		probeTypes(MONSTER_AGENT_PATTERN, 1, dir, allMonsterTypes);
+		probeTypes(MONSTER_AGENT_PATTERN, 1, dir, ctx.allMonsterTypes);
 	}
 
 	private void probeTrapTypes() {
-		allTrapTypes.clear();
+		ctx.allTrapTypes.clear();
 		File agentTrapsDir = config.getTargetDir(config.agentTrapsDir);
-		probeTypes(TRAP_AGENT_PATTERN, 1, agentTrapsDir, allTrapTypes);
+		probeTypes(TRAP_AGENT_PATTERN, 1, agentTrapsDir, ctx.allTrapTypes);
 	}
 	
 	private void probeItemTypes() {
-		allItemTypes.clear();
+		ctx.allItemTypes.clear();
 		File dir = config.getTargetDir(config.itemsDir);
-		probeTypes(ITEM_PATTERN, 1, dir, allItemTypes);
+		probeTypes(ITEM_PATTERN, 1, dir, ctx.allItemTypes);
 	}
 	
 
@@ -138,25 +156,25 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 
 	private void generateForCorridors(File corridorsFile) {
 		// SETUP TARGET CORRIDORS FILE
-		this.corridorsFile = config.corridorsDir + "/" + corridorsFile.getName();
+		ctx.corridorsFile = config.corridorsDir + "/" + corridorsFile.getName();
 		
 		// SETUP TARGET ROOMS FILE
-		this.roomsCount = readRequiredRooms(corridorsFile);		
-		this.roomsFile = config.roomsDir + "/Rooms" + roomsCount + ".xml";
+		ctx.roomsCount = readRequiredRooms(corridorsFile);		
+		ctx.roomsFile = config.roomsDir + "/Rooms" + ctx.roomsCount + ".xml";
 		
 		// SETUP TARGET HEROES FILE
-		this.heroesFile = config.heroesDir + "/Hero1-Room1.xml";
+		ctx.heroesFile = config.heroesDir + "/Hero1-Room1.xml";
 				
 		// SETUP TARGET GOALS FILE
-		this.goalsFile = config.goalsDir + "/Goal-Room" + roomsCount + ".xml";
+		ctx.goalsFile = config.goalsDir + "/Goal-Room" + ctx.roomsCount + ".xml";
 		
 		// DETERMINE RESULT DIR ROOT RELATIVE PATH
-		this.resultDirRootRelativePath = determineResultDirRootRelativePath();
+		ctx.resultDirRootRelativePath = determineResultDirRootRelativePath();
 
 		// GENERATE ROOM INDICES FOR PLACEMENTS
 				
-		List<Integer> allRoomIndices = new ArrayList<Integer>(roomsCount);
-		for (int i = 1; i <= roomsCount; ++i) {
+		List<Integer> allRoomIndices = new ArrayList<Integer>(ctx.roomsCount);
+		for (int i = 1; i <= ctx.roomsCount; ++i) {
 			allRoomIndices.add(i);
 		}
 		
@@ -167,13 +185,13 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 			for (int trapsCount : config.traps) {
 				for (int monstersCount : config.monsters) {
 					// GO THROUGH ALL COMBINATIONS OF ITEM
-					CombinationsGenerator<String> itemTypeNonUniqueCombinations = new CombinationsGenerator<String>(itemsCount, allItemTypes, false, false);
+					CombinationsGenerator<String> itemTypeNonUniqueCombinations = new CombinationsGenerator<String>(itemsCount, ctx.allItemTypes, false, false);
 					// GO THROUGH ALL COMBINATIONS OF TRAPS
-					CombinationsGenerator<String> trapTypeNonUniqueCombinations = new CombinationsGenerator<String>(trapsCount, allTrapTypes, false, false);
+					CombinationsGenerator<String> trapTypeNonUniqueCombinations = new CombinationsGenerator<String>(trapsCount, ctx.allTrapTypes, false, false);
 					// GO THROUGH ALL COMBINATIONS OF MONSTERS					
 					CombinationsGenerator<String> monsterTypeNonUniqueCombinations;
-					if (config.monstersOfTheSameType) monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(1,             allMonsterTypes, false, false);
-					else                              monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(monstersCount, allMonsterTypes, false, false);
+					if (config.monstersOfTheSameType) monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(1,             ctx.allMonsterTypes, false, false);
+					else                              monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(monstersCount, ctx.allMonsterTypes, false, false);
 					
 					for (List<String> itemTypes : itemTypeNonUniqueCombinations) {
 						for (List<String> trapTypes : trapTypeNonUniqueCombinations) {
@@ -210,6 +228,12 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 	}
 
 	private void generateForSettings(List<String> itemTypes, List<String> trapTypes, List<String> monsterTypes, int monstersCount, List<Integer> roomIds) {
+		ctx.itemTypes = itemTypes;
+		ctx.trapTypes = trapTypes;
+		ctx.monsterTypes = monsterTypes;
+		ctx.monstersCount = monstersCount;
+		ctx.roomIds = roomIds;
+		
 		int itemsCount = itemTypes.size();
 		int trapsCount = trapTypes.size();	
 		
@@ -219,10 +243,10 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 		// DUNGEON
 		
 		result.dungeons = new ArrayList<FileXML>(4 + itemTypes.size() + trapTypes.size() + monsterTypes.size());
-		result.dungeons.add(newFileXML(this.roomsFile));
-		result.dungeons.add(newFileXML(this.corridorsFile));
-		result.dungeons.add(newFileXML(this.goalsFile));
-		result.dungeons.add(newFileXML(this.heroesFile));		
+		result.dungeons.add(newFileXML(ctx.roomsFile));
+		result.dungeons.add(newFileXML(ctx.corridorsFile));
+		result.dungeons.add(newFileXML(ctx.goalsFile));
+		result.dungeons.add(newFileXML(ctx.heroesFile));		
 		
 		// ADD ITEMS
 		for (int i = 0; i < itemTypes.size(); ++i) {
@@ -278,55 +302,29 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 		}
 
 		// SimStateXML READY!
-		// => SERIALIZE IT INTO FILE
-		
-		File targetFile = config.getTargetFile(config.resultDir, "Adventure" + adventureNumber + ".xml");
-		
-		String comment = "ADVENTURE " + adventureNumber;
-		comment += Const.NEW_LINE + "-----------------";
-		comment += Const.NEW_LINE + "#Rooms:        " + roomsCount;
-		comment += Const.NEW_LINE + "Corridors:     " + newFileXML(this.corridorsFile).path;
-		
-		comment += Const.NEW_LINE + "#Items:        " + itemTypes.size();
-		if (itemTypes.size() > 0) {
-			comment += Const.NEW_LINE + "Item types:    ";
-			for (int i = 0; i < itemTypes.size(); ++i) {
-				if (i != 0) comment += ", ";
-				comment += itemTypes.get(i);
-				comment += " in room" + roomIds.get(i);
+		// => CHECK THE FILTERS
+		if (config.filters != null && config.filters.length > 0) {
+			for (IAdventureFilter filter : config.filters) {
+				if (!filter.isAccepted(ctx, result, config)) return;
 			}
 		}
 		
-		comment += Const.NEW_LINE + "#Traps:        " + trapTypes.size();
-		if (trapTypes.size() > 0) {
-			comment += Const.NEW_LINE + "Trap types:    ";
-			for (int i = 0; i < trapTypes.size(); ++i) {
-				if (i != 0) comment += ", ";
-				comment += trapTypes.get(i);
-				comment += " in room" + roomIds.get(itemsCount+i);
+		// FILTERS PASSED!
+		// => CALLBACK TIME!
+		
+		if (config.callback != null && config.callback.length > 0) {
+			for (IAdventureCallback callback : config.callback) {
+				callback.process(ctx, result, this, config);
 			}
 		}
-		
-		comment += Const.NEW_LINE + "#Monsters:     " + monstersCount;
-		if (monsterTypes.size() > 0) {
-			comment += Const.NEW_LINE + "Monster types: ";
-			for (int i = 0; i < monstersCount; ++i) {
-				if (i != 0) comment += ", ";
-				comment += monsterTypes.get(i % monsterTypes.size());				
-				comment += " in room" + roomIds.get(itemsCount+trapsCount+i);
-			}
-		}
-		
-		config.log.info("Generated adventure " + adventureNumber + "...");
-		write(targetFile, result, SimStateXML.class, comment);		
 		
 		// RAISE ADVENTURE NUMBER
-		++adventureNumber;
+		++ctx.adventureNumber;
 	}
 	
 	private FileXML newFileXML(String file) {
 		FileXML result = new FileXML();
-		result.path = resultDirRootRelativePath + file;
+		result.path = ctx.resultDirRootRelativePath + file;
 		return result;
 	}
 
