@@ -1,6 +1,7 @@
 package cz.dd4j.generator.adventure;
 
 import cz.dd4j.generator.GeneratorConfig;
+import cz.dd4j.generator.adventure.callbacks.AdventureSerializerCallback;
 
 /**
  * We assume that source files are going to be read relatively to the same path as the result is going to be written.
@@ -42,4 +43,9 @@ public class AdventureGeneratorConfig extends GeneratorConfig {
 	
 	public Range traps = new Range(1,1);
 	
+	// FILTERS AND CALLBACKS
+	
+	public IAdventureFilter[] filters;
+	
+	public IAdventureCallback[] callback = new IAdventureCallback[]{ new AdventureSerializerCallback() };	
 }

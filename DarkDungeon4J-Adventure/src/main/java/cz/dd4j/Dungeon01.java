@@ -1,6 +1,10 @@
 package cz.dd4j;
 
 import java.io.File;
+import java.net.FileNameMap;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.concurrent.*;
 
 import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.domain.EEntity;
@@ -27,29 +31,28 @@ import cz.dd4j.ui.console.VisConsole;
 public class Dungeon01 {
 
 	public static void main(String[] args) {
-	
-		// CREATE ADVANTURE CONFIGURATION
-		SimStaticConfig config = new SimStaticConfig();
-		
-		// SPECIFY ACTIONS TO USE
-		IHeroInstantAction[]    heroActions    = new IHeroInstantAction[] { new HeroAttackInstant(), new HeroDisarmInstant(), new HeroDropInstant(),
-				                                                            new HeroMoveInstant(),   new HeroPickupInstant() };		
-		IMonsterInstantAction[] monsterActions = new IMonsterInstantAction[] { new MonsterMoveInstant(), new MonsterAttackInstant() };		
-		IFeatureInstantAction[] featureActions = new IFeatureInstantAction[] { new FeatureAttackInstant() };
-		
-		config.bindActions(EEntity.HERO, heroActions);
-		config.bindActions(EEntity.MONSTER, monsterActions);
-		config.bindActions(EEntity.FEATURE, featureActions);
-		
+//		runDungeon1();
+
+		try {
+			// TODO: parse args to extract experiment & result dirs + continue/restart flag
+			new ExperimentEvaluator("./results", "./experiment").runEvaluator();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void runDungeon1() {
+		SimStaticConfig config = ExperimentEvaluator.getSimStaticConfig();
+
 		// LOAD SIM STATE
-		
+
 		File dungeonFile = new File("./levels/dungeon-01/dungeon-01.xml");
-		
+
 		SimStateLoader loader = new SimStateLoader();
 		SimState simState = loader.loadSimState(dungeonFile);
-		
+
 		config.bindSimState(simState);
-		
+
 		// CREATE THE HERO!
 
 		// WARNING: this assumes use of Eclipse of NetBeans that starts the code within the project folder itself!		
@@ -61,34 +64,34 @@ public class Dungeon01 {
 		
 		AgentsLoader<IHeroAgent> heroesLoader = new AgentsLoader<IHeroAgent>();
 		Agents<IHeroAgent> heroes = heroesLoader.loadAgents(heroesFile);
-		
+
 		config.bindHeroes(heroes);
-		
+
 		// SANITY CHECKS...
-		
+
 		if (!config.isReady()) {
 			throw new RuntimeException("Configuration is not complete. " + config.getMissingInitDescription());
 		}
-		
+
 		// CREATE THE SIMULATION
-		
+
 		SimStatic simulation = new SimStatic(config);
-		
+
 		// BIND THE CONSOLE VISUALIZATION
-		
+
 		simulation.getEvents().addHandler(new VisConsole());
-		
-		// FIRE THE SIMULATION!		
+
+		// FIRE THE SIMULATION!
 		SimResult result = simulation.simulate();
-		
+
 		// OUTPUT RESULT
 		System.out.println();
 		System.out.println("Finished: " + result);
 		System.out.println();
-		
+
 		// DONE!
-		
+
 		System.out.println("---/// DONE ///---");
 	}
-	
+
 }

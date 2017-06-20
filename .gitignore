@@ -1,6 +1,17 @@
-/.idea
+
+.idea/
+*.iml
+target/
+temp/
+/NPlan/
+/PDDL/
+
 /.metadata
 /.recommenders
+
+/DarkDungeon4J-Adventure/experiment/
+/DarkDungeon4J-Adventure/results/
+
 /DarkDungeon4J/.settings
 /DarkDungeon4J-Adventure/.settings
 /DarkDungeon4J-Adventure/target
@@ -11,3 +22,4 @@
 /DarkDungeon4J-Agents/.settings
 /NPlan
 /PDDL
+/DarkDungeon4J-Utils/.settings
