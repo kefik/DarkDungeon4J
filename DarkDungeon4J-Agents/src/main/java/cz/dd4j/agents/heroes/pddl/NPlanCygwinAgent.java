@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cz.dd4j.agents.heroes.planners.NPlanCygwinExecutor;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
@@ -29,13 +30,14 @@ public class NPlanCygwinAgent extends PDDLAgentBase {
 	// =======
 	
 	protected File nplanWorkingDir;
-	
+
 	@Override
 	public void prepareAgent() {
 		super.prepareAgent();
 
-		// ALTER NEW LINE FOR PDDLs
-		pddlNewLine = Const.NEW_LINE_LINUX;
+		executor = new NPlanCygwinExecutor();
+		executor.prepareEnvironment(agentWorkingDir);
+		inputGenerator.setPddlNewLine(executor.getPddlNewLine());
 		
 		// ALTER TARGET FOR PROBLEM FILE GENERATION
 		problemFile = getWorkingFile("nplan/problem.pddl");
@@ -76,54 +78,6 @@ public class NPlanCygwinAgent extends PDDLAgentBase {
 	public void simulationEnded() {
 		super.simulationEnded();
 		FileUtils.deleteQuietly(nplanWorkingDir);
-	}
-
-	@Override
-	protected List<PDDLAction> execPlanner(File domainFile, File problemFile) throws Exception {
-		// ./nplan.bat domain.pddl problem.pddl plan.SOL
-				
-		File resultFile = new File(nplanWorkingDir, "plan.SOL");
-		
-		Map<String, String> config = new HashMap<String, String>();
-		config.put("domain", "domain.pddl");
-		config.put("problem", "problem.pddl");
-		config.put("result", "plan.SOL");
-		
-		CommandLine commandLine = new CommandLine("cmd.exe");
-		commandLine.addArgument("/C");
-		commandLine.addArgument(nplanBatchFile);
-		commandLine.addArgument("${domain}");
-		commandLine.addArgument("${problem}");		
-		commandLine.addArgument("${result}");		
-		commandLine.setSubstitutionMap(config);
-		
-		final Executor executor = new DefaultExecutor();
-		executor.setWorkingDirectory(nplanWorkingDir);
-		executor.setExitValue(0);
-		
-		// SYNC EXECUTION
-		try {
-			executor.execute(commandLine);
-		} catch (Exception e) {
-			// FAILED TO EXECUTE THE PLANNER
-			// => cannot be distinguished from "no plan exists"
-			return null;
-		}
-		
-		// NOW RESULT FILE SHOULD BE READY
-		if (!resultFile.exists()) {
-			// nplan failed to produce results
-			return null;
-		}
-		
-		// PROCESS RESULT
-		String resultLines = FileUtils.readFileToString(resultFile);
-		
-		// DELETE INTERMEDIATE FILE
-		resultFile.delete();
-		
-		// PARSE LINES AS PDDL ACTION
-		return parseLines(resultLines);
 	}
 
 }

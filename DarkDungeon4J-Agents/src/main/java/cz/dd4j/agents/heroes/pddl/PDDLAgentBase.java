@@ -9,7 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import cz.dd4j.agents.heroes.planners.*;
+import cz.dd4j.utils.astar.AStar;
+import cz.dd4j.utils.astar.IAStarView;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 
@@ -30,7 +34,7 @@ import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
 @AutoConfig
-public abstract class PDDLAgentBase extends HeroAgentBase {
+public class PDDLAgentBase extends HeroAgentBase {
 	
 	// =============
 	// CONFIGURATION
@@ -44,7 +48,13 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 	
 	@Configurable
 	protected File agentWorkingDirBase = new File("./temp");
-		
+
+	@Configurable
+	protected AbstractPlannerExecutor executor = new NPlanCygwinExecutor();
+
+	@Configurable
+	protected String executorClass = "cz.dd4j.agents.heroes.planners.NPlanNativeExecutor";
+
 	// ============
 	// PDDL RUNTIME
 	// ============
@@ -59,7 +69,7 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 	protected File problemFile;
 	
 	protected boolean workingDirExisted = true;
-	
+
 	// ====================
 	// DARK DUNGEON RUNTIME
 	// ====================
@@ -76,7 +86,9 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 	protected StringBuffer pddlStaticPartCache = new StringBuffer();
 	
 	protected String pddlNewLine = Const.NEW_LINE;
-	
+
+	protected PDDLInputGenerator inputGenerator;
+
 	// ================
 	// AGENT LIFE-CYCLE
 	// ================
@@ -94,7 +106,22 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 			workingDirExisted = false;
 			agentWorkingDir.mkdirs();
 		}
-		
+
+		try {
+			executor = (AbstractPlannerExecutor)Class.forName(executorClass).newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		inputGenerator = new PDDLInputGenerator(agentWorkingDir);
+		executor.prepareEnvironment(agentWorkingDir);
+		problemFile = executor.getProblemFile();
+		inputGenerator.setPddlNewLine(executor.getPddlNewLine());
+
 		reset();
 	}
 	
@@ -128,11 +155,39 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 		this.dungeon = dungeon;
 		if (firstObserve) {
 			processDungeonFull(dungeon);
-			preparePDDLStatic();
+			inputGenerator.prepareStaticPart(dungeon, domainName, roomsWithSword);
 			firstObserve = false;
 		} else {
 			processDungeonUpdate(dungeon);
 		}		
+	}
+
+	protected int dang(Room r) {
+
+		if (r.feature != null && r.feature.type == EFeature.TRAP) {
+			if (hero.hand != null && hero.hand.type == EItem.SWORD) //in a room with trap with sword -> dead end
+				return 0;
+			else
+				return 1;
+		}
+
+		if (hero.hand != null && hero.hand.type == EItem.SWORD) { // have sword -> safe
+			return Integer.MAX_VALUE;
+		}
+
+		List<Room> monsters = dungeon.rooms.values().stream().filter((room) -> room.monster != null).collect(Collectors.toList());
+		if (monsters.size() == 0) { // no monsters -> safe
+			return Integer.MAX_VALUE;
+		}
+
+		AStar<Room> astar = new AStar<>((r1, r2) -> 0);
+		int min = Integer.MAX_VALUE;
+		for (Room mr : monsters) {
+			int dist = astar.findPath(mr, r, room -> ((Room) room).feature != null || !((Room) room).feature.isA(EFeature.TRAP)).getDistanceNodes();
+			min = Math.min(min, dist);
+		}
+
+		return min;
 	}
 
 	protected void processDungeonFull(Dungeon dungeon) {
@@ -154,69 +209,16 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 			}
 		}
 	}
-	
-	protected void preparePDDLStatic() {
-		pddlStaticPartCache.setLength(0);
-		
-		StringBuffer sb = pddlStaticPartCache;
-		
-		//(define (problem p1) 
-		sb.append("(define (problem p1)");
-		sb.append(pddlNewLine);
-		
-		//(:domain DarkDungeon)
-		sb.append("(:domain " + domainName + ")");
-		sb.append(pddlNewLine);
-		sb.append(pddlNewLine);
-		
-		//(:objects r1 r2 r3 r4 - room
-        //          s - sword)
-		sb.append("(:objects");
-		for (Room room : dungeon.rooms.values()) {
-			sb.append(" ");
-			sb.append(room.id.name);
-		}
-		sb.append(" - room");
-		sb.append(pddlNewLine);
-		
-		sb.append("          ");
-		boolean atLeastOneSword = false;
-		for (Room room : roomsWithSword) {
-			if (room.item != null && EH.isA(room.item.type, EItem.SWORD)) {
-				sb.append(" ");
-				sb.append(room.item.id.name);
-				atLeastOneSword = true;
-			}			
-		}
-		if (atLeastOneSword) {
-			sb.append(" - sword)");
-		} else {
-			sb.append(")");			
-		}
-		sb.append(pddlNewLine);
-		sb.append(pddlNewLine);
-				
-		//(:init
-		sb.append("(:init");
-		sb.append(pddlNewLine);
-		sb.append(pddlNewLine);
-		
-		// GRAPH
-		//    (connected r1 r2)
-		//    ...
-		
-		for (Room room : dungeon.rooms.values()) {
-			for (Corridor corridor : room.corridors) {
-				Room other = corridor.getOtherRoom(room);
-				sb.append("    (connected " + room.id.name + " " + other.id.name + ")");
-				sb.append(pddlNewLine);
-			}
-		}
-	}
-	
+
 	protected void processDungeonUpdate(Dungeon dungeon) {
 		roomsWithSword.clear();
 		for (Room room : dungeon.rooms.values()) {
+			if (room.monster != null) {
+				monsters.put(room.monster.id, room.monster);
+			}
+			if (room.feature != null) {
+				features.put(room.feature.id, room.feature);
+			}
 			if (room.item != null && EH.isA(room.item.type, EItem.SWORD)) {
 				roomsWithSword.add(room);		
 			}
@@ -265,19 +267,26 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 	// ========
 	// PLANNING
     // ========
-	
+
 	protected List<PDDLAction> plan() {
+		return plan(null);
+	}
+
+	protected List<PDDLAction> plan(String goal) {
 		// GENERATE PROBLEM FILE
-		File problemFile = generateProblemFile();
-		if (problemFile == null) {
+		InputFiles inputs;
+		if (goal == null) { //no special goal, plan to goal rooms
+			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goalRooms, problemFile, domainFile);
+		} else
+			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goal, problemFile, domainFile);
+		if (inputs.problemFile == null) {
 			throw new RuntimeException("Failed to genereate problem file!");
 		}
-		
-		String plannerResult = null;
+
 		try {
 			// we have domainFile and problemFile
 			// => EXECUTE THE PLANNER			
-			return execPlanner(domainFile, problemFile);
+			return execPlanner(inputs.domainFile, inputs.problemFile);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to execute the planner.", e);
 		} finally {
@@ -294,157 +303,16 @@ public abstract class PDDLAgentBase extends HeroAgentBase {
 	 * @param problemFile
 	 * @return
 	 */
-	protected abstract List<PDDLAction> execPlanner(File domainFile, File problemFile) throws Exception;
-	
-	// =======================
-	// PDDL PROBLEM GENERATION
-	// =======================
-
-	protected File generateProblemFile() {
-		if (problemFile == null) {
-			problemFile = getWorkingFile("problem.pddl");
-		}
-		FileOutputStream outStream = null;
-		PrintWriter print = null;
-		try {
-			 outStream = new FileOutputStream(problemFile);
-			 print = new PrintWriter(outStream);
-			 generateProblem(print);
-		} catch (Exception e) {
-			if (print != null) {
-				try {
-					print.close();
-				} catch (Exception e1) {
-					print = null;
-				}
-			}
-			if (outStream != null) {
-				try {
-					outStream.close();
-				} catch (Exception e2) {
-					outStream = null;
-				}
-			}
-			try {
-				problemFile.delete();
-			} catch (Exception e3) {
-			}
-			throw new RuntimeException("Failed to generate PDDL problem file into: " + problemFile.getAbsolutePath(), e);
-		} finally {
-			if (print != null) {
-				try {
-					print.close();
-				} catch (Exception e) {
-					print = null;
-				}
-			}
-			if (outStream != null) {
-				try {
-					outStream.close();
-				} catch (Exception e) {
-					outStream = null;
-				}
-			}
-		}
-		return problemFile;
+	protected List<PDDLAction> execPlanner(File domainFile, File problemFile) throws Exception {
+		return executor.execPlanner(domainFile, problemFile);
 	}
 
-	protected void generateProblem(PrintWriter print) throws IOException {
-		//(define (problem p1) 
-		print.print(pddlStaticPartCache.toString());
-		print.print(pddlNewLine);
-				
-		//    (alive)
-		if (hero.alive) { 
-			print.print("    (alive)");
-			print.print(pddlNewLine);
-		}
-		
-		//    (has_sword)
-		if (hero.hand != null && EH.isA(hero.hand.type, EItem.SWORD)) {
-			print.print("    (has_sword)");
-			print.print(pddlNewLine);
-		}
-		
-		// ENTITIES
-		//    (monster_at r2)
-   	    //    (trap_at r3)
-   	    //    (sword_at r1)
-        //    (hero_at r1)
-		
-		// monsters...
-		for (Monster monster : monsters.values()) {
-			if (monster.alive && monster.atRoom != null) {
-				print.print("    (monster_at " + monster.atRoom.id.name + ")");
-				print.print(pddlNewLine);
-			}
-		}
-		// traps
-		for (Feature feature : features.values()) {
-			if (feature.alive && EH.isA(feature.type, EFeature.TRAP) && feature.atRoom != null) {
-				print.print("    (trap_at " + feature.atRoom.id.name + ")");
-				print.print(pddlNewLine);
-			}
-		}
-		// swords
-		for (Room room : roomsWithSword) {
-			print.print("    (sword_at " + room.id.name + ")");
-			print.print(pddlNewLine);
-		}
-		// hero
-		if (hero.atRoom != null) {
-			print.print("    (hero_at " + hero.atRoom.id.name + ")");
-			print.print(pddlNewLine);
-		} else {
-			throw new RuntimeException("hero.atRoom is null, invalid");
-		}
-		
-		//)
-		print.print(")");
-		print.print(pddlNewLine);
-		
-		print.print("");
-		print.print(pddlNewLine);
-
-		//(:goal (and (alive)(hero_at r4)))
-		if (goalRooms.size() > 0) {
-			print.print("(:goal (and (alive)(hero_at " + goalRooms.get(0).id.name + ")))");
-			print.print(pddlNewLine);
-		} else {
-			throw new RuntimeException("goalRooms.size() == 0, invalid");
-		}
-		
-		print.print("");
-		print.print(pddlNewLine);
-		//)
-		print.print(")");
-		print.print(pddlNewLine);
-	}
-	
 	// =====
 	// UTILS
 	// =====
 	
 	protected File getWorkingFile(String name) {
 		return new File(agentWorkingDir, name);
-	}
-	
-	protected List<PDDLAction> parseLines(String lines) {
-		if (lines == null || lines.trim().length() == 0) {
-			return null;
-		}
-		
-		String[] parts = lines.split("\n");
-		List<PDDLAction> result = new ArrayList<PDDLAction>(parts.length);
-		for (String line : parts) {
-			if (line.endsWith("\r")) line = line.substring(0, line.length()-1);
-			PDDLAction action = PDDLAction.parseSOL(line);
-			if (action != null) {
-				result.add(action);
-			}
-		}	
-
-		return result;
 	}
 
 }
