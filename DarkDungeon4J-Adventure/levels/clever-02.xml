@@ -1,6 +1,6 @@
 <agents>
   <agent id="hero1">
-    <agentFQCN>cz.dd4j.agents.heroes.pddl.NaivePlanning02Agent</agentFQCN>
+    <agentFQCN>cz.dd4j.agents.heroes.pddl.Clever02Agent</agentFQCN>
     <config>
         <key>threshold</key>
         <value>2</value>
@@ -19,7 +19,7 @@
     </config>
     <config>
         <key>executorClass</key>
-        <value>cz.dd4j.agents.heroes.planners.NPlanCygwinExecutor</value>
+        <value>cz.dd4j.agents.heroes.planners.NPlanDockerExecutor</value>
     </config>
   </agent>
 </agents>

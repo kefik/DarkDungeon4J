@@ -183,7 +183,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 		AStar<Room> astar = new AStar<>((r1, r2) -> 0);
 		int min = Integer.MAX_VALUE;
 		for (Room mr : monsters) {
-			int dist = astar.findPath(mr, r, room -> ((Room) room).feature != null || !((Room) room).feature.isA(EFeature.TRAP)).getDistanceNodes();
+			int dist = astar.findPath(mr, r, room -> ((Room) room).feature == null || !((Room) room).feature.isA(EFeature.TRAP)).getDistanceNodes();
 			min = Math.min(min, dist);
 		}
 

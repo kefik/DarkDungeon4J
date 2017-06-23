@@ -31,7 +31,7 @@ import cz.dd4j.ui.console.VisConsole;
 public class Dungeon01 {
 
 	public static void main(String[] args) {
-//		runDungeon1();
+		runDungeon1();
 
 		try {
 			// TODO: parse args to extract experiment & result dirs + continue/restart flag
@@ -60,7 +60,7 @@ public class Dungeon01 {
 		//File heroesFile = new File("./levels/hero-semi-random.xml");
 		//File heroesFile = new File("./levels/hero-rules-with-random-move.xml");
 		//File heroesFile = new File("./levels/nplan-cygwin.xml");
-		File heroesFile = new File("./levels/hero-rules-with-clever-move.xml");
+		File heroesFile = new File("./levels/clever-02.xml");
 		
 		AgentsLoader<IHeroAgent> heroesLoader = new AgentsLoader<IHeroAgent>();
 		Agents<IHeroAgent> heroes = heroesLoader.loadAgents(heroesFile);
