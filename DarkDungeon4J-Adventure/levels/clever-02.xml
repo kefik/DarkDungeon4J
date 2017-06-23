@@ -19,7 +19,7 @@
     </config>
     <config>
         <key>executorClass</key>
-        <value>cz.dd4j.agents.heroes.planners.NPlanDockerExecutor</value>
+        <value>cz.dd4j.agents.heroes.planners.NPlanCygwinExecutor</value>
     </config>
   </agent>
 </agents>
