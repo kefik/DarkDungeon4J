@@ -60,7 +60,7 @@ public class Dungeon01 {
 		//File heroesFile = new File("./levels/hero-semi-random.xml");
 		//File heroesFile = new File("./levels/hero-rules-with-random-move.xml");
 		//File heroesFile = new File("./levels/nplan-cygwin.xml");
-		File heroesFile = new File("./levels/clever-02.xml");
+		File heroesFile = new File("./levels/clever-01.xml");
 		
 		AgentsLoader<IHeroAgent> heroesLoader = new AgentsLoader<IHeroAgent>();
 		Agents<IHeroAgent> heroes = heroesLoader.loadAgents(heroesFile);
