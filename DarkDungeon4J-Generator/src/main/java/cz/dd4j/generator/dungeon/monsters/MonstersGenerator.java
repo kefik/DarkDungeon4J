@@ -33,7 +33,7 @@ public class MonstersGenerator extends GeneratorBase<MonstersGeneratorConfig> {
 	}
 
 	private void generate(int monsterId, int roomId) {
-		File targetFile = config.getTargetFile("/monsters", "Monster" + monsterId + "-Room" + roomId + ".xml");
+		File targetFile = config.target.getFile("/monsters", "Monster" + monsterId + "-Room" + roomId + ".xml");
 		
 		config.log.info(getClass().getSimpleName() + ".generate(monster " + monsterId + " for room " + roomId + "): generating...");
 		

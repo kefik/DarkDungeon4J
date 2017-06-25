@@ -1,4 +1,4 @@
-package cz.dd4j.utils;
+package cz.dd4j.utils.strings;
 
 public class Sanitize {
 

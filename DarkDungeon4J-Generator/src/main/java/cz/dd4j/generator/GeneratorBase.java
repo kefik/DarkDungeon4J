@@ -11,8 +11,9 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import cz.dd4j.loader.LoaderXML;
 import cz.dd4j.loader.meta.MetaInfo;
 import cz.dd4j.utils.Const;
+import cz.dd4j.utils.config.GenericConfig;
 
-public abstract class GeneratorBase<CONFIG extends GeneratorConfig> {
+public abstract class GeneratorBase<CONFIG extends GenericConfig> {
 
 	protected Class classToSave;
 	

@@ -1,8 +1,8 @@
 package cz.dd4j.generator.dungeon.goals;
 
-import cz.dd4j.generator.GeneratorConfig;
+import cz.dd4j.utils.config.GenericConfig;
 
-public class GoalsGeneratorConfig extends GeneratorConfig {
+public class GoalsGeneratorConfig extends GenericConfig {
 
 	public int roomsCount;
 	

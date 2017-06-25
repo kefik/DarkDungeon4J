@@ -1,8 +1,8 @@
 package cz.dd4j.generator.dungeon.traps;
 
-import cz.dd4j.generator.GeneratorConfig;
+import cz.dd4j.utils.config.GenericConfig;
 
-public class TrapsGeneratorConfig extends GeneratorConfig {
+public class TrapsGeneratorConfig extends GenericConfig {
 
 	/**
 	 * Generates trap'X', where X is from [1; trapsCount].

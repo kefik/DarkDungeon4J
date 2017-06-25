@@ -97,7 +97,7 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 		probeTrapTypes();
 		probeItemTypes();
 		
-		File corridorsDir = config.getTargetDir(config.corridorsDir);
+		File corridorsDir = config.target.getDir(config.corridorsDir);
 		
 		File[] corridorFiles = corridorsDir.listFiles();
 		Arrays.sort(corridorFiles, new Comparator<File>() {
@@ -110,25 +110,27 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 		for (File corridorsFile : corridorFiles) {
 			if (!corridorsFile.getName().endsWith(".xml")) continue;
 			generateForCorridors(corridorsFile);
+			
+			System.out.println("GENERATING FOR 1 CORRIDORS ONLY!");
 			return; // for now, just generate one
 		}
 	}
 	
 	private void probeMonsterTypes() {
 		ctx.allMonsterTypes.clear();
-		File dir = config.getTargetDir(config.agentMonstersDir);
+		File dir = config.target.getDir(config.agentMonstersDir);
 		probeTypes(MONSTER_AGENT_PATTERN, 1, dir, ctx.allMonsterTypes);
 	}
 
 	private void probeTrapTypes() {
 		ctx.allTrapTypes.clear();
-		File agentTrapsDir = config.getTargetDir(config.agentTrapsDir);
+		File agentTrapsDir = config.target.getDir(config.agentTrapsDir);
 		probeTypes(TRAP_AGENT_PATTERN, 1, agentTrapsDir, ctx.allTrapTypes);
 	}
 	
 	private void probeItemTypes() {
 		ctx.allItemTypes.clear();
-		File dir = config.getTargetDir(config.itemsDir);
+		File dir = config.target.getDir(config.itemsDir);
 		probeTypes(ITEM_PATTERN, 1, dir, ctx.allItemTypes);
 	}
 	

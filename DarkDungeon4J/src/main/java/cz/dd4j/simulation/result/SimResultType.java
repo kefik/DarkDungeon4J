@@ -4,6 +4,7 @@ public enum SimResultType {
 	
 	HERO_WIN(true, false),
 	HEROES_LOSE(false, false),
+	TIMEOUT(false, false),
 	SIMULATION_EXCEPTION(false, true),
 	AGENT_EXCEPTION(false, true);
 	

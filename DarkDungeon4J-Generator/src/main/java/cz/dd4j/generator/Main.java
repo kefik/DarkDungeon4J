@@ -3,16 +3,8 @@ package cz.dd4j.generator;
 import java.io.File;
 
 import cz.cuni.amis.utils.simple_logging.SimpleLogging;
-import cz.dd4j.agents.features.TrapAgent;
-import cz.dd4j.agents.heroes.HeroRandom;
-import cz.dd4j.agents.heroes.HeroRulesWithRandomMove;
-import cz.dd4j.agents.heroes.HeroSemiRandom;
-import cz.dd4j.agents.monsters.DynamicMonsterAgent;
-import cz.dd4j.agents.monsters.KillerMonsterAgent;
-import cz.dd4j.agents.monsters.StaticMonsterAgent;
 import cz.dd4j.domain.DD4JDomainInit;
-import cz.dd4j.loader.agents.impl.xml.AgentXML;
-import cz.dd4j.utils.config.ConfigXML;
+import cz.dd4j.utils.config.GenericConfig;
 
 public class Main {
 
@@ -21,8 +13,8 @@ public class Main {
 		
 		DD4JDomainInit.init();
 		
-		GeneratorConfig config = new GeneratorConfig();
-		config.targetDir = new File("result");
+		GenericConfig config = new GenericConfig();
+		config.target.dir = new File("result");
 		
 		Generator generator = new Generator(config);
 		
@@ -32,8 +24,8 @@ public class Main {
 		// Goals for rooms 1-100
 		//generator.generateGoals(100);
 		
-		// Grids 2x2 -> 10x10
-		//generator.generateGrid(4, 100);
+		// Grids 2x2 -> 5x5
+		//generator.generateGrid(4, 25);
 			
 		// Torus 2x2 -> 10x10
 		//generator.generateTorus(4, 100);

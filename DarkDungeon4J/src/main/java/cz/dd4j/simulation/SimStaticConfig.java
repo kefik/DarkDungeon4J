@@ -18,6 +18,13 @@ public class SimStaticConfig {
 	static {
 		DD4JDomainInit.init();
 	}
+	
+	// ===========
+	// DESCRIPTION
+	// ===========
+	
+	public String id;
+	public String description;
 
 	// ============
 	// CONFIG STATE
@@ -95,6 +102,7 @@ public class SimStaticConfig {
 		if (simStateBound) throw new RuntimeException("You cannot bindSimState() twice!");
 		
 		this.state = state;		
+		this.state.config = this;
 		
 		simStateBound = true;
 	}

@@ -1,7 +1,7 @@
 package cz.dd4j.generator.adventure;
 
-import cz.dd4j.generator.GeneratorConfig;
 import cz.dd4j.generator.adventure.callbacks.AdventureSerializerCallback;
+import cz.dd4j.utils.config.GenericConfig;
 
 /**
  * We assume that source files are going to be read relatively to the same path as the result is going to be written.
@@ -14,7 +14,7 @@ import cz.dd4j.generator.adventure.callbacks.AdventureSerializerCallback;
  * 
  * @author Jimmy
  */
-public class AdventureGeneratorConfig extends GeneratorConfig {
+public class AdventureGeneratorConfig extends GenericConfig {
 
 	public String roomsDir = "rooms";
 	
@@ -36,7 +36,7 @@ public class AdventureGeneratorConfig extends GeneratorConfig {
 	
 	public String resultDir = "adventures/grid";
 	
-	public Range monsters = new Range(1,2);
+	public Range monsters = new Range(1,1);
 	public boolean monstersOfTheSameType = true;
 	
 	public Range items = new Range(1,1);

@@ -30,7 +30,7 @@ public class TorusCorridorsGenerator extends GeneratorBase<CorridorsGeneratorCon
 	}
 
 	private void generate(int roomCount) {
-		File targetFile = config.getTargetFile("/corridors/torus", "Torus" + roomCount + ".xml");
+		File targetFile = config.target.getFile("/corridors/torus", "Torus" + roomCount + ".xml");
 		
 		config.log.info("TorusCorridorsGenerator.generate(" + roomCount + "): generating...");
 		

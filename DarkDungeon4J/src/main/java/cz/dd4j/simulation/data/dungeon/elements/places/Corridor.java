@@ -4,6 +4,7 @@ import cz.dd4j.domain.EPlace;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.utils.Id;
+import cz.dd4j.utils.Safe;
 import cz.dd4j.utils.astar.graph.ILink;
 import cz.dd4j.utils.astar.graph.LinkType;
 
@@ -51,6 +52,14 @@ public class Corridor extends Place implements ILink<Room>
 			this.room1 = room1;
 			this.room2 = room2;
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (!(obj instanceof Corridor)) return false;
+		Corridor other = (Corridor)obj;
+		return Safe.equals(room1, other.room1) && Safe.equals(room2, other.room2) || Safe.equals(room1, other.room2) && Safe.equals(room1, other.room2);  
 	}
 	
 	public boolean leadsTo(Room room) {

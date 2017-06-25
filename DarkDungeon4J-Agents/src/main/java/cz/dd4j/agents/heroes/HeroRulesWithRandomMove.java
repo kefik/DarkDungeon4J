@@ -31,7 +31,7 @@ public class HeroRulesWithRandomMove extends HeroAgentBase implements IHeroAgent
 	public Command act() {
 		if (hero.atRoom.monster != null && hero.hand != null && hero.hand.type == EItem.SWORD) return actions.attack();
 		if (hero.atRoom.feature != null && hero.hand == null) return actions.disarm();		
-		if (hero.atRoom.item != null) return actions.pickup();
+		if (moveIntention != null && hero.atRoom.item != null) return actions.pickup();
 		
 		// ALL POSSIBLE MOVE ACTIONS
 		List<Command> moveActions = actionsGenerator.generateFor(hero, EAction.MOVE);

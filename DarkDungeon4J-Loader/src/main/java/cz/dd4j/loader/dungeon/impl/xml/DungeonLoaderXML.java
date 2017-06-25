@@ -46,6 +46,16 @@ public class DungeonLoaderXML extends LoaderXML<DungeonXML> implements IDungeonL
 		
 		return result;
 	}
+	
+	protected Room createEmptyRoom(Dungeon dungeon, Id roomId) {
+		Room result = new Room();
+		
+		result.id = roomId;
+		
+		dungeon.rooms.put(result.id, result);
+		
+		return result;
+	}
 
 	protected void createRoom(Dungeon dungeon, RoomXML room) {
 		Room result = new Room();
@@ -160,7 +170,13 @@ public class DungeonLoaderXML extends LoaderXML<DungeonXML> implements IDungeonL
 
 	protected void createCorridor(Dungeon dungeon, CorridorXML corridor) {
 		Room room1 = dungeon.rooms.get(corridor.room1Id);
+		if (room1 == null) {
+			room1 = createEmptyRoom(dungeon, corridor.room1Id);
+		}
 		Room room2 = dungeon.rooms.get(corridor.room2Id);
+		if (room2 == null) {
+			room2 = createEmptyRoom(dungeon, corridor.room2Id);
+		}
 		
 		Corridor result = new Corridor(room1, room2);
 		

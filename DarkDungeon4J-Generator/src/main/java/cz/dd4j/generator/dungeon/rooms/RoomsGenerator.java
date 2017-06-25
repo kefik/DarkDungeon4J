@@ -30,7 +30,7 @@ public class RoomsGenerator extends GeneratorBase<RoomsGeneratorConfig> {
 	}
 
 	private void generate(int roomCount) {
-		File targetFile = config.getTargetFile("/rooms", "Rooms" + roomCount + ".xml");
+		File targetFile = config.target.getFile("/rooms", "Rooms" + roomCount + ".xml");
 		
 		config.log.info("RoomsGenerator.generate(" + roomCount + "): generating...");
 		

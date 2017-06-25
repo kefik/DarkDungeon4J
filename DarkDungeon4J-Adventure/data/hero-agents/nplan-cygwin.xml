@@ -11,7 +11,7 @@
     </config>
     <config>
         <key>domainFile</key>
-        <value>./levels/DarkDungeon.pddl</value>
+        <value>./data/DarkDungeon.pddl</value>
     </config>
     <config>
         <key>domainName</key>

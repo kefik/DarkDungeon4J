@@ -116,17 +116,19 @@ public class SimStatic {
 					simulationResult = createSimulationResult();
 					return simulationResult;
 				}
-
+				
 				++frameNumber;
 				long lastTickMillis = currentTickMillis;
 				currentTickMillis = System.currentTimeMillis();
 				timeDeltaMillis = currentTickMillis - lastTickMillis;
 
-				eventsTracker.event().simulationFrameBegin(frameNumber, currentTickMillis - simulationStartMillis);
+				eventsTracker.event().simulationFrameBegin(config.state, frameNumber, currentTickMillis - simulationStartMillis);
 
 				tick();
 
 				eventsTracker.event().simulationFrameEnd(frameNumber);
+				
+				--config.state.roundsLeft;
 			}
 		} catch (SimulationException e1) {
 			return simulationResult = exception(e1, SimResultType.SIMULATION_EXCEPTION);
@@ -699,7 +701,7 @@ public class SimStatic {
 	// ========================
 
 	private boolean isEnd() {
-		return isVictory() || isLose() || isException();
+		return isVictory() || isLose() || isTimeout() || isException();
 	}
 
 	private boolean isVictory() {
@@ -722,6 +724,9 @@ public class SimStatic {
 		}
 		if (isLose()) {
 			return lose();
+		}
+		if (isTimeout()) {
+			return timeout();
 		}
 		if (isException()) {
 			return resultException;
@@ -755,10 +760,20 @@ public class SimStatic {
 		}
 		return true;
 	}
+	
+	private boolean isTimeout() {
+		return config.state.roundsLeft <= 0;
+	}
 
 	private SimResult lose() {
 		SimResult result = newSimResult();
 		result.resultType = SimResultType.HEROES_LOSE;
+		return result;
+	}
+	
+	private SimResult timeout() {
+		SimResult result = newSimResult();
+		result.resultType = SimResultType.TIMEOUT;
 		return result;
 	}
 

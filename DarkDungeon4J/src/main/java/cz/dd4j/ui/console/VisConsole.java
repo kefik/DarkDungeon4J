@@ -2,7 +2,11 @@ package cz.dd4j.ui.console;
 
 import java.io.PrintStream;
 
+import cz.dd4j.agents.IFeatureAgent;
+import cz.dd4j.agents.IHeroAgent;
+import cz.dd4j.agents.IMonsterAgent;
 import cz.dd4j.agents.commands.Command;
+import cz.dd4j.simulation.data.agents.AgentMindBody;
 import cz.dd4j.simulation.data.dungeon.Element;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
@@ -46,14 +50,29 @@ public class VisConsole implements ISimEvents {
 	public void simulationBegin(SimState state) {
 		frameNumber = 0;
 		log(WHO_SIMULATOR, "SimBegin", "Simulation begins.");
-		log(WHO_SIMULATOR, "SimBegin", "ID:   " + state.id);
-		log(WHO_SIMULATOR, "SimBegin", "DESC: " + state.description);
+		log(WHO_SIMULATOR, "SimBegin", "ID:   " + state.config.id);
+		log(WHO_SIMULATOR, "SimBegin", "DESC: " + state.config.description);
 	}
 
 	@Override
-	public void simulationFrameBegin(long frameNumber, long simMillis) {
+	public void simulationFrameBegin(SimState state, long frameNumber, long simMillis) {
 		this.frameNumber = frameNumber;
 		log(WHO_SIMULATOR, "SimFrameBegin", "Simulation frame " + frameNumber + " begun, sim time " + simMillis + "ms.");
+		for (AgentMindBody<Hero, IHeroAgent> agent : state.heroes.values()) {
+			if (agent.body.alive) {
+				log(WHO_SIMULATOR, "SimFrameBegin", "  +-- HERO    at " + agent.body.atRoom + (agent.body.hand != null ? " with " + agent.body.hand : "") + ": " + agent.mind + ", " + agent.body);
+			}
+		}
+		for (AgentMindBody<Monster, IMonsterAgent> agent : state.monsters.values()) {
+			if (agent.body.alive) {
+				log(WHO_SIMULATOR, "SimFrameBegin", "  +-- MONSTER at " + agent.body.atRoom + ": " + agent.mind + ", " + agent.body);
+			}
+		}
+		for (AgentMindBody<Feature, IFeatureAgent> agent : state.features.values()) {
+			if (agent.body.alive) {
+				log(WHO_SIMULATOR, "SimFrameBegin", "  +-- FEATURE at " + agent.body.atRoom + ": " + agent.mind + ", " + agent.body);
+			}
+		}
 	}
 	
 	public String getName(Element who) {

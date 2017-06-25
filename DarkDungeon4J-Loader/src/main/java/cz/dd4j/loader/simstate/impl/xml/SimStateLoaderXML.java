@@ -20,6 +20,7 @@ import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
+import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.utils.Id;
@@ -61,15 +62,33 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 		// LOAD DUNGEON FILES, ADDITIVELY BLEND LATER ONES OVER EARLIER ONES...
 		DungeonLoader dungeonLoader = new DungeonLoader();		
 		for (File dungeonXMLFile : dungeonXMLFiles) {
-			Dungeon append = dungeonLoader.loadDungeon(dungeonXMLFile);
-			blend(dungeon, append);
+			Dungeon append = null;
+			try {
+				append = dungeonLoader.loadDungeon(dungeonXMLFile);
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to load: " + dungeonXMLFile.getAbsolutePath(), e);
+			}
+			try {
+				blend(dungeon, append);
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to blend: " + dungeonXMLFile.getAbsolutePath(), e);
+			}
 		}
 		
 		// LOAD AGENT FILES, ADDITIVELY BLEND LATER ONES OVER EARLIER ONES...
 		AgentsLoader agentsLoader = new AgentsLoader();
 		for (File agentsXMLFile : agentsXMLFiles) {
-			Agents append = agentsLoader.loadAgents(agentsXMLFile);
-			blend(monsters, features, append);
+			Agents append = null;
+			try {
+				append = agentsLoader.loadAgents(agentsXMLFile);
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to load: " + agentsXMLFile.getAbsolutePath(), e);
+			}
+			try {
+				blend(monsters, features, append);
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to blend: " + agentsXMLFile.getAbsolutePath(), e);
+			}
 		}
 		
 		// SET UP THE SimState
@@ -124,12 +143,17 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 			if (targetRoom == null) {
 				target.rooms.put(entry.getKey(), entry.getValue());
 			} else {
-				blend(targetRoom, entry.getValue());
+				blend(target, targetRoom, entry.getValue());
 			}
 		}
 	}
 	
-	private static void blend(Room targetRoom, Room append) {
+	private static void blend(Dungeon dungeon, Room targetRoom, Room append) {
+		if (append.corridors != null) {
+			for (Corridor corridor : append.corridors) {
+				blend(dungeon, corridor);
+			}
+		}
 		if (append.label != null) {
 			targetRoom.label = append.label;
 		}
@@ -157,6 +181,40 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 		if (append.item != null) {
 			blend(targetRoom.item, append.item);
 		}
+	}
+
+	private static void blend(Dungeon targetDungeon, Corridor corridor) {
+		Room targetRoom1 = targetDungeon.rooms.get(corridor.room1.id);
+		Room targetRoom2 = targetDungeon.rooms.get(corridor.room2.id);
+			
+		corridor.room1 = targetRoom1;
+		corridor.room2 = targetRoom2;
+		
+		boolean add;
+		
+		if (targetRoom1.corridors == null) targetRoom1.corridors = new ArrayList<Corridor>();
+		add = true;
+		for (Corridor other : targetRoom1.corridors) {
+			if (other.equals(corridor)) {
+				add = false;
+				break;
+			}
+		}
+		if (add) {
+			targetRoom1.corridors.add(corridor);
+		}
+		
+		if (targetRoom2.corridors == null) targetRoom2.corridors = new ArrayList<Corridor>();
+		add = true;
+		for (Corridor other : targetRoom2.corridors) {
+			if (other.equals(corridor)) {
+				add = false;
+				break;
+			}
+		}
+		if (add) {
+			targetRoom2.corridors.add(corridor);
+		}		
 	}
 
 	private static void blend(Item target, Item append) {

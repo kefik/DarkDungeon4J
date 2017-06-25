@@ -39,9 +39,9 @@ public class SimEventsTracker {
 		}
 
 		@Override
-		public void simulationFrameBegin(long frameNumber, long simMillis) {
+		public void simulationFrameBegin(SimState state, long frameNumber, long simMillis) {
 			for (ISimEvents handler : handlers) {
-				handler.simulationFrameBegin(frameNumber, simMillis);
+				handler.simulationFrameBegin(state, frameNumber, simMillis);
 			}
 		}
 		

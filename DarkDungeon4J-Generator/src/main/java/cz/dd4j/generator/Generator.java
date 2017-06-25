@@ -25,12 +25,13 @@ import cz.dd4j.generator.dungeon.rooms.RoomsGeneratorConfig;
 import cz.dd4j.generator.dungeon.traps.TrapsGenerator;
 import cz.dd4j.generator.dungeon.traps.TrapsGeneratorConfig;
 import cz.dd4j.loader.agents.impl.xml.AgentXML;
+import cz.dd4j.utils.config.GenericConfig;
 
 public class Generator {
 
-	private GeneratorConfig rootConfig;
+	private GenericConfig rootConfig;
 
-	public Generator(GeneratorConfig config) {
+	public Generator(GenericConfig config) {
 		this.rootConfig = config;
 		if (config.log == null) config.log = Logger.getAnonymousLogger();
 	}

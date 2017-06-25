@@ -1,8 +1,8 @@
 package cz.dd4j.generator.dungeon.heroes;
 
-import cz.dd4j.generator.GeneratorConfig;
+import cz.dd4j.utils.config.GenericConfig;
 
-public class HeroesGeneratorConfig extends GeneratorConfig {
+public class HeroesGeneratorConfig extends GenericConfig {
 
 	/**
 	 * Generates hero'X', where X is from [1; heroesCount].

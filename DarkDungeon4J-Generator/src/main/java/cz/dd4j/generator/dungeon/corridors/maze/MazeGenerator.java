@@ -12,6 +12,7 @@ import cz.dd4j.loader.dungeon.impl.xml.CorridorXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
 import cz.dd4j.utils.Const;
+import cz.dd4j.utils.collection.Tuple2;
 
 /**
  * Maze can be generated only for full rectangles!
@@ -63,17 +64,17 @@ public class MazeGenerator extends GeneratorBase<MazeGeneratorConfig> {
 		
 		for (int extraJunctions = 0; extraJunctions <= maxExtraJunctions; ++extraJunctions) {
 			// TARGET FILE TO SAVE
-			File targetFile = config.getTargetFile("/corridors/maze", "Maze-" + width + "x" + height +"-V" + number + "-EJ" + extraJunctions + ".xml");
+			File targetFile = config.target.getFile("/corridors/maze", "Maze-" + width + "x" + height +"-V" + number + "-EJ" + extraJunctions + ".xml");
 			
 			DungeonXML dungeon = new DungeonXML();
 			dungeon.corridors = new ArrayList<CorridorXML>();
 			
 			// COUNT REQUIRED ROOMS
-			Map<Tuple2, Integer> rooms = new HashMap<Tuple2, Integer>();		
+			Map<Tuple2<Integer, Integer>, Integer> rooms = new HashMap<Tuple2<Integer, Integer>, Integer>();		
 			for (int y = 1; y <= height; ++y) {
 				for (int x = 1; x <= width; ++x) {
 					if (maze.isWall(x-1, y-1)) continue;
-					rooms.put(new Tuple2(x, y), rooms.size()+1);
+					rooms.put(new Tuple2<Integer, Integer>(x, y), rooms.size()+1);
 				}
 			}
 			int roomsRequired = rooms.size();
@@ -85,17 +86,17 @@ public class MazeGenerator extends GeneratorBase<MazeGeneratorConfig> {
 					int cellX = x - 1;
 					
 					if (maze.isWall(cellX, cellY)) continue;
-					int roomNumber = rooms.get(new Tuple2(x, y));
+					int roomNumber = rooms.get(new Tuple2<Integer, Integer>(x, y));
 					
 					// CORRIDOR TO THE RIGHT
 					if (!maze.isWall(cellX, cellY) && !maze.isWall(cellX+1, cellY) && !maze.isWallBetween(cellX, cellY, cellX+1, cellY)) {
-						int roomRight = rooms.get(new Tuple2(x+1, y));					
+						int roomRight = rooms.get(new Tuple2<Integer, Integer>(x+1, y));					
 						dungeon.corridors.add(GeneratorUtils.generateCorridor(roomNumber, roomRight, GeneratorUtils.roomId(roomNumber).name + " == [" + x + "," + y + "] -- link RIGHT -- [" + (x+1) + "," + y + "] == " + GeneratorUtils.roomId(roomRight).name));
 					}
 					
 					// CORRIDOR DOWN
 					if (!maze.isWall(cellX, cellY) && !maze.isWall(cellX, cellY+1) && !maze.isWallBetween(cellX, cellY, cellX, cellY+1)) {
-						int roomDown = rooms.get(new Tuple2(x, y+1));					
+						int roomDown = rooms.get(new Tuple2<Integer, Integer>(x, y+1));					
 						dungeon.corridors.add(GeneratorUtils.generateCorridor(roomNumber, roomDown, GeneratorUtils.roomId(roomNumber).name + " == [" + x + "," + y + "] -- link DOWN -- [" + x + "," + (y+1) + "] == " + GeneratorUtils.roomId(roomDown).name));
 					}				
 				}

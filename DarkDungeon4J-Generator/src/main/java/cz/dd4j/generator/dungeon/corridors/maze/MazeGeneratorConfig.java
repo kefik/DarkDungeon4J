@@ -1,12 +1,12 @@
 package cz.dd4j.generator.dungeon.corridors.maze;
 
-import cz.dd4j.generator.GeneratorConfig;
+import cz.dd4j.utils.config.GenericConfig;
 
 /**
  * All numbers are 1-based, min 3x3!
  * @author Jimmy
  */
-public class MazeGeneratorConfig extends GeneratorConfig {
+public class MazeGeneratorConfig extends GenericConfig {
 	
 	public int xFrom;
 	public int xTo;

@@ -27,9 +27,11 @@ public interface ISimEvents {
 	
 	/**
 	 * Simulation frame has begun.
+	 * @param state
 	 * @param frameNumber
+	 * @param simMillis
 	 */
-	public void simulationFrameBegin(long frameNumber, long simMillis);
+	public void simulationFrameBegin(SimState state, long frameNumber, long simMillis);
 	
 	/**
 	 * An 'action' has been chosen by 'who' for the execution.

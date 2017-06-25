@@ -1,7 +1,18 @@
 package cz.dd4j;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+
 import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.loader.agents.AgentsLoader;
@@ -11,127 +22,166 @@ import cz.dd4j.simulation.SimStaticConfig;
 import cz.dd4j.simulation.actions.instant.IFeatureInstantAction;
 import cz.dd4j.simulation.actions.instant.IHeroInstantAction;
 import cz.dd4j.simulation.actions.instant.IMonsterInstantAction;
-import cz.dd4j.simulation.actions.instant.impl.*;
+import cz.dd4j.simulation.actions.instant.impl.FeatureAttackInstant;
+import cz.dd4j.simulation.actions.instant.impl.HeroAttackInstant;
+import cz.dd4j.simulation.actions.instant.impl.HeroDisarmInstant;
+import cz.dd4j.simulation.actions.instant.impl.HeroDropInstant;
+import cz.dd4j.simulation.actions.instant.impl.HeroMoveInstant;
+import cz.dd4j.simulation.actions.instant.impl.HeroPickupInstant;
+import cz.dd4j.simulation.actions.instant.impl.MonsterAttackInstant;
+import cz.dd4j.simulation.actions.instant.impl.MonsterMoveInstant;
 import cz.dd4j.simulation.data.agents.Agents;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.result.SimResult;
 import cz.dd4j.ui.console.VisConsole;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import cz.dd4j.utils.ExceptionToString;
+import cz.dd4j.utils.collection.Tuple2;
+import cz.dd4j.utils.files.DirCrawler;
+import cz.dd4j.utils.files.DirCrawlerCallback;
 
 public class ExperimentEvaluator {
-	private String _resultsDir;
-	private String _setupDir;
-
-	public ExperimentEvaluator(String resultsDir, String setupDir) {
-		this._resultsDir = resultsDir;
-		_setupDir = setupDir;
-	}
-
-	public class WorkItem {
-		File dungeonFile;
+	
+	public static class WorkItem {
+		File adventureFile;
 		File heroFile;
 
 		WorkItem(File dungeonDir, File heroFile) {
-			this.dungeonFile = dungeonDir;
+			this.adventureFile = dungeonDir;
 			this.heroFile = heroFile;
 		}
 
 		public String toFileName() {
-			return dungeonFile.getName() + "_" + heroFile.getName();
+			return adventureFile.getName() + "_" + heroFile.getName();
+		}
+		
+		@Override
+		public String toString() {
+			return "WorkItem[adventure=" + adventureFile.getName() + ", hero=" + heroFile.getName() + "]";
 		}
 	}
+	
+	private ExperimentEvaluatorConfig config;
+	
+	private ExecutorService executor;
+	
+	private List<File> heroAgentsFiles;
 
-	public HashSet<String> loadProgress() {
-		HashSet<String> results = new HashSet<String>();
-
-		File[] files = resultFiles();
-
-		for (File result : files) {
-			results.add(result.getName());
-		}
-
-		return results;
+	public ExperimentEvaluator(ExperimentEvaluatorConfig config) {
+		this.config = config;
 	}
-
-	private File resultsDir() {
-		return new File(_resultsDir);
+	
+	public synchronized void init() {
+		if (executor != null) return;
+		
+		int numCores = Runtime.getRuntime().availableProcessors();
+		executor = Executors.newFixedThreadPool(numCores);
+		
+		heroAgentsFiles = findHeroAgentFiles();
+		
+		config.target.ensureDir();
 	}
-
-	// TODO: generate the work items lazily.
-	private ArrayList<WorkItem> generateWorkItems() {
-		Tuple<File[], File[]> workItemFiles = loadWorkItemFiles();
-
-		File[] dungeonDirs = workItemFiles.a;
-		File[] heroFiles = workItemFiles.b;
-
-		HashSet<String> currentProgress = loadProgress();
-
-		ArrayList<WorkItem> items = new ArrayList<WorkItem>(dungeonDirs.length * heroFiles.length);
-
-		for (File dungeonDir : dungeonDirs) {
-			final File dungeonFile = new File(dungeonDir.getAbsolutePath(), dungeonDir.getName() + ".xml");
-
-			for (File heroDir : heroFiles) {
-				if (heroDir.toString().endsWith(".meta")) continue;
-
-				final File heroFile = new File(heroDir.getAbsolutePath());
-
-				WorkItem workItem = new WorkItem(dungeonFile, heroFile);
-
-				if (!currentProgress.contains(workItem.toFileName())) {
-					items.add(workItem);
+	
+	private List<File> findHeroAgentFiles() {
+		// LOAD HERO AGENTS
+		final List<File> heroAgents = new ArrayList<File>();		
+		File heroAgentsDir = config.heroAgents.dir;
+		DirCrawler.crawl(heroAgentsDir, new DirCrawlerCallback() {
+			
+			@Override
+			public void visitFile(File file) {
+				if (file.getName().endsWith(".xml")) {
+					heroAgents.add(file);
 				}
 			}
-		}
-
-		return items;
+			
+		});
+		return heroAgents;
 	}
 
-	public void runEvaluator() throws InterruptedException {
-		if (!resultsDir().isDirectory()) {
-			resultsDir().mkdir();
-		}
+//	public HashSet<String> loadProgress() {
+//		HashSet<String> results = new HashSet<String>();
+//
+//		File[] files = resultFiles();
+//
+//		for (File result : files) {
+//			results.add(result.getName());
+//		}
+//
+//		return results;
+//	}
 
-		int numCores = Runtime.getRuntime().availableProcessors();
-		ExecutorService executor = Executors.newFixedThreadPool(numCores);
-
-		for (final WorkItem item : generateWorkItems()) {
-			executor.submit(new Runnable() {
-				@Override
-				public void run() {
-					SimResult result = playout(getSimStaticConfig(), item.dungeonFile, item.heroFile);
-
-					System.out.println("Playout result " + result);
-					try {
-						saveResult(item, result);
-					} catch (IOException e) {
-						System.err.println("Error trying to save result " + item);
-						e.printStackTrace();
-					}
+	public void run() throws InterruptedException {
+		// ENSURE INITIALIZATION
+		init();
+		
+		// CRAWL DUNGEONS AND EXECUTE SIMULATIONS
+		File dungeonDirs = config.source.getDir("adventures");
+		DirCrawler.crawl(dungeonDirs, new DirCrawlerCallback() {
+			
+			@Override
+			public void visitFile(File adventurefile) {
+				if (!adventurefile.getName().endsWith(".xml")) return;
+				for (File heroAgentFile : heroAgentsFiles) {
+					WorkItem item = new WorkItem(adventurefile, heroAgentFile);
+					runOnExecutor(item);
 				}
-			});
-		}
-
+			}
+			
+		});
+						
 		executor.shutdown();
 		executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
 
 		System.out.println("DONE");
 	}
+	
+	private synchronized void runOnExecutor(final WorkItem item) {
+		if (config.playoutLimit == 0) return;
+		if (config.playoutLimit > 0) {
+			--config.playoutLimit;
+		}
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					SimResult result = playout(getSimStaticConfig(), item);
+					System.out.println("Playout result " + result);
+					try {
+						saveResult(item, result);
+					} catch (IOException e) {
+						System.out.println(ExceptionToString.process("Error trying to save result " + item, e));
+					}
+				} catch (Exception e) {
+					System.out.println(ExceptionToString.process("FAILED TO RUN: " + item, e));
+				}
+			}
+		});
+	}
+	
+	private SimResult playout(SimStaticConfig config, WorkItem item) {
+		SimState simState = new SimStateLoader().loadSimState(item.adventureFile);
+		config.bindSimState(simState);
+
+		Agents<IHeroAgent> heroes = new AgentsLoader<IHeroAgent>().loadAgents(item.heroFile);
+		config.bindHeroes(heroes);
+
+		if (!config.isReady()) {
+			throw new RuntimeException("Configuration is not complete. " + config.getMissingInitDescription());
+		}
+		
+		config.description = item.toString();
+		
+		config.state.roundsLeft = 5 * (int)Math.pow(config.state.dungeon.rooms.size(), 2); 
+		
+		SimStatic simulation = new SimStatic(config);
+		simulation.getEvents().addHandler(new VisConsole());
+
+		return simulation.simulate();
+	}
 
 	private void saveResult(WorkItem item, SimResult result) throws IOException {
-		File dir = resultsDir();
-
-		String resultFileName = item.toFileName();
-
-		File file = new File(dir, resultFileName);
+		File file = config.target.getFile(item.toFileName());
+		
 		FileOutputStream writer = new FileOutputStream(file);
 
 		XStream xstream = new XStream(new DomDriver());
@@ -139,66 +189,47 @@ public class ExperimentEvaluator {
 		xstream.toXML(result, writer);
 	}
 
-	private SimResult playout(SimStaticConfig config, File dungeonFile, File heroFile) {
-		SimState simState = new SimStateLoader().loadSimState(dungeonFile);
-		config.bindSimState(simState);
-
-		Agents<IHeroAgent> heroes = new AgentsLoader<IHeroAgent>().loadAgents(heroFile);
-		config.bindHeroes(heroes);
-
-		if (!config.isReady()) {
-			throw new RuntimeException("Configuration is not complete. " + config.getMissingInitDescription());
-		}
-
-		SimStatic simulation = new SimStatic(config);
-		simulation.getEvents().addHandler(new VisConsole());
-
-		return simulation.simulate();
-	}
-
+//	private File[] resultFiles() {
+//		File[] files = config.target.dir.listFiles();
+//
+//		if (files == null) {
+//			return new File[0];
+//		} else {
+//			return files;
+//		}
+//	}
 
 	public static SimStaticConfig getSimStaticConfig() {
 		// CREATE ADVANTURE CONFIGURATION
 		SimStaticConfig config = new SimStaticConfig();
 
 		// SPECIFY ACTIONS TO USE
-		IHeroInstantAction[] heroActions = new IHeroInstantAction[]{new HeroAttackInstant(), new HeroDisarmInstant(), new HeroDropInstant(),
-				new HeroMoveInstant(), new HeroPickupInstant()};
+		IHeroInstantAction[] heroActions = new IHeroInstantAction[]{
+											   new HeroAttackInstant(), new HeroDisarmInstant(), new HeroDropInstant(),
+											   new HeroMoveInstant(), new HeroPickupInstant()
+										   };
 		IMonsterInstantAction[] monsterActions = new IMonsterInstantAction[]{new MonsterMoveInstant(), new MonsterAttackInstant()};
 		IFeatureInstantAction[] featureActions = new IFeatureInstantAction[]{new FeatureAttackInstant()};
 
 		config.bindActions(EEntity.HERO, heroActions);
 		config.bindActions(EEntity.MONSTER, monsterActions);
 		config.bindActions(EEntity.FEATURE, featureActions);
+		
 		return config;
 	}
-
-
-	private File[] resultFiles() {
-		File[] files = resultsDir().listFiles();
-
-		if (files == null) {
-			return new File[0];
-		} else {
-			return files;
+	
+	public static void main(String[] args) {
+		try {
+			ExperimentEvaluatorConfig config = new ExperimentEvaluatorConfig();
+			config.playoutLimit = 20;
+			
+			config.source.dir = new File("../DarkDungeon4J-Generator/result");
+			config.target.dir = new File("./result");
+			
+			// TODO: parse args to extract experiment & result dirs + continue/restart flag
+			new ExperimentEvaluator(config).run();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-	}
-
-	private Tuple<File[], File[]> loadWorkItemFiles() {
-		File dungeonsParent = new File(_setupDir, "dungeons");
-		final File[] dungeonDirs = dungeonsParent.listFiles();
-
-		if (dungeonDirs == null) {
-			throw new RuntimeException("Directory " + dungeonsParent.getAbsolutePath() + " doesn't exist.");
-		}
-
-		File heroesParent = new File(_setupDir, "heroes");
-		final File[] heroDirs = heroesParent.listFiles();
-
-		if (heroDirs == null) {
-			throw new RuntimeException("Directory " + heroesParent.getAbsolutePath() + " doesn't exist.");
-		}
-
-		return new Tuple<File[], File[]>(dungeonDirs, heroDirs);
 	}
 }

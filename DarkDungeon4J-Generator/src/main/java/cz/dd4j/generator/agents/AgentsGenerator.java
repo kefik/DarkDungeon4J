@@ -33,7 +33,7 @@ public class AgentsGenerator extends GeneratorBase<AgentsGeneratorConfig> {
 	}
 
 	private void generate(int agentId, AgentXML agentPrototype) {
-		File targetFile = config.getTargetFile("/agents/" + config.directory, config.agentIdPrefix + agentId + "-" + agentPrototype.name + ".xml");
+		File targetFile = config.target.getFile("/agents/" + config.directory, config.agentIdPrefix + agentId + "-" + agentPrototype.name + ".xml");
 		
 		config.log.info(getClass().getSimpleName() + ".generate(agent " + agentPrototype.name + " of id " + agentId + "): generating...");
 		

@@ -32,7 +32,7 @@ public class GoalsGenerator extends GeneratorBase<GoalsGeneratorConfig> {
 	}
 
 	private void generate(int goalRoom) {
-		File targetFile = config.getTargetFile("/goals", "Goal-Room" + goalRoom + ".xml");
+		File targetFile = config.target.getFile("/goals", "Goal-Room" + goalRoom + ".xml");
 		
 		config.log.info(getClass().getSimpleName() + ".generate(goal for room " + goalRoom + "): generating...");
 		
