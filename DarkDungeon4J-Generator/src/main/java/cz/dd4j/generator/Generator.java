@@ -189,9 +189,10 @@ public class Generator {
 	
 	public void generateAdventuresJune2017_Full() {
 		NiceAdventureGeneratorConfig_V1 config = new NiceAdventureGeneratorConfig_V1();
-		config.setupJune2017_Full();
 		
 		config.assign(rootConfig);
+		
+		config.setupJune2017_Full();
 		
 		NiceAdventureGenerator_V1 generator = new NiceAdventureGenerator_V1(config);
 		
