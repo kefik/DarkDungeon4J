@@ -1,6 +1,8 @@
 package cz.dd4j.generator.adventure;
 
-import cz.dd4j.generator.adventure.AdventureGenerator.AdventureContext;
+import cz.dd4j.generator.adventure.callbacks.AdventureContext;
+import cz.dd4j.generator.adventure.impls.AdventureGeneratorBase;
+import cz.dd4j.generator.adventure.impls.AdventureGeneratorConfigBase;
 import cz.dd4j.loader.simstate.impl.xml.SimStateXML;
 
 public interface IAdventureCallback {
@@ -11,6 +13,6 @@ public interface IAdventureCallback {
 	 * @param generator
 	 * @param config the same as generator.config
 	 */
-	public void process(AdventureContext ctx, SimStateXML adventure, AdventureGenerator generator, AdventureGeneratorConfig config);
+	public void process(AdventureContext ctx, SimStateXML adventure, AdventureGeneratorBase generator, AdventureGeneratorConfigBase config);
 	
 }

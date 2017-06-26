@@ -24,10 +24,10 @@ public abstract class GeneratorBase<CONFIG extends GenericConfig> {
 	public GeneratorBase(Class classToSave, CONFIG config) {
 		this.classToSave = classToSave;
 		this.config = config;	
-		xstream = init();		
+		xstream = initXStream();		
 	}
 	
-	protected XStream init() {
+	protected XStream initXStream() {
 		XStream xstream = new XStream(new DomDriver());
 		xstream.autodetectAnnotations(true);
 		xstream.alias(((XStreamAlias)classToSave.getAnnotation(XStreamAlias.class)).value(), classToSave);

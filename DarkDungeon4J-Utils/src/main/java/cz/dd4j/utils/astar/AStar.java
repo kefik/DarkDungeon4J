@@ -57,7 +57,7 @@ public class AStar<NODE extends INode<NODE>> {
 		while (opened.size() > 0) {
 			SearchNode current = opened.remove();
 			
-			if (current == to) {
+			if (current.node.equals(to)) {
 				return reconstructPath(from, current);
 			}
 			

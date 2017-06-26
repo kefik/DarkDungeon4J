@@ -9,6 +9,10 @@ import java.util.Map;
 import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Convert;
 
+/**
+ * If getter does not find value in this map, looks up {@link Policy#INSTANCE} before returning default value.
+ * @author Jimmy
+ */
 public class ConfigMap extends HashMap<String, Object> {
 
 	/**
@@ -25,6 +29,14 @@ public class ConfigMap extends HashMap<String, Object> {
 		}
 	}
 	
+	@Override
+	public Object get(Object key) {
+		if (containsKey(key)) {
+			return super.get(key);
+		}
+		return (this == Policy.INSTANCE ? null : Policy.INSTANCE.get(key));		
+	}
+	
 	public int getInt(String key) { 
 		return getInt(key, 0);
 	}
@@ -35,7 +47,7 @@ public class ConfigMap extends HashMap<String, Object> {
 			if (value == null) return defaultValue;
 			return value;
 		}
-		return defaultValue;
+		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getInt(key, defaultValue));
 	}
 	
 	public long getLong(String key) { 
@@ -48,7 +60,7 @@ public class ConfigMap extends HashMap<String, Object> {
 			if (value == null) return defaultValue;
 			return value;
 		}
-		return defaultValue;
+		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getLong(key, defaultValue));
 	}
 	
 	public double getDouble(String key) {
@@ -61,7 +73,7 @@ public class ConfigMap extends HashMap<String, Object> {
 			if (value == null) return defaultValue;
 			return value;
 		}
-		return defaultValue;
+		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getDouble(key, defaultValue));
 	}
 	
 	public float getFloat(String key) {
@@ -74,7 +86,7 @@ public class ConfigMap extends HashMap<String, Object> {
 			if (value == null) return defaultValue;
 			return value;
 		}
-		return defaultValue;
+		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getFloat(key, defaultValue));
 	}
 	
 	public String getString(String key) {
@@ -87,7 +99,7 @@ public class ConfigMap extends HashMap<String, Object> {
 			if (value == null) return defaultValue;
 			return value;
 		}
-		return defaultValue;
+		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getString(key, defaultValue));
 	}
 	
 	public boolean getBoolean(String key) {
@@ -96,7 +108,7 @@ public class ConfigMap extends HashMap<String, Object> {
 	
 	public boolean getBoolean(String key, boolean defaultValue) {
 		if (containsKey(key)) return Convert.toBoolean(get(key));
-		return defaultValue;
+		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getBoolean(key, defaultValue));
 	}
 	
 	public File getFile(String key) {
@@ -109,7 +121,7 @@ public class ConfigMap extends HashMap<String, Object> {
 			if (value == null) return defaultValue;
 			return value;
 		}
-		return defaultValue;
+		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getFile(key, defaultValue));
 	}
 
 	public String describe() {
@@ -168,7 +180,11 @@ public class ConfigMap extends HashMap<String, Object> {
 
 	private void autoConfigField(Object object, Class classInfo, Field field) {
 		String fieldName = field.getName();
-		if (!containsKey(fieldName)) return;
+		if (!containsKey(fieldName)) {
+			// TRY TO USE POLICY AS DEFAULTS...
+			
+			return;
+		}
 		if (field.getType() == int.class || field.getType() == Integer.class) {
 			autoConfigFieldInt(object, classInfo, field, fieldName);
 		} else

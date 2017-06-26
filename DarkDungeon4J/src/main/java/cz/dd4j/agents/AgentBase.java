@@ -1,6 +1,8 @@
 package cz.dd4j.agents;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import cz.dd4j.agents.commands.Command;
@@ -115,6 +117,15 @@ public class AgentBase implements IAgent, IConfigurable {
 		} else {
 			return actions.get(random.nextInt(actions.size()));
 		}
+	}
+
+	/**
+	 * To be overridden by subclasses if required, so far, empty implementation.
+	 * If overridden, the subclass should use super.getReport() first, add own details and return the map then.
+	 */
+	@Override
+	public Map<String, Object> getReport() {
+		return new HashMap<String, Object>();
 	}
 
 }

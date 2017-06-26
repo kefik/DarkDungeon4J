@@ -20,12 +20,17 @@ public class SimStaticConfig {
 	}
 	
 	// ===========
-	// DESCRIPTION
+	// USER CONFIG
 	// ===========
 	
 	public String id;
 	public String description;
 
+	/**
+	 * Whether to collect executed actions within {@link SimStaticStats#actionSelectedStats} and {@link SimStaticStats#actionExecutedStats}.
+	 */
+	public boolean collectActionStats = true; 
+	
 	// ============
 	// CONFIG STATE
 	// ============
@@ -55,6 +60,7 @@ public class SimStaticConfig {
 	// SIM STATE
 	// =========
 	
+	// TODO: this should not be used by {@link SimStatic} directly but clone()d...
 	public SimState state;
 	
 	public SimStaticConfig() {

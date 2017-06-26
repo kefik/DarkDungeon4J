@@ -1,5 +1,6 @@
 package cz.dd4j.agents;
 
+import java.util.Map;
 import java.util.Random;
 
 import cz.dd4j.domain.EEntity;
@@ -73,5 +74,16 @@ public interface IAgent {
 	 * WARNING: exception thrown by this method are ignored and not logged!
 	 */
 	public void simulationEnded();
+	
+	// =============
+	// DATA REPORTER
+	// =============
+	
+	/**
+	 * Returns the report about the agent run; this is used by experiments that reports data about agent runs into CSV files.
+	 * @return
+	 */
+	public Map<String, Object> getReport();
+	
 	
 }

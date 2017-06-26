@@ -59,13 +59,9 @@ public class SimStatic {
 	// ===========
 	// SIM RUNNING
 	// ===========
-
-	private long frameNumber;
-
-	private long simulationStartMillis;
-
-	private long currentTickMillis;
-
+	
+	private SimStaticStats stats;
+	
 	private long timeDeltaMillis;
 
 	private SimResult resultException;
@@ -117,16 +113,16 @@ public class SimStatic {
 					return simulationResult;
 				}
 				
-				++frameNumber;
-				long lastTickMillis = currentTickMillis;
-				currentTickMillis = System.currentTimeMillis();
-				timeDeltaMillis = currentTickMillis - lastTickMillis;
+				++stats.frameNumber;
+				long lastTickMillis = stats.currentTickMillis;
+				stats.currentTickMillis = System.currentTimeMillis();
+				timeDeltaMillis = stats.currentTickMillis - lastTickMillis;
 
-				eventsTracker.event().simulationFrameBegin(config.state, frameNumber, currentTickMillis - simulationStartMillis);
+				eventsTracker.event().simulationFrameBegin(config.state, stats);
 
 				tick();
 
-				eventsTracker.event().simulationFrameEnd(frameNumber);
+				eventsTracker.event().simulationFrameEnd(stats);
 				
 				--config.state.roundsLeft;
 			}
@@ -142,8 +138,12 @@ public class SimStatic {
 	}
 
 	private void prepareSimulation() {
-		frameNumber = 0;
-		simulationStartMillis = System.currentTimeMillis();
+		stats = new SimStaticStats();
+		stats.config = config;
+		
+		stats.frameNumber = 0;
+		stats.simulationStartMillis = System.currentTimeMillis();
+		
 		resultException = null;
 		simulationResult = null;
 
@@ -301,7 +301,7 @@ public class SimStatic {
 	}
 
 	private void startSimulation() {
-		eventsTracker.event().simulationBegin(config.state);
+		eventsTracker.event().simulationBegin(config.state, stats);
 		startAgents();
 	}
 
@@ -335,7 +335,7 @@ public class SimStatic {
 		} catch (Exception e) {
 		}
 		try {
-			eventsTracker.event().simulationEnd(simulationResult);
+			eventsTracker.event().simulationEnd(simulationResult, stats);
 		} catch (Exception e) {
 		}
 	}
@@ -388,8 +388,8 @@ public class SimStatic {
 		for (AgentMindBody<Hero, IHeroAgent> hero : config.state.heroes.values()) {
 			try {
 				// OBSERVE
-				hero.mind.observeBody(hero.body, currentTickMillis);
-				hero.mind.observeDungeon(config.state.dungeon, true, currentTickMillis);
+				hero.mind.observeBody(hero.body, stats.currentTickMillis);
+				hero.mind.observeDungeon(config.state.dungeon, true, stats.currentTickMillis);
 				// ACT
 				hero.body.action = hero.mind.act();
 			} catch (Exception e) {
@@ -400,6 +400,8 @@ public class SimStatic {
 			}
 			// SUBSCRIBE
 			subscribeAction(hero.body);
+			// NOTE
+			if (config.collectActionStats) stats.actionSelectedStats.get(hero.mind).inc(hero.body.action.type);
 			// INFORM EVENT
 			eventsTracker.event().actionSelected(hero.body, hero.body.action);
 		}
@@ -411,8 +413,8 @@ public class SimStatic {
 				continue;
 			try {
 				// OBSERVE
-				monster.mind.observeBody(monster.body, currentTickMillis);
-				monster.mind.observeDungeon(config.state.dungeon, true, currentTickMillis);
+				monster.mind.observeBody(monster.body, stats.currentTickMillis);
+				monster.mind.observeDungeon(config.state.dungeon, true, stats.currentTickMillis);
 				// ACT
 				monster.body.action = monster.mind.act();
 				if (monster.body.action != null) {
@@ -423,6 +425,8 @@ public class SimStatic {
 			}
 			// SUBSCRIBE
 			subscribeAction(monster.body);
+			// NOTE
+			if (config.collectActionStats) stats.actionSelectedStats.get(monster.mind).inc(monster.body.action.type);
 			// INFORM EVENT
 			eventsTracker.event().actionSelected(monster.body, monster.body.action);
 		}
@@ -451,6 +455,8 @@ public class SimStatic {
 			}
 			// SUBSCRIBE
 			subscribeAction(feature.body);
+			// NOTE
+			if (config.collectActionStats) stats.actionSelectedStats.get(feature.mind).inc(feature.body.action.type);
 			// INFORM EVENT
 			eventsTracker.event().actionSelected(feature.body, feature.body.action);
 		}
@@ -573,6 +579,10 @@ public class SimStatic {
 			eventsTracker.event().actionEnded(entity, action);
 			checkDead(action.who);
 			checkDead(action.target);
+			
+			// NOTE
+			if (config.collectActionStats) stats.actionSelectedStats.get(config.state.getAgentMindBody(entity.id).mind).inc(entity.action.type);
+			
 			return true;
 		} else {
 			invalidateAction(entity);
@@ -736,8 +746,8 @@ public class SimStatic {
 
 	private SimResult newSimResult() {
 		SimResult result = new SimResult();
-		result.frameNumber = frameNumber;
-		result.simTimeMillis = System.currentTimeMillis() - simulationStartMillis;
+		result.frameNumber = stats.frameNumber;
+		result.simTimeMillis = System.currentTimeMillis() - stats.simulationStartMillis;
 		return result;
 	}
 

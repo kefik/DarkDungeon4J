@@ -1,4 +1,4 @@
-package cz.dd4j.generator.adventure;
+package cz.dd4j.generator.adventure.impls;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,88 +14,24 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cz.dd4j.generator.GeneratorBase;
+import cz.dd4j.generator.adventure.IAdventureCallback;
+import cz.dd4j.generator.adventure.IAdventureFilter;
 import cz.dd4j.loader.simstate.impl.xml.FileXML;
 import cz.dd4j.loader.simstate.impl.xml.SimStateXML;
-import cz.dd4j.utils.Const;
-import cz.dd4j.utils.collection.CombinationsGenerator;
 import cz.dd4j.utils.files.DirCrawler;
 import cz.dd4j.utils.files.DirCrawlerCallback;
+import cz.dd4j.utils.math.CombinationsGenerator;
+import cz.dd4j.utils.math.VariationsGenerator;
 
-public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
+public class TotalAdventureGenerator extends AdventureGeneratorBase<TotalAdventureGeneratorConfig> {
 	
-	public static class AdventureContext {
-		
-		public int adventureNumber;
-		
-		public int roomsCount;
-		
-		public String roomsFile;
-		
-		public String heroesFile;
-		
-		public String goalsFile;
-		
-		public String corridorsFile;
-		
-		public String resultDirRootRelativePath;
-		
-		public List<String> allMonsterTypes = new ArrayList<String>();
-		
-		public List<String> allTrapTypes = new ArrayList<String>();
-		
-		public List<String> allItemTypes = new ArrayList<String>();
-
-		public List<String> itemTypes;
-
-		public List<String> trapTypes;
-
-		public List<String> monsterTypes;
-		
-		public int monstersCount;
-
-		public List<Integer> roomIds;
-		
-		public void reset() {
-			adventureNumber = 0;
-			roomsCount = 0;
-			roomsFile = null;
-			heroesFile = null;
-			goalsFile = null;
-			corridorsFile = null;		
-			resultDirRootRelativePath = null;
-			allMonsterTypes.clear();
-			allTrapTypes.clear();
-			allItemTypes.clear();
-		}
-		
-	}
-
-	private static final Pattern ROOMS_PATTERN = Pattern.compile("Requires: Rooms([0-9]*)\\.xml"); 
-	
-	private static final Pattern MONSTER_AGENT_PATTERN = Pattern.compile("monster[0-9]*-([^.]*)\\.xml$");
-	
-	private static final Pattern TRAP_AGENT_PATTERN = Pattern.compile("trap[0-9]*-([^.]*)\\.xml$");
-	
-	private static final Pattern ITEM_PATTERN = Pattern.compile("([a-zA-Z_]*)[0-9]*-Room[0-9]*\\.xml$");
-	
-	private AdventureContext ctx = new AdventureContext();	
-	
-	public AdventureGenerator(AdventureGeneratorConfig config) {
-		super(SimStateXML.class, config);
+	public TotalAdventureGenerator(TotalAdventureGeneratorConfig config) {
+		super(config);
 	}
 	
-	private void reset() {
-		ctx.reset();
-	}
-
 	@Override
 	public void generate() {
-		reset();
-		
-		probeMonsterTypes();
-		probeTrapTypes();
-		probeItemTypes();
+		init();
 		
 		File corridorsDir = config.target.getDir(config.corridorsDir);
 		
@@ -116,46 +52,6 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 		}
 	}
 	
-	private void probeMonsterTypes() {
-		ctx.allMonsterTypes.clear();
-		File dir = config.target.getDir(config.agentMonstersDir);
-		probeTypes(MONSTER_AGENT_PATTERN, 1, dir, ctx.allMonsterTypes);
-	}
-
-	private void probeTrapTypes() {
-		ctx.allTrapTypes.clear();
-		File agentTrapsDir = config.target.getDir(config.agentTrapsDir);
-		probeTypes(TRAP_AGENT_PATTERN, 1, agentTrapsDir, ctx.allTrapTypes);
-	}
-	
-	private void probeItemTypes() {
-		ctx.allItemTypes.clear();
-		File dir = config.target.getDir(config.itemsDir);
-		probeTypes(ITEM_PATTERN, 1, dir, ctx.allItemTypes);
-	}
-	
-
-	private void probeTypes(final Pattern pattern, final int typeInMatcherGroup, File rootDir, final List<String> output) {
-		final Set<String> types = new HashSet<String>();
-		
-		DirCrawler.crawl(rootDir, new DirCrawlerCallback() {
-			
-			@Override
-			public void visitFile(File file) {
-				
-				Matcher matcher = pattern.matcher(file.getName());
-				if (matcher.find()) {
-					String type = matcher.group(typeInMatcherGroup);
-					types.add(type);
-				}
-			}
-			
-		});		
-		
-		output.addAll(types);
-		Collections.sort(output);		
-	}
-
 	private void generateForCorridors(File corridorsFile) {
 		// SETUP TARGET CORRIDORS FILE
 		ctx.corridorsFile = config.corridorsDir + "/" + corridorsFile.getName();
@@ -187,13 +83,13 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 			for (int trapsCount : config.traps) {
 				for (int monstersCount : config.monsters) {
 					// GO THROUGH ALL COMBINATIONS OF ITEM
-					CombinationsGenerator<String> itemTypeNonUniqueCombinations = new CombinationsGenerator<String>(itemsCount, ctx.allItemTypes, false, false);
+					CombinationsGenerator<String> itemTypeNonUniqueCombinations = new CombinationsGenerator<String>(itemsCount, ctx.allItemTypes, false);
 					// GO THROUGH ALL COMBINATIONS OF TRAPS
-					CombinationsGenerator<String> trapTypeNonUniqueCombinations = new CombinationsGenerator<String>(trapsCount, ctx.allTrapTypes, false, false);
+					CombinationsGenerator<String> trapTypeNonUniqueCombinations = new CombinationsGenerator<String>(trapsCount, ctx.allTrapTypes, false);
 					// GO THROUGH ALL COMBINATIONS OF MONSTERS					
 					CombinationsGenerator<String> monsterTypeNonUniqueCombinations;
-					if (config.monstersOfTheSameType) monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(1,             ctx.allMonsterTypes, false, false);
-					else                              monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(monstersCount, ctx.allMonsterTypes, false, false);
+					if (config.monstersOfTheSameType) monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(1,             ctx.allMonsterTypes, false);
+					else                              monsterTypeNonUniqueCombinations = new CombinationsGenerator<String>(monstersCount, ctx.allMonsterTypes, false);
 					
 					for (List<String> itemTypes : itemTypeNonUniqueCombinations) {
 						for (List<String> trapTypes : trapTypeNonUniqueCombinations) {
@@ -203,7 +99,7 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 								// room'roomsCount' -> goal position
 								
 								// PLACE ALL ITEMS/TRAPS/MONSTERS SOMEWHERE								
-								CombinationsGenerator<Integer> roomIndicesUniqueVariations = new CombinationsGenerator<Integer>(itemsCount+trapsCount+monstersCount, allRoomIndices, true, true);								
+								VariationsGenerator<Integer> roomIndicesUniqueVariations = new VariationsGenerator<Integer>(itemsCount+trapsCount+monstersCount, allRoomIndices, true);								
 								for (List<Integer> roomIndices : roomIndicesUniqueVariations) {
 									generateForSettings(itemTypes, trapTypes, monsterTypes, monstersCount, roomIndices);									
 								}
@@ -215,20 +111,7 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 			}
 		}
 	}
-
-	private String determineResultDirRootRelativePath() {
-		if (config.resultDir == null || config.resultDir.length() == 0 || config.resultDir.equals(".")) return "";
-		
-		String result = "";
-		
-		String[] parts = config.resultDir.split("/");
-		for (int i = 0; i < parts.length; ++i) {
-			result += "../";
-		}
-		
-		return result;
-	}
-
+	
 	private void generateForSettings(List<String> itemTypes, List<String> trapTypes, List<String> monsterTypes, int monstersCount, List<Integer> roomIds) {
 		ctx.itemTypes = itemTypes;
 		ctx.trapTypes = trapTypes;
@@ -322,39 +205,6 @@ public class AdventureGenerator extends GeneratorBase<AdventureGeneratorConfig>{
 		
 		// RAISE ADVENTURE NUMBER
 		++ctx.adventureNumber;
-	}
-	
-	private FileXML newFileXML(String file) {
-		FileXML result = new FileXML();
-		result.path = ctx.resultDirRootRelativePath + file;
-		return result;
-	}
-
-	private int readRequiredRooms(File corridorsFile) {
-		FileInputStream stream = null;
-		BufferedReader reader = null;
-		try {
-			stream = new FileInputStream(corridorsFile);
-			reader = new BufferedReader(new InputStreamReader(stream));
-			while (reader.ready()) {
-				String line = reader.readLine();
-				Matcher matcher = ROOMS_PATTERN.matcher(line);
-				if (matcher.find()) {
-					return Integer.parseInt(matcher.group(1));
-				}
-			}
-		} catch (Exception e) {	
-			throw new RuntimeException("Failed to open file: " + corridorsFile.getAbsolutePath());
-		} finally {
-			if (reader != null) {				
-				try { reader.close(); } catch (Exception e) {}
-			}
-			if (stream != null) {				
-				try { stream.close(); } catch (Exception e) {}
-			}
-		}
-				
-		throw new RuntimeException("Failed to find the required number of rooms in file: " + corridorsFile.getAbsolutePath());
 	}
 	
 }

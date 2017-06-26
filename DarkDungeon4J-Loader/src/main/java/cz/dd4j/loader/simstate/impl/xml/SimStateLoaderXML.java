@@ -34,20 +34,28 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 	@Override
 	public SimState loadSimState(File xmlFile) {
 		SimStateXML simStateXML = load(xmlFile);
-		
+
 		if (simStateXML.dungeons.size() == 0) {
 			throw new RuntimeException("SimState does not contain any dungeon definition! File: " + xmlFile.getAbsolutePath());
 		}
 		
-		List<File> dungeonXMLFiles = new ArrayList<File>(simStateXML.dungeons.size());
-		List<File> agentsXMLFiles = new ArrayList<File>(simStateXML.agents.size());
+		return loadSimState(new File(xmlFile.getParent()), simStateXML);
+	}
+	
+	public SimState loadSimState(File xmlFileDir, SimStateXML simStateXML) {
+		List<File> dungeonXMLFiles = new ArrayList<File>(simStateXML.dungeons == null ? 0 : simStateXML.dungeons.size());
+		List<File> agentsXMLFiles = new ArrayList<File>(simStateXML.agents == null ? 0 : simStateXML.agents.size());
 		
-		for (FileXML dungeon : simStateXML.dungeons) {
-			dungeonXMLFiles.add(new File(xmlFile.getParent(), dungeon.path));			
+		if (simStateXML.dungeons != null) {
+			for (FileXML dungeon : simStateXML.dungeons) {
+				dungeonXMLFiles.add(new File(xmlFileDir, dungeon.path));			
+			}
 		}
 		
-		for (FileXML agents : simStateXML.agents) {
-			agentsXMLFiles.add(new File(xmlFile.getParent(), agents.path));			
+		if (simStateXML.agents != null) {
+			for (FileXML agents : simStateXML.agents) {
+				agentsXMLFiles.add(new File(xmlFileDir, agents.path));			
+			}
 		}
 		
 		return loadSimState(dungeonXMLFiles, agentsXMLFiles);

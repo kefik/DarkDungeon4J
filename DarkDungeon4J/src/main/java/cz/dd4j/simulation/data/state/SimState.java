@@ -51,4 +51,10 @@ public class SimState {
 	 */
 	public int roundsLeft = 1000;
 	
+	public AgentMindBody getAgentMindBody(Id id) {
+		if (heroes.containsKey(id)) return heroes.get(id);
+		if (monsters.containsKey(id)) return monsters.get(id);
+		return features.get(id);
+	}
+	
 }

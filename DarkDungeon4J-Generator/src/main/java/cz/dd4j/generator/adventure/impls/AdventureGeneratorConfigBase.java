@@ -1,6 +1,11 @@
-package cz.dd4j.generator.adventure;
+package cz.dd4j.generator.adventure.impls;
 
+import java.io.File;
+
+import cz.dd4j.generator.adventure.IAdventureCallback;
+import cz.dd4j.generator.adventure.IAdventureFilter;
 import cz.dd4j.generator.adventure.callbacks.AdventureSerializerCallback;
+import cz.dd4j.utils.config.BidirConfig;
 import cz.dd4j.utils.config.GenericConfig;
 
 /**
@@ -14,7 +19,7 @@ import cz.dd4j.utils.config.GenericConfig;
  * 
  * @author Jimmy
  */
-public class AdventureGeneratorConfig extends GenericConfig {
+public class AdventureGeneratorConfigBase extends BidirConfig {
 
 	public String roomsDir = "rooms";
 	
@@ -34,18 +39,14 @@ public class AdventureGeneratorConfig extends GenericConfig {
 	
 	public String agentTrapsDir = "agents/traps";
 	
-	public String resultDir = "adventures/grid";
-	
-	public Range monsters = new Range(1,1);
-	public boolean monstersOfTheSameType = true;
-	
-	public Range items = new Range(1,1);
-	
-	public Range traps = new Range(1,1);
-	
 	// FILTERS AND CALLBACKS
 	
 	public IAdventureFilter[] filters;
 	
-	public IAdventureCallback[] callback = new IAdventureCallback[]{ new AdventureSerializerCallback() };	
+	public IAdventureCallback[] callback = new IAdventureCallback[]{ new AdventureSerializerCallback() };
+	
+	public AdventureGeneratorConfigBase() {
+		source.dir = new File("result/");
+		target.dir = new File("result/adventures/grid");
+	}
 }

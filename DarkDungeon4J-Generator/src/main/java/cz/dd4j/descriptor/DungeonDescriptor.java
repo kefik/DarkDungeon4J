@@ -75,13 +75,13 @@ public class DungeonDescriptor {
 			if (room.item != null && room.item.isA(EItem.SWORD)) swordRooms.add(room);
 		}
 		
-		// CONSTRUCT ASTAR
-		AStar astar = new AStar(heuristic);
+		// CONSTRUCT PATHS
+		DungeonPaths paths = new DungeonPaths(dungeon);
 		
 		Path<Room> path = null;
 		
 		// FIND MINIMAL PATH TO GOAL
-		path = astar.findPath(heroRoom, goalRoom);
+		path = paths.findPath(heroRoom, goalRoom);
 		
 		if (path == null) {
 			throw new RuntimeException("Invalid dungeon, hero cannot reach the goal.");
@@ -89,14 +89,7 @@ public class DungeonDescriptor {
 		
 		result.goalDistance = path.getDistanceNodes();
 		
-		IAStarView<Room> nonMonsterRooms = new IAStarView<Room>() {
-			@Override
-			public boolean isOpened(Room node) {
-				return node.monster != null;
-			}			
-		};
-		
-		path = astar.findPath(heroRoom, goalRoom, nonMonsterRooms);
+		path = paths.findPath(heroRoom, goalRoom, DungeonPaths.ASTAR_NO_MONSTERS_VIEW);
 		if (path == null) {
 			result.goalDistanceNonMonster = -1;
 		} else {
@@ -104,17 +97,10 @@ public class DungeonDescriptor {
 		}
 		
 		// FIND DANGEROUSNESS
-		IAStarView<Room> nonTrapRooms = new IAStarView<Room>() {
-			@Override
-			public boolean isOpened(Room node) {
-				return node.feature != null || !node.feature.isA(EFeature.TRAP);
-			}			
-		};
-		
 		result.lowestDanger = -1;
 		
 		for (Room monsterRoom : monsterRooms) {
-			path = astar.findPath(monsterRoom, heroRoom, nonTrapRooms);
+			path = paths.findPath(monsterRoom, heroRoom, DungeonPaths.ASTAR_NO_TRAPS_VIEW);
 			if (path == null) continue;
 			result.danger.put(path.getDistanceNodes(), 1+result.danger.get(path.getDistanceNodes()));
 			if (result.lowestDanger < 0 || result.lowestDanger > path.getDistanceNodes()) result.lowestDanger = path.getDistanceNodes();
@@ -124,7 +110,7 @@ public class DungeonDescriptor {
 		result.nearestSwordDistance = -1;
 		
 		for (Room swordRoom : swordRooms) {
-			path = astar.findPath(heroRoom, swordRoom, nonMonsterRooms);
+			path = paths.findPath(heroRoom, swordRoom, DungeonPaths.ASTAR_NO_MONSTERS_VIEW);
 			if (path == null) continue;
 			if (result.nearestSwordDistance < 0 || result.nearestSwordDistance > path.getDistanceNodes()) result.nearestSwordDistance = path.getDistanceNodes();
 		}
