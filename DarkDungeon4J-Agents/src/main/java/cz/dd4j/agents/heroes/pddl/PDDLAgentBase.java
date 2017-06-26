@@ -175,6 +175,10 @@ public class PDDLAgentBase extends HeroAgentBase {
 			return Integer.MAX_VALUE;
 		}
 
+		return getClosestMonsterDistance(r);
+	}
+
+	protected int getClosestMonsterDistance(Room r) {
 		List<Room> monsters = dungeon.rooms.values().stream().filter((room) -> room.monster != null).collect(Collectors.toList());
 		if (monsters.size() == 0) { // no monsters -> safe
 			return Integer.MAX_VALUE;

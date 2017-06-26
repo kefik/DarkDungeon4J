@@ -3,6 +3,8 @@ package cz.dd4j.agents.heroes.pddl;
 import com.sun.istack.internal.NotNull;
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.actions.EAction;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
+import cz.dd4j.simulation.data.dungeon.elements.entities.features.Trap;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
@@ -19,6 +21,7 @@ public class Clever01Agent extends PDDLAgentBase {
     protected int threshold = 2;
 
     protected List<PDDLAction> currentPlan;
+    private boolean reactiveActionTaken;
 
     @Override
     public void prepareAgent() {
@@ -26,6 +29,9 @@ public class Clever01Agent extends PDDLAgentBase {
     }
 
     protected boolean shouldReplan() {
+
+        if (reactiveActionTaken)
+            return true;
 
         if (currentPlan == null || currentPlan.isEmpty()) //no plan or plan finished
             return true;
@@ -42,11 +48,14 @@ public class Clever01Agent extends PDDLAgentBase {
         System.out.println("dang: " + dng);
         if (dng <= threshold) {
             System.out.println("Reactive action");
+            reactiveActionTaken = true;
             List<Command> availableActions = actionsGenerator.generateFor(hero);
-            return availableActions.stream().min(Comparator.comparingInt(this::evaluateCommand)).orElse(null);
+            return availableActions.stream().max(Comparator.comparingInt(this::evaluateCommand)).orElse(null);
         } else if (shouldReplan()) {
             currentPlan = plan();
         }
+
+        reactiveActionTaken = false;
 
         PDDLAction currentAction = currentPlan.remove(0);
         return translateAction(currentAction);
@@ -54,8 +63,41 @@ public class Clever01Agent extends PDDLAgentBase {
 
     private int evaluateCommand(@NotNull Command cmd) {
 
-        if (cmd.isType(EAction.MOVE)) { //for moves, the value is the dang of the target room
-            return dang(dungeon.rooms.get(cmd.target.id));
+        // room with trap, anything except disarm is dead-end, disarm is distance to closest monster - 1 (monster can move)
+        if (hero.atRoom.feature != null) {
+            if (cmd.isType(EAction.DISARM)) {
+                // this is technically not correct (see comment above), but leads to always selecting DISARM action
+                return 1;
+            }
+            else
+                return 0;
+        }
+
+        // room with monster
+        if (hero.atRoom.monster != null) {
+            if (hero.hand == null) {
+                return 0;
+            }
+            Monster m = hero.atRoom.monster;
+            hero.atRoom.monster = null;
+            int val = evaluateCommand(cmd);
+            hero.atRoom.monster = m;
+            return val;
+        }
+
+        //for moves, the value is the distance to closest monster from the target room - 1 (the monsters can move)
+        if (cmd.isType(EAction.MOVE)) {
+            return getClosestMonsterDistance(dungeon.rooms.get(cmd.target.id)) - 1;
+        }
+
+        //for sword dropping, the value is the distance to closest monster from the current room - 1 (monsters move)
+        if (cmd.isType(EAction.DROP)) {
+            return getClosestMonsterDistance(hero.atRoom) - 1;
+        }
+
+        //after picking up sword (in a room without trap), the hero is safe
+        if (cmd.isType(EAction.PICKUP)) {
+            return Integer.MAX_VALUE;
         }
 
         return 0;
