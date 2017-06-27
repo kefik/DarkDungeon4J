@@ -1,9 +1,13 @@
 <agents>
   <agent id="hero1">
-    <agentFQCN>cz.dd4j.agents.heroes.pddl.NaivePlanning02Agent</agentFQCN>
+    <agentFQCN>cz.dd4j.agents.heroes.pddl.Clever02Agent</agentFQCN>
+    <config>
+        <key>threshold</key>
+        <value>2</value>
+    </config>
     <config>
         <key>domainFile</key>
-        <value>./levels/DarkDungeon.pddl</value>
+        <value>./data/DarkDungeon.pddl</value>
     </config>
     <config>
         <key>domainName</key>
