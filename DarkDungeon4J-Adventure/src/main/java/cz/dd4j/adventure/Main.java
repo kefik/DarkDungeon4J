@@ -287,7 +287,7 @@ public class Main {
 		// -----------
 		// FOR TESTING
 		// -----------
-		args = getTestArgs();		
+		//args = getTestArgs();		
 
 		// --------------
 		// IMPLEMENTATION
