@@ -2,10 +2,10 @@ package cz.dd4j.generator.agents;
 
 import java.util.List;
 
-import cz.dd4j.generator.GeneratorConfig;
 import cz.dd4j.loader.agents.impl.xml.AgentXML;
+import cz.dd4j.utils.config.GenericConfig;
 
-public class AgentsGeneratorConfig extends GeneratorConfig {
+public class AgentsGeneratorConfig extends GenericConfig {
 	
 	/**
 	 * Prefix for the agent id.

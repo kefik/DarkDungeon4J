@@ -1,4 +1,4 @@
-package cz.dd4j;
+package cz.dd4j.adventure;
 
 import java.io.File;
 import java.net.FileNameMap;
@@ -12,6 +12,7 @@ import cz.dd4j.loader.agents.AgentsLoader;
 import cz.dd4j.loader.simstate.SimStateLoader;
 import cz.dd4j.simulation.SimStatic;
 import cz.dd4j.simulation.SimStaticConfig;
+import cz.dd4j.simulation.SimStaticStats;
 import cz.dd4j.simulation.actions.instant.IFeatureInstantAction;
 import cz.dd4j.simulation.actions.instant.IHeroInstantAction;
 import cz.dd4j.simulation.actions.instant.IMonsterInstantAction;
@@ -28,25 +29,21 @@ import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.result.SimResult;
 import cz.dd4j.ui.console.VisConsole;
 
-public class Dungeon01 {
+public class ExampleDungeon {
 
 	public static void main(String[] args) {
-		runDungeon1();
-
-		try {
-			// TODO: parse args to extract experiment & result dirs + continue/restart flag
-			new ExperimentEvaluator("./results", "./experiment").runEvaluator();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		runDungeon();
 	}
 
-	private static void runDungeon1() {
+	/**
+	 * Example Dungeon.
+	 */
+	private static void runDungeon() {
 		SimStaticConfig config = ExperimentEvaluator.getSimStaticConfig();
 
 		// LOAD SIM STATE
 
-		File dungeonFile = new File("./levels/dungeon-01/dungeon-01.xml");
+		File dungeonFile = new File("./data/dungeons/dungeon-example/dungeon-01.xml");
 
 		SimStateLoader loader = new SimStateLoader();
 		SimState simState = loader.loadSimState(dungeonFile);
@@ -56,11 +53,10 @@ public class Dungeon01 {
 		// CREATE THE HERO!
 
 		// WARNING: this assumes use of Eclipse of NetBeans that starts the code within the project folder itself!		
-		//File heroesFile = new File("./levels/hero-random.xml");
-		//File heroesFile = new File("./levels/hero-semi-random.xml");
-		//File heroesFile = new File("./levels/hero-rules-with-random-move.xml");
-		//File heroesFile = new File("./levels/nplan-cygwin.xml");
-		File heroesFile = new File("./levels/clever-01.xml");
+		File heroesFile = new File("./data/hero-agents/hero-random.xml");
+		//File heroesFile = new File("./data/hero-agents/hero-semi-random.xml");
+		//File heroesFile = new File("./data/hero-agents/hero-rules-with-random-move.xml");
+		//File heroesFile = new File("./data/hero-agents/nplan-cygwin.xml");
 		
 		AgentsLoader<IHeroAgent> heroesLoader = new AgentsLoader<IHeroAgent>();
 		Agents<IHeroAgent> heroes = heroesLoader.loadAgents(heroesFile);
@@ -82,11 +78,11 @@ public class Dungeon01 {
 		simulation.getEvents().addHandler(new VisConsole());
 
 		// FIRE THE SIMULATION!
-		SimResult result = simulation.simulate();
+		SimStaticStats result = simulation.simulate();
 
 		// OUTPUT RESULT
 		System.out.println();
-		System.out.println("Finished: " + result);
+		System.out.println("Finished: " + result.simulationResult);
 		System.out.println();
 
 		// DONE!

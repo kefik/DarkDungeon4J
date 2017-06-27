@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import cz.dd4j.domain.EFeature;
 import cz.dd4j.domain.EItem;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
-import cz.dd4j.utils.astar.AStar;
 import cz.dd4j.utils.astar.IAStarHeuristic;
-import cz.dd4j.utils.astar.IAStarView;
 import cz.dd4j.utils.astar.Path;
-import cz.dd4j.utils.collection.LazyMap;
+import cz.dd4j.utils.collection.IntMap;
+import cz.dd4j.utils.csv.CSV.CSVRow;
+import cz.dd4j.utils.reporting.IReporting;
 
-public class DungeonDescriptor {
+public class DungeonDescriptor implements IReporting {
 
 	/**
 	 * Minimum distance between the hero and the goal room, not accounting for traps and monsters.
@@ -45,12 +43,7 @@ public class DungeonDescriptor {
 	 * KEY   == level (DANG function)
 	 * VALUE == number of threats (the shortest paths between a monster and a hero)
 	 */
-	public Map<Integer, Integer> danger = new LazyMap<Integer, Integer>() {
-		@Override
-		protected Integer create(Object key) {
-			return 0;
-		}
-	};
+	public IntMap<Integer> danger = new IntMap<Integer>();
 	
 	public static DungeonDescriptor describe(DungeonXML dungeonXML, IAStarHeuristic<Room> heuristic) {
 		DungeonLoaderXML loader = new DungeonLoaderXML();
@@ -75,13 +68,13 @@ public class DungeonDescriptor {
 			if (room.item != null && room.item.isA(EItem.SWORD)) swordRooms.add(room);
 		}
 		
-		// CONSTRUCT ASTAR
-		AStar astar = new AStar(heuristic);
+		// CONSTRUCT PATHS
+		DungeonPaths paths = new DungeonPaths(dungeon);
 		
 		Path<Room> path = null;
 		
 		// FIND MINIMAL PATH TO GOAL
-		path = astar.findPath(heroRoom, goalRoom);
+		path = paths.findPath(heroRoom, goalRoom);
 		
 		if (path == null) {
 			throw new RuntimeException("Invalid dungeon, hero cannot reach the goal.");
@@ -89,14 +82,7 @@ public class DungeonDescriptor {
 		
 		result.goalDistance = path.getDistanceNodes();
 		
-		IAStarView<Room> nonMonsterRooms = new IAStarView<Room>() {
-			@Override
-			public boolean isOpened(Room node) {
-				return node.monster != null;
-			}			
-		};
-		
-		path = astar.findPath(heroRoom, goalRoom, nonMonsterRooms);
+		path = paths.findPath(heroRoom, goalRoom, DungeonPaths.ASTAR_NO_MONSTERS_VIEW);
 		if (path == null) {
 			result.goalDistanceNonMonster = -1;
 		} else {
@@ -104,19 +90,12 @@ public class DungeonDescriptor {
 		}
 		
 		// FIND DANGEROUSNESS
-		IAStarView<Room> nonTrapRooms = new IAStarView<Room>() {
-			@Override
-			public boolean isOpened(Room node) {
-				return node.feature != null || !node.feature.isA(EFeature.TRAP);
-			}			
-		};
-		
 		result.lowestDanger = -1;
 		
 		for (Room monsterRoom : monsterRooms) {
-			path = astar.findPath(monsterRoom, heroRoom, nonTrapRooms);
+			path = paths.findPath(monsterRoom, heroRoom, DungeonPaths.ASTAR_NO_TRAPS_VIEW);
 			if (path == null) continue;
-			result.danger.put(path.getDistanceNodes(), 1+result.danger.get(path.getDistanceNodes()));
+			result.danger.inc(path.getDistanceNodes());
 			if (result.lowestDanger < 0 || result.lowestDanger > path.getDistanceNodes()) result.lowestDanger = path.getDistanceNodes();
 		}
 		
@@ -124,7 +103,7 @@ public class DungeonDescriptor {
 		result.nearestSwordDistance = -1;
 		
 		for (Room swordRoom : swordRooms) {
-			path = astar.findPath(heroRoom, swordRoom, nonMonsterRooms);
+			path = paths.findPath(heroRoom, swordRoom, DungeonPaths.ASTAR_NO_MONSTERS_VIEW);
 			if (path == null) continue;
 			if (result.nearestSwordDistance < 0 || result.nearestSwordDistance > path.getDistanceNodes()) result.nearestSwordDistance = path.getDistanceNodes();
 		}
@@ -162,6 +141,39 @@ public class DungeonDescriptor {
 		result.append("]");
 		
 		return super.toString();
+	}
+	
+	// =========
+	// REPORTING
+	// =========
+	
+	public static final String CSV_GOAL_DISTANCE = "DESC-goal_distance";
+	public static final String CSV_GOAL_DISTANCE_NON_MONSTER = "DESC-goal_distance_non_monster";
+	public static final String CSV_NEAREST_SWORD_DISTANCE = "DESC-nearest_sword_distance";
+	public static final String CSV_INITIAL_DANGER = "DESC-initial_danger";
+
+	@Override
+	public List<String> getCSVHeaders() {
+		List<String> result = new ArrayList<String>();
+		
+		result.add(CSV_GOAL_DISTANCE);
+		result.add(CSV_GOAL_DISTANCE_NON_MONSTER);
+		result.add(CSV_NEAREST_SWORD_DISTANCE);
+		result.add(CSV_INITIAL_DANGER);
+
+		return result;
+	}
+
+	@Override
+	public CSVRow getCSVRow() {
+		CSVRow result = new CSVRow();
+		
+		result.add(CSV_GOAL_DISTANCE, goalDistance);
+		result.add(CSV_GOAL_DISTANCE_NON_MONSTER, goalDistanceNonMonster);
+		result.add(CSV_NEAREST_SWORD_DISTANCE, nearestSwordDistance);
+		result.add(CSV_INITIAL_DANGER, lowestDanger);
+		
+		return result;
 	}
 	
 }

@@ -34,7 +34,7 @@ public class TrapsGenerator extends GeneratorBase<TrapsGeneratorConfig> {
 	}
 
 	private void generate(int trapId, int roomId) {
-		File targetFile = config.getTargetFile("/traps", "Trap" + trapId + "-Room" + roomId + ".xml");
+		File targetFile = config.target.getFile("/traps", "Trap" + trapId + "-Room" + roomId + ".xml");
 		
 		config.log.info(getClass().getSimpleName() + ".generate(trap " + trapId + " for room " + roomId + "): generating...");
 		

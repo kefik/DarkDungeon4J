@@ -1,10 +1,13 @@
 package cz.dd4j.generator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import cz.dd4j.generator.adventure.AdventureGenerator;
-import cz.dd4j.generator.adventure.AdventureGeneratorConfig;
+import cz.dd4j.generator.adventure.impls.NiceAdventureGeneratorConfig_V1;
+import cz.dd4j.generator.adventure.impls.NiceAdventureGenerator_V1;
+import cz.dd4j.generator.adventure.impls.TotalAdventureGenerator;
+import cz.dd4j.generator.adventure.impls.TotalAdventureGeneratorConfig;
 import cz.dd4j.generator.agents.AgentsGenerator;
 import cz.dd4j.generator.agents.AgentsGeneratorConfig;
 import cz.dd4j.generator.dungeon.corridors.CorridorsGeneratorConfig;
@@ -25,12 +28,13 @@ import cz.dd4j.generator.dungeon.rooms.RoomsGeneratorConfig;
 import cz.dd4j.generator.dungeon.traps.TrapsGenerator;
 import cz.dd4j.generator.dungeon.traps.TrapsGeneratorConfig;
 import cz.dd4j.loader.agents.impl.xml.AgentXML;
+import cz.dd4j.utils.config.GenericConfig;
 
 public class Generator {
 
-	private GeneratorConfig rootConfig;
+	private GenericConfig rootConfig;
 
-	public Generator(GeneratorConfig config) {
+	public Generator(GenericConfig config) {
 		this.rootConfig = config;
 		if (config.log == null) config.log = Logger.getAnonymousLogger();
 	}
@@ -160,13 +164,37 @@ public class Generator {
 	/**
 	 * @param resultDirSuffix must not include ".." or ".", must not end with "/"
 	 */
-	public void generateAdventures(String resultDirSuffix) {
-		AdventureGeneratorConfig config = new AdventureGeneratorConfig();
+	public void generateTotalAdventures(String resultDirSuffix) {
+		TotalAdventureGeneratorConfig config = new TotalAdventureGeneratorConfig();
 		
-		config.resultDir =  resultDirSuffix;
+		config.target.dir = new File("result/adventures/" + resultDirSuffix);
 		config.assign(rootConfig);
 		
-		AdventureGenerator generator = new AdventureGenerator(config);
+		TotalAdventureGenerator generator = new TotalAdventureGenerator(config);
+		
+		generator.generate();
+	}
+
+	public void generateAdventuresJune2017_Test() {
+		NiceAdventureGeneratorConfig_V1 config = new NiceAdventureGeneratorConfig_V1();
+				
+		config.assign(rootConfig);
+		
+		config.setupJune2017_Test();
+		
+		NiceAdventureGenerator_V1 generator = new NiceAdventureGenerator_V1(config);
+		
+		generator.generate();
+	}
+	
+	public void generateAdventuresJune2017_Full() {
+		NiceAdventureGeneratorConfig_V1 config = new NiceAdventureGeneratorConfig_V1();
+		
+		config.assign(rootConfig);
+		
+		config.setupJune2017_Full();
+		
+		NiceAdventureGenerator_V1 generator = new NiceAdventureGenerator_V1(config);
 		
 		generator.generate();
 	}

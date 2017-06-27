@@ -15,7 +15,9 @@ public abstract class LazyMap<K, V> extends HashMap<K, V> {
 	public V get(Object key) {
 		V value = super.get(key);
 		if (value != null) return value;
-		return put((K)key, create(key));				
+		value = create(key);
+		put((K)key, value);
+		return value;
 	}
 	
 }

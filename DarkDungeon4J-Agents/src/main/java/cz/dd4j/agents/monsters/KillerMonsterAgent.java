@@ -51,5 +51,10 @@ public class KillerMonsterAgent extends MonsterAgentBase {
 		
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return "KillerMonsterAgent[moveProb=" + movementProbability + "]";
+	}
 
 }

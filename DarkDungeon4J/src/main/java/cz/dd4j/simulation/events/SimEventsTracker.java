@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.dd4j.agents.commands.Command;
+import cz.dd4j.simulation.SimStaticStats;
 import cz.dd4j.simulation.data.dungeon.Element;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.result.SimResult;
 
@@ -32,16 +30,16 @@ public class SimEventsTracker {
 	protected class SimEventsNotifier implements ISimEvents {
 
 		@Override
-		public void simulationBegin(SimState state) {
+		public void simulationBegin(SimState state, SimStaticStats stats) {
 			for (ISimEvents handler : handlers) {
-				handler.simulationBegin(state);
+				handler.simulationBegin(state, stats);
 			}
 		}
 
 		@Override
-		public void simulationFrameBegin(long frameNumber, long simMillis) {
+		public void simulationFrameBegin(SimState state, SimStaticStats stats) {
 			for (ISimEvents handler : handlers) {
-				handler.simulationFrameBegin(frameNumber, simMillis);
+				handler.simulationFrameBegin(state, stats);
 			}
 		}
 		
@@ -88,16 +86,16 @@ public class SimEventsTracker {
 		}
 
 		@Override
-		public void simulationFrameEnd(long frameNumber) {
+		public void simulationFrameEnd(SimStaticStats stats) {
 			for (ISimEvents handler : handlers) {
-				handler.simulationFrameEnd(frameNumber);
+				handler.simulationFrameEnd(stats);
 			}
 		}
 
 		@Override
-		public void simulationEnd(SimResult result) {
+		public void simulationEnd(SimResult result, SimStaticStats stats) {
 			for (ISimEvents handler : handlers) {
-				handler.simulationEnd(result);
+				handler.simulationEnd(result, stats);
 			}
 		}
 		

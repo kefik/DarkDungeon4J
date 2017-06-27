@@ -1,4 +1,4 @@
-package cz.dd4j.utils.collection;
+package cz.dd4j.utils.math;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class CombinationsGenerator<T> implements Iterable<List<T>> {
 
-	private static abstract class CombinationsIteratorBase<T> implements Iterator<List<T>> {
+	protected static abstract class CombinationsIteratorBase<T> implements Iterator<List<T>> {
 
 		protected int count;
 		protected List<T> items;
@@ -51,6 +51,7 @@ public class CombinationsGenerator<T> implements Iterable<List<T>> {
 
 		@Override
 		public List<T> next() {
+			if (indices == null) hasNext();
 			if (!hasNext) return null;
 			
 			// COMPUTE RESULT
@@ -163,134 +164,42 @@ public class CombinationsGenerator<T> implements Iterable<List<T>> {
 		
 	}
 	
-	private static class UniqueVariationsIterator<T> extends CombinationsIteratorBase<T> {
-
-		public UniqueVariationsIterator(int count, List<T> items) {
-			super(count, items);
-		}
-
-		@Override
-		protected void init() {
-			indices = new int[count];
-			for (int i = 0; i < indices.length; ++i) {
-				indices[i] = -1;
-				computeNextIndices(indices, i);
-			}
-			
-		}
-
-		@Override
-		protected void computeNextIndices(int[] indices, int index) {
-			if (index < 0) {
-				hasNext = false;
-				return;
-			}
-			
-			do {
-				indices[index] += 1;
-			} while (!isIndexUniqueToPrevious(indices, index));
-			
-			if (indices[index] < items.size()) {
-				// WE'RE DONE
-				return;
-			}
-			
-			// WE NEED TO CHANGE PREVIOUS INDEX AND REGENERATE THIS ONE
-			computeNextIndices(indices, index-1);
-				
-			if (!hasNext) {
-				// NO MORE ALTERNATIVES
-				return;
-			}
-			
-			// PREVIOUS INDEX GENERATED AND UNIQUE, TRY TO GENERATE THIS ONE
-			indices[index] = -1;
-			do {
-				indices[index] += 1;
-			} while (!isIndexUniqueToPrevious(indices, index));
-			
-			if (indices[index] < items.size()) {
-				// WE'RE DONE
-				return;
-			}
-			
-			// WE HAVE FAILED TO FIND NEXT UNIQUE INDEX
-			hasNext = false;
-		}
-		
-		private boolean isIndexUniqueToPrevious(int[] indices, int index) {
-			for (int i = index-1; i >= 0; --i) {
-				if (indices[i] == indices[index]) return false;
-			}
-			return true;
-		}
-		
-	}
-	
-	private static class NonUniqueVariationsIterator<T> extends CombinationsIteratorBase<T> {
-
-		public NonUniqueVariationsIterator(int count, List<T> items) {
-			super(count, items);
-		}
-
-		@Override
-		protected void init() {
-			indices = new int[count];
-			for (int i = 0; i < indices.length; ++i) {
-				indices[i] = 0; 
-			}
-			
-		}
-
-		@Override
-		protected void computeNextIndices(int[] indices, int index) {
-			if (index < 0) return;
-			
-			indices[index] += 1;
-			if (indices[index] < items.size()) return;
-			
-			if (index == 0) {
-				hasNext = false;
-				return;
-			}
-			
-			computeNextIndices(indices, index-1);
-			if (!hasNext) {
-				// NO MORE VARIANTS...
-				return;
-			}
-			
-			indices[index] = 0;			
-		}
-		
-	}
-
 	private int count;
 	private List<T> items;
 	private boolean unique;
-	private boolean variations;
 	
-	public CombinationsGenerator(int count, List<T> items, boolean unique, boolean variations) {
+	public CombinationsGenerator(int count, List<T> items, boolean unique) {
 		this.count = count;
 		this.items = items;
 		this.unique = unique;
-		this.variations = variations;
 	}
 	
 	@Override
 	public Iterator<List<T>> iterator() {
-		if (variations) {
-			if (unique) {
-				return new UniqueVariationsIterator<T>(count, items);
-			} else {
-				return new NonUniqueVariationsIterator<T>(count, items);
-			}
+		if (unique) { 
+			return new UniqueCombinationsIterator<T>(count, items);
 		} else {
-			if (unique) { 
-				return new UniqueCombinationsIterator<T>(count, items);
-			} else {
-				return new NonUniqueCombinationsIterator<T>(count, items);
+			return new NonUniqueCombinationsIterator<T>(count, items);
+		}		
+	}
+	
+	public long totalCount() {
+		if (unique) {
+			long a = 1;
+			long b = 1;
+			for (int i = 0; i < count; ++i) {
+				a *= (items.size() - i);
+				b *= (count - i);
 			}
+			return a / b;
+		} else {
+			long a = 1;
+			long b = 1;
+			for (int i = 0; i < count; ++i) {
+				a *= (items.size() + count - 1 - i);
+				b *= (count - i);
+			}
+			return a / b;
 		}
 	}
 

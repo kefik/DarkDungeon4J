@@ -3,16 +3,8 @@ package cz.dd4j.generator;
 import java.io.File;
 
 import cz.cuni.amis.utils.simple_logging.SimpleLogging;
-import cz.dd4j.agents.features.TrapAgent;
-import cz.dd4j.agents.heroes.HeroRandom;
-import cz.dd4j.agents.heroes.HeroRulesWithRandomMove;
-import cz.dd4j.agents.heroes.HeroSemiRandom;
-import cz.dd4j.agents.monsters.DynamicMonsterAgent;
-import cz.dd4j.agents.monsters.KillerMonsterAgent;
-import cz.dd4j.agents.monsters.StaticMonsterAgent;
 import cz.dd4j.domain.DD4JDomainInit;
-import cz.dd4j.loader.agents.impl.xml.AgentXML;
-import cz.dd4j.utils.config.ConfigXML;
+import cz.dd4j.utils.config.GenericConfig;
 
 public class Main {
 
@@ -21,29 +13,29 @@ public class Main {
 		
 		DD4JDomainInit.init();
 		
-		GeneratorConfig config = new GeneratorConfig();
-		config.targetDir = new File("result");
+		GenericConfig config = new GenericConfig();
+		config.target.dir = new File("result");
 		
 		Generator generator = new Generator(config);
 		
-		// Rooms 4-100
-		//generator.generateRooms(4, 100);
+		// Rooms 4-1000
+		//generator.generateRooms(4, 1000);
 		
 		// Goals for rooms 1-100
 		//generator.generateGoals(100);
 		
-		// Grids 2x2 -> 10x10
-		//generator.generateGrid(4, 100);
+		// Grids 2x2 -> 20x20
+		//generator.generateGrid(4, 400);
 			
-		// Torus 2x2 -> 10x10
-		//generator.generateTorus(4, 100);
+		// Torus 2x2 -> 20x20
+		//generator.generateTorus(4, 400);
 		
 		// Mazes
 //		generator.generateMazes(
-//				4, 4,   // 4x4
-//				6, 6,   // up-to 6x6 
-//				5,      // 5 random mazes for each dimension
-//				3       // 0-3 extra junctions
+//				4, 4,     // 4x4
+//				20, 20,   // up-to 20x20 
+//				5,        // 5 random mazes for each dimension
+//				5         // 0-5 extra junctions
 //		);
 		
 		// Monsters 1-10 for rooms 1-100
@@ -106,8 +98,13 @@ public class Main {
 //			new AgentXML("Trap", TrapAgent.class.getName())
 //		);
 		
-		// Generate adventures
-		generator.generateAdventures("adventures/grid");
+		// Generate total adventures
+		// --> see generator methods for config details
+		//generator.generateTotalAdventures("grid");
+		
+		// Generate June 2017 Experiment Adventures
+		generator.generateAdventuresJune2017_Test();
+		generator.generateAdventuresJune2017_Full();
 		
 	}
 	

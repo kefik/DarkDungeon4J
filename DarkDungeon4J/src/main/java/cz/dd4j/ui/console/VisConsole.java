@@ -2,7 +2,12 @@ package cz.dd4j.ui.console;
 
 import java.io.PrintStream;
 
+import cz.dd4j.agents.IFeatureAgent;
+import cz.dd4j.agents.IHeroAgent;
+import cz.dd4j.agents.IMonsterAgent;
 import cz.dd4j.agents.commands.Command;
+import cz.dd4j.simulation.SimStaticStats;
+import cz.dd4j.simulation.data.agents.AgentMindBody;
 import cz.dd4j.simulation.data.dungeon.Element;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
@@ -25,6 +30,8 @@ public class VisConsole implements ISimEvents {
 	protected int whoLength = 9;
 	protected int whatLength = 15;
 	
+	public String outputPrefix = "";
+	
 	public VisConsole() {
 		out = System.out;
 	}
@@ -37,23 +44,38 @@ public class VisConsole implements ISimEvents {
 		if (frameNumber > Math.pow(10, frameLength)) frameLength = (int)(Math.ceil(Math.log10(frameNumber)));
 		if (who.length() > whoLength) whoLength = who.length();
 		if (what.length() > whatLength) whatLength = what.length();
-		out.printf("[%" + frameLength + "d] {%" + whoLength + "s} (%" + whatLength + "s) %s", frameNumber, who, what, description);
+		out.printf(outputPrefix + "[%" + frameLength + "d] {%" + whoLength + "s} (%" + whatLength + "s) %s", frameNumber, who, what, description);
 		out.println();
 		//out.println("[" + frameNumber + "] {" + who + "} (" + what + ") " + description);
 	}
 	
 	@Override
-	public void simulationBegin(SimState state) {
+	public void simulationBegin(SimState state, SimStaticStats stats) {
 		frameNumber = 0;
 		log(WHO_SIMULATOR, "SimBegin", "Simulation begins.");
-		log(WHO_SIMULATOR, "SimBegin", "ID:   " + state.id);
-		log(WHO_SIMULATOR, "SimBegin", "DESC: " + state.description);
+		log(WHO_SIMULATOR, "SimBegin", "ID:   " + state.config.id);
+		log(WHO_SIMULATOR, "SimBegin", "DESC: " + state.config.description);
 	}
 
 	@Override
-	public void simulationFrameBegin(long frameNumber, long simMillis) {
-		this.frameNumber = frameNumber;
-		log(WHO_SIMULATOR, "SimFrameBegin", "Simulation frame " + frameNumber + " begun, sim time " + simMillis + "ms.");
+	public void simulationFrameBegin(SimState state, SimStaticStats stats) {
+		this.frameNumber = stats.frameNumber;
+		log(WHO_SIMULATOR, "SimFrameBegin", "Simulation frame " + frameNumber + " begun, sim time " + stats.simMillis() + "ms.");
+		for (AgentMindBody<Hero, IHeroAgent> agent : state.heroes.values()) {
+			if (agent.body.alive) {
+				log(WHO_SIMULATOR, "SimFrameBegin", "  +-- HERO    at " + agent.body.atRoom + (agent.body.hand != null ? " with " + agent.body.hand : "") + ": " + agent.mind + ", " + agent.body);
+			}
+		}
+		for (AgentMindBody<Monster, IMonsterAgent> agent : state.monsters.values()) {
+			if (agent.body.alive) {
+				log(WHO_SIMULATOR, "SimFrameBegin", "  +-- MONSTER at " + agent.body.atRoom + ": " + agent.mind + ", " + agent.body);
+			}
+		}
+		for (AgentMindBody<Feature, IFeatureAgent> agent : state.features.values()) {
+			if (agent.body.alive) {
+				log(WHO_SIMULATOR, "SimFrameBegin", "  +-- FEATURE at " + agent.body.atRoom + ": " + agent.mind + ", " + agent.body);
+			}
+		}
 	}
 	
 	public String getName(Element who) {
@@ -105,12 +127,12 @@ public class VisConsole implements ISimEvents {
 	}
 
 	@Override
-	public void simulationFrameEnd(long frameNumber) {
-		log(WHO_SIMULATOR, "SimFrameEnd", "Simulation frame " + frameNumber + " ended.");
+	public void simulationFrameEnd(SimStaticStats stats) {
+		log(WHO_SIMULATOR, "SimFrameEnd", "Simulation frame " + stats.frameNumber + " ended.");
 	}
 
 	@Override
-	public void simulationEnd(SimResult result) {
+	public void simulationEnd(SimResult result, SimStaticStats stats) {
 		log(WHO_SIMULATOR, "SimEnd", "Simulation ended in frame " + result.frameNumber + ", time " + result.simTimeMillis + "ms.");
 		log(WHO_SIMULATOR, "SimEndResult", getResultDescription(result));
 	}

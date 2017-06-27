@@ -71,5 +71,10 @@ public class HeroSemiRandom extends HeroAgentBase {
 		
 		return result;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 
 }

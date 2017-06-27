@@ -1,10 +1,9 @@
 package cz.dd4j.simulation.events;
 
 import cz.dd4j.agents.commands.Command;
+import cz.dd4j.simulation.SimStaticStats;
 import cz.dd4j.simulation.data.dungeon.Element;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.result.SimResult;
 
@@ -23,13 +22,15 @@ public interface ISimEvents {
 	 * Marks the beginning of the simulation.
 	 * @param state
 	 */
-	public void simulationBegin(SimState state);
+	public void simulationBegin(SimState state, SimStaticStats stats);
 	
 	/**
 	 * Simulation frame has begun.
+	 * @param state
 	 * @param frameNumber
+	 * @param simMillis
 	 */
-	public void simulationFrameBegin(long frameNumber, long simMillis);
+	public void simulationFrameBegin(SimState state, SimStaticStats stats);
 	
 	/**
 	 * An 'action' has been chosen by 'who' for the execution.
@@ -77,7 +78,7 @@ public interface ISimEvents {
 	 * Simulation frame has ended.
 	 * @param frameNumber
 	 */
-	public void simulationFrameEnd(long frameNumber);
+	public void simulationFrameEnd(SimStaticStats stats);
 	
 	/**
 	 * Simulation has ended with {@link SimResult}.
@@ -85,6 +86,6 @@ public interface ISimEvents {
 	 * WARNING: all exceptions thrown by this are ignored and not logged!
 	 * @param result
 	 */
-	public void simulationEnd(SimResult result);
+	public void simulationEnd(SimResult result, SimStaticStats stats);
 	
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import cz.dd4j.utils.Const;
+import cz.dd4j.utils.collection.Tuple2;
 
 /**
  * Courtesy of: nazar_art
@@ -562,15 +563,15 @@ public class Maze {
 	}
 	
 	public boolean placeExtraJunction() {
-		List<Tuple2> rightOptions = new ArrayList<Tuple2>();
-		List<Tuple2> downOptions = new ArrayList<Tuple2>();
+		List<Tuple2<Integer, Integer>> rightOptions = new ArrayList<Tuple2<Integer, Integer>>();
+		List<Tuple2<Integer, Integer>> downOptions = new ArrayList<Tuple2<Integer, Integer>>();
 		for (int cellX = 0; cellX < dimensionX; ++cellX) {
 			for (int cellY = 0; cellY < dimensionY; ++cellY) {
 				if (canPlaceExtraJunctionRightOf(cellX, cellY)) {
-					rightOptions.add(new Tuple2(cellX, cellY));
+					rightOptions.add(new Tuple2<Integer, Integer>(cellX, cellY));
 				}
 				if (canPlaceExtraJunctionDownOf(cellX, cellY)) {
-					downOptions.add(new Tuple2(cellX, cellY));
+					downOptions.add(new Tuple2<Integer, Integer>(cellX, cellY));
 				}
 			}
 		}
@@ -578,10 +579,10 @@ public class Maze {
 		if (rightOptions.size() + downOptions.size() == 0) return false;
 		int next = random.nextInt(rightOptions.size() + downOptions.size());
 		if (next < rightOptions.size()) {
-			Tuple2 option = rightOptions.get(next);
+			Tuple2<Integer, Integer> option = rightOptions.get(next);
 			
-			int cellX = option.x;
-			int cellY = option.y;
+			int cellX = option.a;
+			int cellY = option.b;
 			
 			int gridX1 = 2 + cellX     * 4;
 			int gridY1 = 1 + cellY     * 2;
@@ -592,10 +593,10 @@ public class Maze {
 			
 		} else {
 			next = next - rightOptions.size();
-			Tuple2 option = downOptions.get(next);
+			Tuple2<Integer, Integer> option = downOptions.get(next);
 			
-			int cellX = option.x;
-			int cellY = option.y;
+			int cellX = option.a;
+			int cellY = option.b;
 			
 			int gridX1 = 2 + cellX     * 4;
 			int gridY1 = 1 + cellY     * 2;

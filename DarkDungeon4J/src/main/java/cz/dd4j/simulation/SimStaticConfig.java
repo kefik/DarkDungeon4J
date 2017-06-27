@@ -1,5 +1,7 @@
 package cz.dd4j.simulation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
@@ -12,13 +14,27 @@ import cz.dd4j.simulation.data.agents.AgentMindBody;
 import cz.dd4j.simulation.data.agents.Agents;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.state.SimState;
+import cz.dd4j.utils.csv.CSV.CSVRow;
+import cz.dd4j.utils.reporting.IReporting;
 
-public class SimStaticConfig {
+public class SimStaticConfig implements IReporting {
 	
 	static {
 		DD4JDomainInit.init();
 	}
+	
+	// ===========
+	// USER CONFIG
+	// ===========
+	
+	public String id;
+	public String description;
 
+	/**
+	 * Whether to collect executed actions within {@link SimStaticStats#actionSelectedStats} and {@link SimStaticStats#actionExecutedStats}.
+	 */
+	public boolean collectActionStats = true; 
+	
 	// ============
 	// CONFIG STATE
 	// ============
@@ -48,6 +64,7 @@ public class SimStaticConfig {
 	// SIM STATE
 	// =========
 	
+	// TODO: this should not be used by {@link SimStatic} directly but clone()d...
 	public SimState state;
 	
 	public SimStaticConfig() {
@@ -95,6 +112,7 @@ public class SimStaticConfig {
 		if (simStateBound) throw new RuntimeException("You cannot bindSimState() twice!");
 		
 		this.state = state;		
+		this.state.config = this;
 		
 		simStateBound = true;
 	}
@@ -128,6 +146,32 @@ public class SimStaticConfig {
 		}
 		
 		heroesBound = true;		
+	}
+	
+	// =========
+	// REPORTING
+	// =========
+
+	public static final String CSV_ID = "SIM-id";
+	public static final String CSV_DESC = "SIM-desc";
+	
+	@Override
+	public List<String> getCSVHeaders() {
+		List<String> result = new ArrayList<String>();
+		result.add(CSV_ID);
+		result.add(CSV_DESC);
+		
+		return result;
+	}
+
+	@Override
+	public CSVRow getCSVRow() {
+		CSVRow result = new CSVRow();
+		
+		result.add(CSV_ID, id);
+		result.add(CSV_DESC, description);
+
+		return result;
 	}
 	
 }

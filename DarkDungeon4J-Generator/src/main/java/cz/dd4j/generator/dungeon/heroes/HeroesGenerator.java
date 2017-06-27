@@ -34,7 +34,7 @@ public class HeroesGenerator extends GeneratorBase<HeroesGeneratorConfig> {
 	}
 
 	private void generate(int heroId, int roomId) {
-		File targetFile = config.getTargetFile("/heroes", "Hero" + heroId + "-Room" + roomId + ".xml");
+		File targetFile = config.target.getFile("/heroes", "Hero" + heroId + "-Room" + roomId + ".xml");
 		
 		config.log.info(getClass().getSimpleName() + ".generate(hero " + heroId + " for room " + roomId + "): generating...");
 		

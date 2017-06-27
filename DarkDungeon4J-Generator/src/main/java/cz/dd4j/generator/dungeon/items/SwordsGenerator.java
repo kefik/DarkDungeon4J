@@ -31,7 +31,7 @@ public class SwordsGenerator extends GeneratorBase<SwordsGeneratorConfig> {
 	}
 
 	private void generate(int swordRoom) {
-		File targetFile = config.getTargetFile("/items", "Sword" + swordRoom + "-Room" + swordRoom + ".xml");
+		File targetFile = config.target.getFile("/items", "Sword" + swordRoom + "-Room" + swordRoom + ".xml");
 		
 		config.log.info(getClass().getSimpleName() + ".generate(for room " + swordRoom + "): generating...");
 		

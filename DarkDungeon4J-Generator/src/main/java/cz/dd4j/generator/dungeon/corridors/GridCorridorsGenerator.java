@@ -30,7 +30,7 @@ public class GridCorridorsGenerator extends GeneratorBase<CorridorsGeneratorConf
 	}
 
 	private void generate(int roomCount) {
-		File targetFile = config.getTargetFile("/corridors/grid", "Grid" + roomCount + ".xml");
+		File targetFile = config.target.getFile("/corridors/grid", "Grid" + roomCount + ".xml");
 		
 		config.log.info("GridCorridorsGenerator.generate(" + roomCount + "): generating...");
 		
@@ -49,12 +49,12 @@ public class GridCorridorsGenerator extends GeneratorBase<CorridorsGeneratorConf
 				
 				int roomRight = (i == width ? -1 : currRoom+1);
 				if (isValidRoom(roomRight, roomCount)) {
-					dungeon.corridors.add(GeneratorUtils.generateCorridor(currRoom, roomRight, GeneratorUtils.roomId(currRoom).name + " == [" + i + "," + j + "] -- link RIGHT -- [" + (i+1) + "," + j + "] == " + GeneratorUtils.roomId(roomRight).name));
+					dungeon.corridors.add(GeneratorUtils.generateCorridor(currRoom, roomRight, GeneratorUtils.roomId(currRoom).name + " == [" + i + "," + j + "] ~~ link RIGHT ~~ [" + (i+1) + "," + j + "] == " + GeneratorUtils.roomId(roomRight).name));
 				}
 				
 				int roomDown  = currRoom+width;
 				if (isValidRoom(roomDown, roomCount)) {
-					dungeon.corridors.add(GeneratorUtils.generateCorridor(currRoom, roomDown, GeneratorUtils.roomId(currRoom).name + " == [" + i + "," + j + "] -- link DOWN -- [" + i + "," + (j+1) + "] == " + GeneratorUtils.roomId(roomDown).name));
+					dungeon.corridors.add(GeneratorUtils.generateCorridor(currRoom, roomDown, GeneratorUtils.roomId(currRoom).name + " == [" + i + "," + j + "] ~~ link DOWN ~~ [" + i + "," + (j+1) + "] == " + GeneratorUtils.roomId(roomDown).name));
 				}	
 				
 				++currRoom;

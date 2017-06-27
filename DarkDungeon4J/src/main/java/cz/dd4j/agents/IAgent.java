@@ -1,13 +1,15 @@
 package cz.dd4j.agents;
 
+import java.util.Map;
 import java.util.Random;
 
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.simulation.actions.IActionsGenerator;
 import cz.dd4j.simulation.actions.IActionsValidator;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Entity;
+import cz.dd4j.utils.reporting.IReporting;
 
-public interface IAgent {
+public interface IAgent extends IReporting {
 
 	/**
 	 * Returns {@link Entity} this agent represents.
