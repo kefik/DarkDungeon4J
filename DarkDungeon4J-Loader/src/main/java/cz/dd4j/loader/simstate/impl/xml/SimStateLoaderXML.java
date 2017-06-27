@@ -72,7 +72,7 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 		for (File dungeonXMLFile : dungeonXMLFiles) {
 			Dungeon append = null;
 			try {
-				append = dungeonLoader.loadDungeon(dungeonXMLFile);
+				append = dungeonLoader.loadDungeon(dungeonXMLFile.getCanonicalFile());
 			} catch (Exception e) {
 				throw new RuntimeException("Failed to load: " + dungeonXMLFile.getAbsolutePath(), e);
 			}
@@ -88,7 +88,7 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 		for (File agentsXMLFile : agentsXMLFiles) {
 			Agents append = null;
 			try {
-				append = agentsLoader.loadAgents(agentsXMLFile);
+				append = agentsLoader.loadAgents(agentsXMLFile.getCanonicalFile());
 			} catch (Exception e) {
 				throw new RuntimeException("Failed to load: " + agentsXMLFile.getAbsolutePath(), e);
 			}
