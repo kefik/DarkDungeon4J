@@ -26,6 +26,11 @@ public class Range implements Iterable<Integer> {
 			return current;
 		}
 		
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("remove");
+		}
+		
 	}
 	
 	public final int from;
