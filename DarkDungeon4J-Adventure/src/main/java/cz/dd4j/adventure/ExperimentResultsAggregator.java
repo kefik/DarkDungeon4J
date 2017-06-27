@@ -36,6 +36,9 @@ public class ExperimentResultsAggregator {
 				processDescriptorFile(file);
 			}
 		}
+	
+		dungeonDesc.keys.remove(Playout.CSV_ID);
+		dungeonDesc.keys.remove(Playout.CSV_HERO);
 		
 		results.toFile(new File(outputDir, "aggregated-results.csv"));		
 		dungeonDesc.toFile(new File(outputDir, "aggregated-dungeon_descriptors.csv"));
@@ -70,11 +73,15 @@ public class ExperimentResultsAggregator {
 			dungeonDesc.keys.add(key);
 		}
 		
-		for (CSVRow newRow : csv.rows) {		
+		for (CSVRow newRow : csv.rows) {
+			boolean add = true;
 			for (CSVRow existingRow : dungeonDesc.rows) {
-				if (existingRow.getString(Playout.CSV_ADVENTURE).equals(newRow.getString(Playout.CSV_ADVENTURE))) continue;
-				dungeonDesc.rows.add(newRow);
+				if (existingRow.getString(Playout.CSV_ADVENTURE).equals(newRow.getString(Playout.CSV_ADVENTURE))) {
+					add = false;
+					break;				
+				}
 			}
+			if (add) dungeonDesc.rows.add(newRow);
 		}		
 	}
 	
