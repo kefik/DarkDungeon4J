@@ -21,6 +21,7 @@ public class ExperimentResultsAggregator {
 	}
 	
 	public void aggregate() {
+		System.out.println("Aggregating results...");
 		
 		results = new CSV();
 		results.keys = new ArrayList<String>();
