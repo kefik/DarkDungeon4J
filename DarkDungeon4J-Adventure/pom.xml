@@ -16,6 +16,10 @@
 	<name>dark-dungeon-4j-adventure</name>
 	<url>https://github.com/kefik/DarkDungeon4J</url>
 	
+	<properties>
+		<main.class>cz.dd4j.adventure.Main</main.class>
+	</properties>
+	
 	<dependencies>
         <dependency>
             <groupId>cz.dd4j</groupId>
@@ -68,6 +72,52 @@
             <version>1.0.0</version>
         </dependency>
 	</dependencies>
+	
+	<profiles>
+		<profile>
+			<id>one-jar-package</id>
+			<activation>
+				<file>
+					<missing>skip.one-jar.package</missing>
+				</file>
+			</activation>
+			<build>
+				<plugins>					
+					<plugin>						
+						<groupId>org.dstovall</groupId>
+						<artifactId>onejar-maven-plugin</artifactId>
+						<version>1.4.4</version>
+						<executions>
+							<execution>
+								<id>onejar</id>
+								<phase>package</phase>
+								<configuration>
+									<!-- Optional -->
+									<onejarVersion>0.97</onejarVersion>
+									<!--
+										Optional, use only if you need to include native libraries
+										(dll's) <binlibs> <fileSet>
+										<directory>${project.build.directory}/dllextract</directory>
+										<includes> <include>test.dll</include> </includes> </fileSet>
+										</binlibs>
+									-->
+									<!-- Optional, default is false -->
+									<attachToBuild>true</attachToBuild>
+									<!-- Optional, default is "onejar" -->
+									<classifier>onejar</classifier>
+									<mainClass>${main.class}</mainClass>
+									<filename>${project.build.finalName}-onejar.jar</filename>
+								</configuration>
+								<goals>
+									<goal>one-jar</goal>
+								</goals>
+							</execution>							
+						</executions>
+					</plugin>					
+				</plugins>				
+			</build>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<repository>

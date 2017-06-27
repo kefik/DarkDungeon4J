@@ -30,6 +30,8 @@ public class VisConsole implements ISimEvents {
 	protected int whoLength = 9;
 	protected int whatLength = 15;
 	
+	public String outputPrefix = "";
+	
 	public VisConsole() {
 		out = System.out;
 	}
@@ -42,7 +44,7 @@ public class VisConsole implements ISimEvents {
 		if (frameNumber > Math.pow(10, frameLength)) frameLength = (int)(Math.ceil(Math.log10(frameNumber)));
 		if (who.length() > whoLength) whoLength = who.length();
 		if (what.length() > whatLength) whatLength = what.length();
-		out.printf("[%" + frameLength + "d] {%" + whoLength + "s} (%" + whatLength + "s) %s", frameNumber, who, what, description);
+		out.printf(outputPrefix + "[%" + frameLength + "d] {%" + whoLength + "s} (%" + whatLength + "s) %s", frameNumber, who, what, description);
 		out.println();
 		//out.println("[" + frameNumber + "] {" + who + "} (" + what + ") " + description);
 	}
@@ -57,7 +59,7 @@ public class VisConsole implements ISimEvents {
 
 	@Override
 	public void simulationFrameBegin(SimState state, SimStaticStats stats) {
-		this.frameNumber = frameNumber;
+		this.frameNumber = stats.frameNumber;
 		log(WHO_SIMULATOR, "SimFrameBegin", "Simulation frame " + frameNumber + " begun, sim time " + stats.simMillis() + "ms.");
 		for (AgentMindBody<Hero, IHeroAgent> agent : state.heroes.values()) {
 			if (agent.body.alive) {

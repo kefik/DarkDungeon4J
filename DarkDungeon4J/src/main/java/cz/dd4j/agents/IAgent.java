@@ -7,8 +7,9 @@ import cz.dd4j.domain.EEntity;
 import cz.dd4j.simulation.actions.IActionsGenerator;
 import cz.dd4j.simulation.actions.IActionsValidator;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Entity;
+import cz.dd4j.utils.reporting.IReporting;
 
-public interface IAgent {
+public interface IAgent extends IReporting {
 
 	/**
 	 * Returns {@link Entity} this agent represents.
@@ -74,16 +75,5 @@ public interface IAgent {
 	 * WARNING: exception thrown by this method are ignored and not logged!
 	 */
 	public void simulationEnded();
-	
-	// =============
-	// DATA REPORTER
-	// =============
-	
-	/**
-	 * Returns the report about the agent run; this is used by experiments that reports data about agent runs into CSV files.
-	 * @return
-	 */
-	public Map<String, Object> getReport();
-	
 	
 }

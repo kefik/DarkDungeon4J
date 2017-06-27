@@ -17,4 +17,9 @@ public class HeroRandom extends HeroAgentBase {
 		return getRandomAction(hero, true);
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
+	
 }

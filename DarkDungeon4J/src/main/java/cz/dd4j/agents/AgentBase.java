@@ -1,5 +1,6 @@
 package cz.dd4j.agents;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import cz.dd4j.simulation.data.dungeon.elements.entities.Entity;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.ConfigMap;
 import cz.dd4j.utils.config.IConfigurable;
+import cz.dd4j.utils.csv.CSV.CSVRow;
 
 public class AgentBase implements IAgent, IConfigurable {
 
@@ -119,13 +121,23 @@ public class AgentBase implements IAgent, IConfigurable {
 		}
 	}
 
+
 	/**
 	 * To be overridden by subclasses if required, so far, empty implementation.
-	 * If overridden, the subclass should use super.getReport() first, add own details and return the map then.
+	 * If overridden, the subclass should use super.getCSVHeaders() first, add own details and return it then.
 	 */
 	@Override
-	public Map<String, Object> getReport() {
-		return new HashMap<String, Object>();
+	public List<String> getCSVHeaders() {
+		return new ArrayList<String>();
+	}
+
+	/**
+	 * To be overridden by subclasses if required, so far, empty implementation.
+	 * If overridden, the subclass should use super.getCSVRow() first, add own details and return it then.
+	 */
+	@Override
+	public CSVRow getCSVRow() {
+		return new CSVRow();
 	}
 
 }

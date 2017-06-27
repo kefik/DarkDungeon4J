@@ -1,5 +1,7 @@
 package cz.dd4j.simulation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
@@ -12,8 +14,10 @@ import cz.dd4j.simulation.data.agents.AgentMindBody;
 import cz.dd4j.simulation.data.agents.Agents;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.state.SimState;
+import cz.dd4j.utils.csv.CSV.CSVRow;
+import cz.dd4j.utils.reporting.IReporting;
 
-public class SimStaticConfig {
+public class SimStaticConfig implements IReporting {
 	
 	static {
 		DD4JDomainInit.init();
@@ -142,6 +146,32 @@ public class SimStaticConfig {
 		}
 		
 		heroesBound = true;		
+	}
+	
+	// =========
+	// REPORTING
+	// =========
+
+	public static final String CSV_ID = "SIM-id";
+	public static final String CSV_DESC = "SIM-desc";
+	
+	@Override
+	public List<String> getCSVHeaders() {
+		List<String> result = new ArrayList<String>();
+		result.add(CSV_ID);
+		result.add(CSV_DESC);
+		
+		return result;
+	}
+
+	@Override
+	public CSVRow getCSVRow() {
+		CSVRow result = new CSVRow();
+		
+		result.add(CSV_ID, id);
+		result.add(CSV_DESC, description);
+
+		return result;
 	}
 	
 }

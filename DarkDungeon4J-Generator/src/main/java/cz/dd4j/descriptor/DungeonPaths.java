@@ -19,6 +19,8 @@ public class DungeonPaths {
 		
 	}
 	
+	public static final AStarNoHeuristic ASTAR_NO_HEURISTIC = new AStarNoHeuristic();
+	
 	public static class AStarDefaultView implements IAStarView<Room> {
 
 		@Override

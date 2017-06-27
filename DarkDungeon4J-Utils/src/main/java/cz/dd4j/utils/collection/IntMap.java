@@ -13,6 +13,10 @@ public class IntMap<K> extends HashMap<K, Integer> {
 	
 	public int inc(K key, int delta) {
 		if (key == null) return 0;
+		if (!containsKey(key)) {
+			put(key, delta);
+			return 0;
+		}
 		return put(key, get(key)+delta);
 	}
 	
@@ -22,6 +26,10 @@ public class IntMap<K> extends HashMap<K, Integer> {
 	
 	public int dec(K key, int delta) {
 		if (key == null) return 0;
+		if (!containsKey(key)) {
+			put(key, -delta);
+			return 0;
+		}
 		return put(key, get(key)-delta);
 	}
 	

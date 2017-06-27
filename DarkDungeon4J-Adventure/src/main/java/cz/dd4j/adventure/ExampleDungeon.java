@@ -1,4 +1,4 @@
-package cz.dd4j;
+package cz.dd4j.adventure;
 
 import java.io.File;
 import java.net.FileNameMap;
@@ -12,6 +12,7 @@ import cz.dd4j.loader.agents.AgentsLoader;
 import cz.dd4j.loader.simstate.SimStateLoader;
 import cz.dd4j.simulation.SimStatic;
 import cz.dd4j.simulation.SimStaticConfig;
+import cz.dd4j.simulation.SimStaticStats;
 import cz.dd4j.simulation.actions.instant.IFeatureInstantAction;
 import cz.dd4j.simulation.actions.instant.IHeroInstantAction;
 import cz.dd4j.simulation.actions.instant.IMonsterInstantAction;
@@ -77,11 +78,11 @@ public class ExampleDungeon {
 		simulation.getEvents().addHandler(new VisConsole());
 
 		// FIRE THE SIMULATION!
-		SimResult result = simulation.simulate();
+		SimStaticStats result = simulation.simulate();
 
 		// OUTPUT RESULT
 		System.out.println();
-		System.out.println("Finished: " + result);
+		System.out.println("Finished: " + result.simulationResult);
 		System.out.println();
 
 		// DONE!

@@ -64,10 +64,6 @@ public class SimStatic {
 	
 	private long timeDeltaMillis;
 
-	private SimResult resultException;
-
-	private SimResult simulationResult;
-
 	private List<Room> roomsBFSOrdered;
 
 	private List<Corridor> corridorsBFSOrdered;
@@ -97,7 +93,7 @@ public class SimStatic {
 	 * 
 	 * @return
 	 */
-	public SimResult simulate() {
+	public SimStaticStats simulate() {
 		if (!config.isReady())
 			throw new RuntimeException("Simulation is not configured properly: " + config.getMissingInitDescription());
 
@@ -109,8 +105,8 @@ public class SimStatic {
 
 			while (true) {
 				if (isEnd()) {
-					simulationResult = createSimulationResult();
-					return simulationResult;
+					stats.simulationResult = createSimulationResult();
+					return stats;
 				}
 				
 				++stats.frameNumber;
@@ -127,11 +123,14 @@ public class SimStatic {
 				--config.state.roundsLeft;
 			}
 		} catch (SimulationException e1) {
-			return simulationResult = exception(e1, SimResultType.SIMULATION_EXCEPTION);
+			stats.simulationResult = exception(e1, SimResultType.SIMULATION_EXCEPTION);
+			return stats;
 		} catch (AgentException e2) {
-			return simulationResult = exception(e2, SimResultType.AGENT_EXCEPTION);
+			stats.simulationResult = exception(e2, SimResultType.AGENT_EXCEPTION);
+			return stats;
 		} catch (Exception e3) {
-			return simulationResult = exception(e3, SimResultType.SIMULATION_EXCEPTION);
+			stats.simulationResult = exception(e3, SimResultType.SIMULATION_EXCEPTION);
+			return stats;
 		} finally {
 			endSimulation();
 		}
@@ -144,8 +143,7 @@ public class SimStatic {
 		stats.frameNumber = 0;
 		stats.simulationStartMillis = System.currentTimeMillis();
 		
-		resultException = null;
-		simulationResult = null;
+		stats.simulationResult = null;
 
 		entityScheduledNonMoveActions = new ArrayList<Entity>();
 		entityScheduledMoveActions = new LinkedList<Entity>();
@@ -335,7 +333,7 @@ public class SimStatic {
 		} catch (Exception e) {
 		}
 		try {
-			eventsTracker.event().simulationEnd(simulationResult, stats);
+			eventsTracker.event().simulationEnd(stats.simulationResult, stats);
 		} catch (Exception e) {
 		}
 	}
@@ -401,7 +399,11 @@ public class SimStatic {
 			// SUBSCRIBE
 			subscribeAction(hero.body);
 			// NOTE
-			if (config.collectActionStats) stats.actionSelectedStats.get(hero.mind).inc(hero.body.action.type);
+			if (config.collectActionStats) {
+				if (hero.body.action != null && hero.body.action.type != null) {
+					stats.actionSelectedStats.get(hero).inc(hero.body.action.type);
+				}
+			}
 			// INFORM EVENT
 			eventsTracker.event().actionSelected(hero.body, hero.body.action);
 		}
@@ -426,7 +428,11 @@ public class SimStatic {
 			// SUBSCRIBE
 			subscribeAction(monster.body);
 			// NOTE
-			if (config.collectActionStats) stats.actionSelectedStats.get(monster.mind).inc(monster.body.action.type);
+			if (config.collectActionStats) {
+				if (monster.body.action != null && monster.body.action.type != null) {
+					stats.actionSelectedStats.get(monster).inc(monster.body.action.type);
+				}				
+			}
 			// INFORM EVENT
 			eventsTracker.event().actionSelected(monster.body, monster.body.action);
 		}
@@ -456,7 +462,11 @@ public class SimStatic {
 			// SUBSCRIBE
 			subscribeAction(feature.body);
 			// NOTE
-			if (config.collectActionStats) stats.actionSelectedStats.get(feature.mind).inc(feature.body.action.type);
+			if (config.collectActionStats) {
+				if (feature.body.action != null && feature.body.action.type != null) {
+					stats.actionSelectedStats.get(feature).inc(feature.body.action.type);
+				}
+			}
 			// INFORM EVENT
 			eventsTracker.event().actionSelected(feature.body, feature.body.action);
 		}
@@ -581,7 +591,11 @@ public class SimStatic {
 			checkDead(action.target);
 			
 			// NOTE
-			if (config.collectActionStats) stats.actionSelectedStats.get(config.state.getAgentMindBody(entity.id).mind).inc(entity.action.type);
+			if (config.collectActionStats) {
+				if (entity.action != null && entity.action.type != null) {
+					stats.actionExecutedStats.get(config.state.getAgentMindBody(entity.id)).inc(entity.action.type);
+				}
+			}
 			
 			return true;
 		} else {
@@ -686,8 +700,10 @@ public class SimStatic {
 	private void checkHeroDead(Hero hero) {
 		if (hero.alive)
 			return;
-		config.state.heroes.remove(hero.id);
-		hero.atRoom.hero = null;
+		// TODO: we need to separate SimState out of the Config!
+		//config.state.heroes.remove(hero.id);
+		if (hero.atRoom != null) hero.atRoom.hero = null;
+		if (hero.atCorridor != null) hero.atCorridor.hero = null;
 		eventsTracker.event().elementDead(hero);
 	}
 
@@ -695,7 +711,8 @@ public class SimStatic {
 		if (monster.alive)
 			return;
 		config.state.monsters.remove(monster.id);
-		monster.atRoom.monster = null;
+		if (monster.atRoom != null) monster.atRoom.monster = null;
+		if (monster.atCorridor != null) monster.atCorridor.monster = null;
 		eventsTracker.event().elementDead(monster);
 	}
 
@@ -711,7 +728,7 @@ public class SimStatic {
 	// ========================
 
 	private boolean isEnd() {
-		return isVictory() || isLose() || isTimeout() || isException();
+		return isVictory() || isLose() || isTimeout();
 	}
 
 	private boolean isVictory() {
@@ -737,11 +754,8 @@ public class SimStatic {
 		}
 		if (isTimeout()) {
 			return timeout();
-		}
-		if (isException()) {
-			return resultException;
-		}
-		throw new RuntimeException("isVictory() is false, isLose() is false, isException() is false ...???");
+		}		
+		throw new RuntimeException("isVictory() is false, isLose() is false, isTimeout() is false ...???");
 	}
 
 	private SimResult newSimResult() {
@@ -787,15 +801,11 @@ public class SimStatic {
 		return result;
 	}
 
-	private boolean isException() {
-		return resultException != null;
-	}
-
 	private SimResult exception(Throwable exception, SimResultType type) {
 		SimResult result = newSimResult();
 		result.resultType = type;
 		result.exception = exception;
-		return resultException = result;
+		return result;
 	}
 
 }

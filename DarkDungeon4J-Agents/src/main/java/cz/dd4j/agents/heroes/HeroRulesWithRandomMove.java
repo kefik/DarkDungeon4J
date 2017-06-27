@@ -83,5 +83,10 @@ public class HeroRulesWithRandomMove extends HeroAgentBase implements IHeroAgent
 		// => wait...
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 
 }
