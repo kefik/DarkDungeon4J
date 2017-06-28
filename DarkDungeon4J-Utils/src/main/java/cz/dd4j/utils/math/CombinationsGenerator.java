@@ -46,6 +46,11 @@ public class CombinationsGenerator<T> implements Iterable<List<T>> {
 			}
 			return hasNext;
 		}
+		
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("remove");
+		}
 
 		protected abstract void init();
 

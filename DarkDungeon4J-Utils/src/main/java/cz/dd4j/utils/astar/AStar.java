@@ -43,7 +43,7 @@ public class AStar<NODE extends INode<NODE>> {
 		
 		Map<NODE, SearchNode> nodes = new HashMap<NODE, SearchNode>();
 		
-		Queue<SearchNode> opened = new PriorityQueue<SearchNode>(new Comparator<SearchNode>() {
+		Queue<SearchNode> opened = new PriorityQueue<SearchNode>(40, new Comparator<SearchNode>() {
 			@Override
 			public int compare(AStar<NODE>.SearchNode o1, AStar<NODE>.SearchNode o2) {
 				return o1.currentCost - o2.currentCost;

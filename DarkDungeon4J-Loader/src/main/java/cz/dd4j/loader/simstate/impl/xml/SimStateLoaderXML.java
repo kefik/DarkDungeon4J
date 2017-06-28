@@ -1,6 +1,7 @@
 package cz.dd4j.loader.simstate.impl.xml;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import cz.dd4j.simulation.data.dungeon.elements.items.Item;
 import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.simulation.data.state.SimState;
+import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Id;
 
 public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimStateLoaderImpl {
@@ -72,9 +74,15 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 		for (File dungeonXMLFile : dungeonXMLFiles) {
 			Dungeon append = null;
 			try {
-				append = dungeonLoader.loadDungeon(dungeonXMLFile);
+				append = dungeonLoader.loadDungeon(dungeonXMLFile.getCanonicalFile());
 			} catch (Exception e) {
-				throw new RuntimeException("Failed to load: " + dungeonXMLFile.getAbsolutePath(), e);
+				File cf = null;
+				try {
+					cf = dungeonXMLFile.getCanonicalFile();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				throw new RuntimeException("Failed to load: " + dungeonXMLFile.getAbsolutePath() + Const.NEW_LINE + "Canonical path: " + (cf == null ? "null" : cf.getAbsolutePath()), e);
 			}
 			try {
 				blend(dungeon, append);
@@ -88,9 +96,15 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 		for (File agentsXMLFile : agentsXMLFiles) {
 			Agents append = null;
 			try {
-				append = agentsLoader.loadAgents(agentsXMLFile);
+				append = agentsLoader.loadAgents(agentsXMLFile.getCanonicalFile());
 			} catch (Exception e) {
-				throw new RuntimeException("Failed to load: " + agentsXMLFile.getAbsolutePath(), e);
+				File cf = null;
+				try {
+					cf = agentsXMLFile.getCanonicalFile();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				throw new RuntimeException("Failed to load: " + agentsXMLFile.getAbsolutePath() + Const.NEW_LINE + "Canonical path: " + (cf == null ? "null" : cf.getAbsolutePath()), e);
 			}
 			try {
 				blend(monsters, features, append);
