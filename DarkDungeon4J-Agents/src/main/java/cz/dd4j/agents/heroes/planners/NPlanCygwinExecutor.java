@@ -39,7 +39,10 @@ public class NPlanCygwinExecutor extends AbstractPlannerExecutor {
         File resultFile = new File(nplanWorkingDir, "plan.SOL");
 
         FileUtils.copyFile(domainFile, new File(nplanWorkingDir, "domain.pddl"));
-        FileUtils.copyFile(problemFile, new File(nplanWorkingDir, "problem.pddl"));
+
+        File workingProblemFile = new File(nplanWorkingDir, "problem.pddl");
+        if (!problemFile.getCanonicalPath().equals(workingProblemFile.getCanonicalPath()))
+            FileUtils.copyFile(problemFile, workingProblemFile);
 
         Map<String, String> config = new HashMap<String, String>();
         config.put("domain", "domain.pddl");

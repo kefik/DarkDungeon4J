@@ -4,16 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import cz.dd4j.agents.heroes.planners.*;
 import cz.dd4j.utils.astar.AStar;
 import cz.dd4j.utils.astar.IAStarView;
+import cz.dd4j.utils.astar.Path;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 
@@ -185,13 +182,8 @@ public class PDDLAgentBase extends HeroAgentBase {
 		}
 
 		AStar<Room> astar = new AStar<>((r1, r2) -> 0);
-		int min = Integer.MAX_VALUE;
-		for (Room mr : monsters) {
-			int dist = astar.findPath(mr, r, room -> ((Room) room).feature == null || !((Room) room).feature.isA(EFeature.TRAP)).getDistanceNodes();
-			min = Math.min(min, dist);
-		}
-
-		return min;
+		return monsters.stream().map(mr -> astar.findPath(mr, r, room -> ((Room) room).feature == null || !((Room) room).feature.isA(EFeature.TRAP)))
+				.filter(Objects::nonNull).map(Path::getDistanceNodes).min(Comparator.comparingInt(x -> x)).orElse(Integer.MAX_VALUE);
 	}
 
 	protected void processDungeonFull(Dungeon dungeon) {

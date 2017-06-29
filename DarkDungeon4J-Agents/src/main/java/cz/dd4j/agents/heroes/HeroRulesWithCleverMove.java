@@ -14,6 +14,7 @@ import cz.dd4j.utils.astar.Path;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,11 +38,9 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 	private long monsterCount;
 
 	int distToClosestSword(Room from, List<Room> swordRooms, AStar<Room> astar) {
-		 Optional<Integer> result = swordRooms.stream().map(r -> astar.findPath(from, r).getDistanceNodes()).min(Comparator.comparingInt(x -> x));
-		 if (result.isPresent())
-		 	return result.get();
-
-		 return Integer.MAX_VALUE;
+		 return swordRooms.stream().map(r -> astar.findPath(from, r)).
+				 filter(Objects::nonNull).map(Path::getDistanceNodes).
+				 min(Comparator.comparingInt(x -> x)).orElse(Integer.MAX_VALUE);
 	}
 
 	@Override
