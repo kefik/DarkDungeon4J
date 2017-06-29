@@ -41,18 +41,25 @@ public class Clever01Agent extends PDDLAgentBase {
 
     }
 
+    private Command getBestReactiveAction() {
+        System.out.println("Reactive action");
+        reactiveActionTaken = true;
+        List<Command> availableActions = actionsGenerator.generateFor(hero);
+        return availableActions.stream().max(Comparator.comparingInt(this::evaluateCommand)).orElse(null);
+    }
+
     @Override
     public Command act() {
 
         int dng = dang(hero.atRoom);
         System.out.println("dang: " + dng);
         if (dng <= threshold) {
-            System.out.println("Reactive action");
-            reactiveActionTaken = true;
-            List<Command> availableActions = actionsGenerator.generateFor(hero);
-            return availableActions.stream().max(Comparator.comparingInt(this::evaluateCommand)).orElse(null);
+            return getBestReactiveAction();
         } else if (shouldReplan()) {
             currentPlan = plan();
+            if (currentPlan == null) { //planner failed to produce plan
+                return getBestReactiveAction();
+            }
         }
 
         reactiveActionTaken = false;

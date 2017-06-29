@@ -37,6 +37,10 @@ public class NaivePlanning02Agent extends PDDLAgentBase {
             currentPlan = plan();
         }
 
+        if (currentPlan == null) {
+            return null;
+        }
+
         PDDLAction currentAction = currentPlan.remove(0);
         return translateAction(currentAction);
     }
