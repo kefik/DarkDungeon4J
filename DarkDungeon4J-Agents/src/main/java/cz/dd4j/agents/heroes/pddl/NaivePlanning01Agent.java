@@ -48,6 +48,9 @@ public class NaivePlanning01Agent extends PDDLAgentBase {
     @Override
     public Command act() {
 
+        if (hero.atRoom.monster != null && hero.hand == null)
+            return null;
+
         if (shouldReplan()) {
             currentPlan = plan();
         }

@@ -218,6 +218,9 @@ public class PDDLInputGenerator {
         if (hero.hand != null && EH.isA(hero.hand.type, EItem.SWORD)) {
             print.print("    (has_sword)");
             print.print(pddlNewLine);
+        } else {
+            print.print("    (empty_handed)");
+            print.print(pddlNewLine);
         }
 
         // ENTITIES

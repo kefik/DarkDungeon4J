@@ -18,10 +18,14 @@ import java.util.List;
 public class Clever01Agent extends PDDLAgentBase {
 
     @Configurable
-    protected int threshold = 2;
+    protected int dangerThreshold = 2;
+
+    @Configurable
+    protected int safeThreshold = 3;
 
     protected List<PDDLAction> currentPlan;
     private boolean reactiveActionTaken;
+    private boolean reactiveEscape = false;
 
     @Override
     public void prepareAgent() {
@@ -42,7 +46,6 @@ public class Clever01Agent extends PDDLAgentBase {
     }
 
     private Command getBestReactiveAction() {
-        System.out.println("Reactive action");
         reactiveActionTaken = true;
         List<Command> availableActions = actionsGenerator.generateFor(hero);
         return availableActions.stream().max(Comparator.comparingInt(this::evaluateCommand)).orElse(null);
@@ -52,10 +55,21 @@ public class Clever01Agent extends PDDLAgentBase {
     public Command act() {
 
         int dng = dang(hero.atRoom);
-        System.out.println("dang: " + dng);
-        if (dng <= threshold) {
+        if (dng == 0) //dead-end state
+            return null;
+
+        if (dng <= dangerThreshold) {
+            reactiveEscape = true;
+        }
+
+        if (dng >= safeThreshold) {
+            reactiveEscape = false;
+        }
+
+        if (reactiveEscape)
             return getBestReactiveAction();
-        } else if (shouldReplan()) {
+
+        if (shouldReplan()) {
             currentPlan = plan();
             if (currentPlan == null) { //planner failed to produce plan
                 return getBestReactiveAction();

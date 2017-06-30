@@ -36,7 +36,8 @@ public class Clever02Agent extends PDDLAgentBase {
     public Command act() {
 
         int dng = dang(hero.atRoom);
-        System.out.println("dang: " + dng);
+        if (dng == 0)
+            return null; //dead-end state
         if (dng <= threshold) {
             currentPlan = plan("(and (alive)(has_sword))");
         } else if (shouldReplan()) {

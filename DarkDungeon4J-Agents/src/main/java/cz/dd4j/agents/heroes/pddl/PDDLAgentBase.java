@@ -161,6 +161,9 @@ public class PDDLAgentBase extends HeroAgentBase {
 
 	protected int dang(Room r) {
 
+		if (r.monster != null && (hero.hand == null || hero.hand.type != EItem.SWORD))
+			return 0;
+
 		if (r.feature != null && r.feature.type == EFeature.TRAP) {
 			if (hero.hand != null && hero.hand.type == EItem.SWORD) //in a room with trap with sword -> dead end
 				return 0;

@@ -2,9 +2,13 @@
   <agent id="hero1">
     <agentFQCN>cz.dd4j.agents.heroes.pddl.Clever01Agent</agentFQCN>
     <config>
-        <key>threshold</key>
+        <key>dangerThreshold</key>
         <value>2</value>
     </config>
+  <config>
+      <key>safeThreshold</key>
+      <value>3</value>
+  </config>
     <config>
         <key>domainFile</key>
         <value>./data/DarkDungeon.pddl</value>

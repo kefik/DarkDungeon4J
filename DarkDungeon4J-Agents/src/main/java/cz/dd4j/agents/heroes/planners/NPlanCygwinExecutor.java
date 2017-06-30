@@ -67,6 +67,9 @@ public class NPlanCygwinExecutor extends AbstractPlannerExecutor {
         } catch (Exception e) {
             // FAILED TO EXECUTE THE PLANNER
             // => cannot be distinguished from "no plan exists"
+//            String path = nplanWorkingDir.getCanonicalPath();
+//            File crashDir = new File("nplanCrashes/" + path.substring(path.length() - 40, path.length()));
+//            FileUtils.copyDirectory(nplanWorkingDir, crashDir);
             return null;
         }
 
