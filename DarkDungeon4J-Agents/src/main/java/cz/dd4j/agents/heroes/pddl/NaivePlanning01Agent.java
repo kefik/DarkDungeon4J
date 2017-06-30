@@ -2,16 +2,11 @@ package cz.dd4j.agents.heroes.pddl;
 
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
-import cz.dd4j.utils.Id;
 import cz.dd4j.utils.config.AutoConfig;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by Martin on 23-Jun-17.
@@ -65,7 +60,12 @@ public class NaivePlanning01Agent extends PDDLAgentBase {
     @Override
     protected void processDungeonFull(Dungeon dungeon) {
         super.processDungeonFull(dungeon);
-        monsterRooms = dungeon.rooms.values().stream().filter(r -> r.monster != null).collect(Collectors.toList());
+        monsterRooms = new ArrayList<>();
+        for (Room r: dungeon.rooms.values()) {
+            if (r.monster != null) {
+                monsterRooms.add(r);
+            }
+        }
     }
 
     @Override
@@ -74,7 +74,12 @@ public class NaivePlanning01Agent extends PDDLAgentBase {
 
         super.processDungeonUpdate(dungeon);
 
-        monsterRooms = dungeon.rooms.values().stream().filter(r -> r.monster != null).collect(Collectors.toList());
+        monsterRooms = new ArrayList<>();
+        for (Room r: dungeon.rooms.values()) {
+            if (r.monster != null) {
+                monsterRooms.add(r);
+            }
+        }
 
         if ((monsterRooms.size() == oldMonsterRooms.size() || monsterRooms.size() == oldMonsterRooms.size() - 1) &&
              (oldMonsterRooms.containsAll(monsterRooms))) {

@@ -4,11 +4,9 @@ import com.sun.istack.internal.NotNull;
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.entities.features.Trap;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -48,7 +46,18 @@ public class Clever01Agent extends PDDLAgentBase {
     private Command getBestReactiveAction() {
         reactiveActionTaken = true;
         List<Command> availableActions = actionsGenerator.generateFor(hero);
-        return availableActions.stream().max(Comparator.comparingInt(this::evaluateCommand)).orElse(null);
+
+        Command selectedAction = null;
+        int bestVal = Integer.MIN_VALUE;
+        for (Command c: availableActions) {
+            int val = evaluateCommand(c);
+            if (val > bestVal) {
+                selectedAction = c;
+                bestVal = val;
+            }
+        }
+
+        return selectedAction;
     }
 
     @Override

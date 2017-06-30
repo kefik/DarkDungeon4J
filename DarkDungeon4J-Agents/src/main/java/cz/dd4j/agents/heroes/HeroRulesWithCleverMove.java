@@ -6,18 +6,12 @@ import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EItem;
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.astar.AStar;
 import cz.dd4j.utils.astar.IAStarHeuristic;
 import cz.dd4j.utils.astar.Path;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Using rules for determining in what state it should enter the room.
@@ -38,9 +32,16 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 	private long monsterCount;
 
 	int distToClosestSword(Room from, List<Room> swordRooms, AStar<Room> astar) {
-		 return swordRooms.stream().map(r -> astar.findPath(from, r)).
-				 filter(Objects::nonNull).map(Path::getDistanceNodes).
-				 min(Comparator.comparingInt(x -> x)).orElse(Integer.MAX_VALUE);
+
+		int minDist = Integer.MAX_VALUE;
+		for (Room r: swordRooms) {
+			Path<Room> p = astar.findPath(from, r);
+			if (p != null) {
+				minDist = Math.min(minDist, p.getDistanceNodes());
+			}
+		}
+
+		return minDist;
 	}
 
 	@Override
@@ -50,17 +51,44 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 		if (moveIntention == null && hero.atRoom.item != null) return actions.pickup();
 
 		needSword = monsterCount > 0 && (hero.hand == null || hero.hand.type != EItem.SWORD);
-		List<Room> swordRooms = myDungeon.rooms.values().stream().filter(r -> r.item != null).collect(Collectors.toList());
+		final List<Room> swordRooms = new ArrayList<>();
+		for (Room r: myDungeon.rooms.values()) {
+			if (r.item != null) {
+				swordRooms.add(r);
+			}
+		}
 
 		// ALL POSSIBLE MOVE ACTIONS
 		List<Command> moveActions = actionsGenerator.generateFor(hero, EAction.MOVE);
 
-		AStar<Room> astar = new AStar<>((n1, n2) -> 0);
+
+		final AStar<Room> aStar = new AStar<>(new IAStarHeuristic<Room>() {
+			@Override
+			public int getEstimate(Room n1, Room n2) {
+				return 0;
+			}
+		});
 
 		if (needSword) {
-			moveActions.sort(Comparator.comparingInt(c -> distToClosestSword((Room) c.target, swordRooms, astar)));
+			Collections.sort(moveActions, new Comparator<Command>() {
+				@Override
+				public int compare(Command o1, Command o2) {
+					int d1 = distToClosestSword((Room) o1.target, swordRooms, aStar);
+					int d2 = distToClosestSword((Room) o2.target, swordRooms, aStar);
+					return Integer.compare(d1, d2);
+				}
+			});
 		} else {
-			moveActions.sort(Comparator.comparingInt(c -> astar.findPath((Room) c.target, goalRoom).getDistanceNodes()));
+			Collections.sort(moveActions, new Comparator<Command>() {
+				@Override
+				public int compare(Command o1, Command o2) {
+					Path<Room> p1 = aStar.findPath((Room) o1.target, goalRoom);
+					Path<Room> p2 = aStar.findPath((Room) o2.target, goalRoom);
+					int d1 = p1 != null ? p1.getDistanceNodes() : Integer.MAX_VALUE;
+					int d2 = p2 != null ? p2.getDistanceNodes() : Integer.MAX_VALUE;
+					return Integer.compare(d1, d2);
+				}
+			});
 		}
 
 		while (moveActions.size() > 0) {
@@ -113,11 +141,17 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 	public void observeDungeon(Dungeon dungeon, boolean full, long timestampMillis) {
 		myDungeon = dungeon;
 
-		if (goalRoom == null) {
-			goalRoom = dungeon.rooms.values().stream().filter((r) -> r.isGoalRoom()).findFirst().get();
-		}
+		monsterCount = 0;
+		for (Room r: dungeon.rooms.values()) {
+			if (goalRoom == null) {
+				if (r.isGoalRoom())
+					goalRoom = r;
+			}
+			if (r.monster != null) {
+				monsterCount++;
+			}
 
-		monsterCount = dungeon.rooms.values().stream().filter((r) -> r.monster != null).count();
+		}
 
 	}
 

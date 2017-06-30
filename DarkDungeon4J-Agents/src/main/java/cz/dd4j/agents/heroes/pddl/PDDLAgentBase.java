@@ -1,18 +1,13 @@
 package cz.dd4j.agents.heroes.pddl;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import cz.dd4j.agents.heroes.planners.*;
 import cz.dd4j.utils.astar.AStar;
+import cz.dd4j.utils.astar.IAStarHeuristic;
 import cz.dd4j.utils.astar.IAStarView;
 import cz.dd4j.utils.astar.Path;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.Executor;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
 import cz.dd4j.agents.HeroAgentBase;
@@ -23,7 +18,6 @@ import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.Dungeon;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
-import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Id;
@@ -179,14 +173,31 @@ public class PDDLAgentBase extends HeroAgentBase {
 	}
 
 	protected int getClosestMonsterDistance(Room r) {
-		List<Room> monsters = dungeon.rooms.values().stream().filter((room) -> room.monster != null).collect(Collectors.toList());
-		if (monsters.size() == 0) { // no monsters -> safe
-			return Integer.MAX_VALUE;
+
+		int minDist = Integer.MAX_VALUE;
+
+		AStar<Room> astar = new AStar<>(new IAStarHeuristic<Room>() {
+			@Override
+			public int getEstimate(Room n1, Room n2) {
+				return 0;
+			}
+		});
+
+		for (Room room: dungeon.rooms.values()) {
+			if (room.monster != null) {
+				Path<Room> path = astar.findPath(room, r, new IAStarView() {
+					@Override
+					public boolean isOpened(Object o) {
+						return ((Room) o).feature == null || !((Room) o).feature.isA(EFeature.TRAP);
+					}
+				});
+				if (path != null) {
+					minDist = Math.min(minDist, path.getDistanceNodes());
+				}
+			}
 		}
 
-		AStar<Room> astar = new AStar<>((r1, r2) -> 0);
-		return monsters.stream().map(mr -> astar.findPath(mr, r, room -> ((Room) room).feature == null || !((Room) room).feature.isA(EFeature.TRAP)))
-				.filter(Objects::nonNull).map(Path::getDistanceNodes).min(Comparator.comparingInt(x -> x)).orElse(Integer.MAX_VALUE);
+		return minDist;
 	}
 
 	protected void processDungeonFull(Dungeon dungeon) {
