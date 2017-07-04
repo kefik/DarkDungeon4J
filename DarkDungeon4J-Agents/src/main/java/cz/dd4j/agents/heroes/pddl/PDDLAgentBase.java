@@ -22,7 +22,9 @@ import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Id;
 import cz.dd4j.utils.config.AutoConfig;
+import cz.dd4j.utils.config.ConfigXML;
 import cz.dd4j.utils.config.Configurable;
+import org.apache.commons.io.FileUtils;
 
 @AutoConfig
 public class PDDLAgentBase extends HeroAgentBase {
@@ -91,8 +93,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 		uuid = UUID.randomUUID();
 		
 		agentWorkingDir = new File(agentWorkingDirBase, uuid.toString());
-		agentWorkingDir.deleteOnExit();
-		
+
 		if (!agentWorkingDir.exists()) {
 			workingDirExisted = false;
 			agentWorkingDir.mkdirs();
@@ -119,9 +120,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 	@Override
 	public void simulationEnded() {
 		super.simulationEnded();
-		if (!workingDirExisted) {
-			agentWorkingDir.delete();
-		}
+		FileUtils.deleteQuietly(agentWorkingDir);
 		
 		reset();
 	}
@@ -176,7 +175,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 
 		int minDist = Integer.MAX_VALUE;
 
-		AStar<Room> astar = new AStar<>(new IAStarHeuristic<Room>() {
+		AStar<Room> astar = new AStar<Room>(new IAStarHeuristic<Room>() {
 			@Override
 			public int getEstimate(Room n1, Room n2) {
 				return 0;

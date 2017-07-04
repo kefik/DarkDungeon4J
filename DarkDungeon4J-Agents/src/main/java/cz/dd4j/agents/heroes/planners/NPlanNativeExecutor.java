@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,16 @@ import java.util.Map;
 public class NPlanNativeExecutor extends AbstractPlannerExecutor {
 
     @Configurable
-    protected File nplanFile = new File("./nplan/nplan");
+    protected File nplanDir = new File("./nplan/");
 
     protected File agentWorkingDir;
     protected File nplanWorkingDir;
 
     protected File nplanWorkingFile;
+
+    public String getPddlNewLine() {
+        return Const.NEW_LINE_LINUX;
+    }
 
     @Override
     public List<PDDLAction> execPlanner(File domainFile, File problemFile) throws IOException {
@@ -35,26 +40,34 @@ public class NPlanNativeExecutor extends AbstractPlannerExecutor {
         File resultFile = new File(nplanWorkingDir, "plan.SOL");
 
         FileUtils.copyFile(domainFile, new File(nplanWorkingDir, "domain.pddl"));
-        FileUtils.copyFile(domainFile, new File(nplanWorkingDir, "problem.pddl"));
+        FileUtils.copyFile(problemFile, new File(nplanWorkingDir, "problem.pddl"));
 
         Map<String, String> config = new HashMap<String, String>();
         config.put("domain", "domain.pddl");
         config.put("problem", "problem.pddl");
 
-        CommandLine commandLine = new CommandLine("nplan");
+        CommandLine commandLine = new CommandLine("sh");
+        commandLine.addArgument("nplan_linux.sh");
         commandLine.addArgument("${domain}");
         commandLine.addArgument("${problem}");
-        commandLine.addArgument("-o");
         commandLine.addArgument(resultFile.getAbsolutePath());
-        commandLine.addArgument("-Q");
         commandLine.setSubstitutionMap(config);
 
         final Executor executor = new DefaultExecutor();
         executor.setWorkingDirectory(nplanWorkingDir);
-        executor.setExitValue(1);
+        executor.setExitValue(0);
 
         // SYNC EXECUTION
-        executor.execute(commandLine);
+        try {
+            executor.execute(commandLine);
+        } catch (Exception e) {
+            // FAILED TO EXECUTE THE PLANNER
+            // => cannot be distinguished from "no plan exists"
+//            String path = nplanWorkingDir.getCanonicalPath();
+//            File crashDir = new File("nplanCrashes/" + path.substring(path.length() - 40, path.length()));
+//            FileUtils.copyDirectory(nplanWorkingDir, crashDir);
+            return null;
+        }
 
         // NOW RESULT FILE SHOULD BE READY
         if (!resultFile.exists()) {
@@ -83,9 +96,9 @@ public class NPlanNativeExecutor extends AbstractPlannerExecutor {
         // TRY TO COPY OUR PLANNER
         nplanWorkingFile = new File(nplanWorkingDir, "nplan");
         try {
-            FileUtils.copyFile(nplanFile, nplanWorkingFile);
+            FileUtils.copyDirectory(nplanDir, nplanWorkingDir);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to copy nplan planner from '" + nplanFile.getAbsolutePath() + "' into '" + nplanWorkingFile.getAbsolutePath() + "'.", e);
+            throw new RuntimeException("Failed to copy nplan directory from '" + nplanDir.getAbsolutePath() + "' into '" + nplanWorkingFile.getAbsolutePath() + "'.", e);
         }
         nplanWorkingFile.deleteOnExit();
     }
