@@ -6,6 +6,7 @@ import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
 
@@ -45,12 +46,14 @@ public class NPlanNativeExecutor extends AbstractPlannerExecutor {
         Map<String, String> config = new HashMap<String, String>();
         config.put("domain", "domain.pddl");
         config.put("problem", "problem.pddl");
+        config.put("result", resultFile.getCanonicalPath());
 
-        CommandLine commandLine = new CommandLine("sh");
-        commandLine.addArgument("nplan_linux.sh");
+        CommandLine commandLine = new CommandLine(new File(nplanDir, "nplan").getCanonicalPath());
         commandLine.addArgument("${domain}");
         commandLine.addArgument("${problem}");
-        commandLine.addArgument(resultFile.getAbsolutePath());
+        commandLine.addArgument("-o");
+        commandLine.addArgument("${result}");
+        commandLine.addArgument("-Q");
         commandLine.setSubstitutionMap(config);
 
         final Executor executor = new DefaultExecutor();
@@ -60,12 +63,22 @@ public class NPlanNativeExecutor extends AbstractPlannerExecutor {
         // SYNC EXECUTION
         try {
             executor.execute(commandLine);
-        } catch (Exception e) {
+        } catch (ExecuteException e) {
             // FAILED TO EXECUTE THE PLANNER
             // => cannot be distinguished from "no plan exists"
-//            String path = nplanWorkingDir.getCanonicalPath();
-//            File crashDir = new File("nplanCrashes/" + path.substring(path.length() - 40, path.length()));
-//            FileUtils.copyDirectory(nplanWorkingDir, crashDir);
+            if (e.getExitValue() == 139) { //segfault in planner, seems to mean the plan does not exist
+                String path = nplanWorkingDir.getCanonicalPath();
+                File crashDir = new File("nplanSegfault/" + path.substring(path.length() - 40, path.length()));
+                FileUtils.copyDirectory(nplanWorkingDir, crashDir);
+                return null;
+
+            }
+
+            String path = nplanWorkingDir.getCanonicalPath();
+            File crashDir = new File("nplanCrashes/" + path.substring(path.length() - 40, path.length()));
+            FileUtils.copyDirectory(nplanWorkingDir, crashDir);
+            System.err.print(crashDir.getCanonicalPath());
+            e.printStackTrace();
             return null;
         }
 
@@ -95,11 +108,11 @@ public class NPlanNativeExecutor extends AbstractPlannerExecutor {
 
         // TRY TO COPY OUR PLANNER
         nplanWorkingFile = new File(nplanWorkingDir, "nplan");
-        try {
-            FileUtils.copyDirectory(nplanDir, nplanWorkingDir);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to copy nplan directory from '" + nplanDir.getAbsolutePath() + "' into '" + nplanWorkingFile.getAbsolutePath() + "'.", e);
-        }
-        nplanWorkingFile.deleteOnExit();
+//        try {
+//            FileUtils.copyDirectory(nplanDir, nplanWorkingDir);
+//        } catch (IOException e) {
+//            throw new RuntimeException("Failed to copy nplan directory from '" + nplanDir.getAbsolutePath() + "' into '" + nplanWorkingFile.getAbsolutePath() + "'.", e);
+//        }
+//        nplanWorkingFile.deleteOnExit();
     }
 }
