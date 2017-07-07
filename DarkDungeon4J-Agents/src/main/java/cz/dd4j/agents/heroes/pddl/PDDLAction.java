@@ -1,8 +1,5 @@
 package cz.dd4j.agents.heroes.pddl;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.utils.Id;
 

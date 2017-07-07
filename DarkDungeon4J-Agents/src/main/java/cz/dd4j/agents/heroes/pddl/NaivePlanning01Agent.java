@@ -60,7 +60,7 @@ public class NaivePlanning01Agent extends PDDLAgentBase {
     @Override
     protected void processDungeonFull(Dungeon dungeon) {
         super.processDungeonFull(dungeon);
-        monsterRooms = new ArrayList<>();
+        monsterRooms = new ArrayList<Room>();
         for (Room r: dungeon.rooms.values()) {
             if (r.monster != null) {
                 monsterRooms.add(r);
@@ -70,11 +70,11 @@ public class NaivePlanning01Agent extends PDDLAgentBase {
 
     @Override
     protected void processDungeonUpdate(Dungeon dungeon) {
-        oldMonsterRooms = new ArrayList<>(monsterRooms);
+        oldMonsterRooms = new ArrayList<Room>(monsterRooms);
 
         super.processDungeonUpdate(dungeon);
 
-        monsterRooms = new ArrayList<>();
+        monsterRooms = new ArrayList<Room>();
         for (Room r: dungeon.rooms.values()) {
             if (r.monster != null) {
                 monsterRooms.add(r);

@@ -51,7 +51,7 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 		if (moveIntention == null && hero.atRoom.item != null) return actions.pickup();
 
 		needSword = monsterCount > 0 && (hero.hand == null || hero.hand.type != EItem.SWORD);
-		final List<Room> swordRooms = new ArrayList<>();
+		final List<Room> swordRooms = new ArrayList<Room>();
 		for (Room r: myDungeon.rooms.values()) {
 			if (r.item != null) {
 				swordRooms.add(r);
@@ -62,7 +62,7 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 		List<Command> moveActions = actionsGenerator.generateFor(hero, EAction.MOVE);
 
 
-		final AStar<Room> aStar = new AStar<>(new IAStarHeuristic<Room>() {
+		final AStar<Room> aStar = new AStar<Room>(new IAStarHeuristic<Room>() {
 			@Override
 			public int getEstimate(Room n1, Room n2) {
 				return 0;
