@@ -17,7 +17,7 @@ import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 /**
  * Using rules for determining in what state it should enter the room.
  * 
- * Move actions are chosen at random {@link HeroRandom#generateActions(Hero)}.
+ * Move actions are chosen at random {@link HeroRandom}.
  * 
  * NEVER goes to the room, which contains unbeatable danger.
  * 
@@ -83,7 +83,7 @@ public class HeroRulesWithRandomMove extends HeroAgentBase implements IHeroAgent
 		// => wait...
 		return null;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();

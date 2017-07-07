@@ -59,7 +59,7 @@ public class Corridor extends Place implements ILink<Room>
 		if (obj == null) return false;
 		if (!(obj instanceof Corridor)) return false;
 		Corridor other = (Corridor)obj;
-		return Safe.equals(room1, other.room1) && Safe.equals(room2, other.room2) || Safe.equals(room1, other.room2) && Safe.equals(room1, other.room2);  
+		return Safe.equals(room1, other.room1) && Safe.equals(room2, other.room2) || Safe.equals(room1, other.room2) && Safe.equals(room2, other.room1);
 	}
 	
 	public boolean leadsTo(Room room) {

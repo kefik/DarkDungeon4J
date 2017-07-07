@@ -1,0 +1,25 @@
+<agents>
+  <agent id="hero1">
+    <agentFQCN>cz.dd4j.agents.heroes.pddl.Clever02Agent</agentFQCN>
+    <config>
+        <key>threshold</key>
+        <value>2</value>
+    </config>
+    <config>
+        <key>domainFile</key>
+        <value>./data/DarkDungeon.pddl</value>
+    </config>
+    <config>
+        <key>domainName</key>
+        <value>DarkDungeon</value>
+    </config>
+    <config>
+        <key>agentWorkingDirBase</key>
+        <value>./temp</value>
+    </config>
+    <config>
+        <key>executorClass</key>
+        <value>cz.dd4j.agents.heroes.planners.NPlanCygwinExecutor</value>
+    </config>
+  </agent>
+</agents>

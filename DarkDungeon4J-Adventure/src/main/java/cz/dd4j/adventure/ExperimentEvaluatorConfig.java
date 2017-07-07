@@ -15,6 +15,7 @@ public class ExperimentEvaluatorConfig extends BidirConfig {
 	 * If greater then 0, then the simulator will execute only this number of playouts at max. 
 	 */
 	public int playoutLimit = -1;
+	public int maxCores = -1;
 	
 	/**
 	 * Wether to attach {@link VisConsole} to all executed simulations.

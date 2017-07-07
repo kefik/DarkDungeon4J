@@ -124,8 +124,11 @@ public class ExperimentEvaluator {
 	
 	public synchronized void init() {
 		if (executor != null) return;
-		
-		int numCores = Runtime.getRuntime().availableProcessors();
+
+		int numCores = config.maxCores;
+
+		if (numCores == -1)
+			numCores = Runtime.getRuntime().availableProcessors();
 		executor = Executors.newFixedThreadPool(numCores);
 		
 		heroAgentsFiles = findHeroAgentFiles();
@@ -236,7 +239,7 @@ public class ExperimentEvaluator {
 
 		config.id = "E" + item.number;
 		config.description = item.toString();		
-		config.state.roundsLeft = 10 * (int)Math.pow(config.state.dungeon.rooms.size(), 2); 		
+		config.state.roundsLeft = 10 * (int)Math.pow(config.state.dungeon.rooms.size(), 2);
 		item.config = config;		
 		System.out.println(item.toString() + ": timeout set to " + config.state.roundsLeft + " frames = 10*dungeon.rooms.size()^2 = 10*" + config.state.dungeon.rooms.size() + "^2");
 		

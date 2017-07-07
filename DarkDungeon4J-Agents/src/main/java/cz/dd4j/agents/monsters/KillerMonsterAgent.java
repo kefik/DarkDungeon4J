@@ -18,6 +18,8 @@ public class KillerMonsterAgent extends MonsterAgentBase {
 	
 	@Override
 	public Command act() {
+		if (monster.atRoom.hero != null) return new Command(EAction.ATTACK, monster.atRoom.hero);
+
 		if (random.nextDouble() > movementProbability) {
 			return null;
 		}

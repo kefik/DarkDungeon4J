@@ -31,7 +31,7 @@ public class Main {
 		generator.generateRooms(4, 1000);
 		
 		// Goals for rooms 1-100
-		generator.generateGoals(100);
+		generator.generateGoals(300);
 		
 		// Grids 2x2 -> 20x20
 		generator.generateGrid(4, 400);
@@ -48,16 +48,16 @@ public class Main {
 		);
 		
 		// Monsters 1-10 for rooms 1-100
-		generator.generateMonsters(10, 100);
+		generator.generateMonsters(100, 260);
 		
 		// Hero 1-1 for rooms 1-100		
-		generator.generateHeroes(1, 100);
+		generator.generateHeroes(1, 260);
 		
 		// Trap 1-10 for rooms 1-100
-		generator.generateTraps(10, 100);
+		generator.generateTraps(100, 260);
 		
 		// Swords for rooms 1-100
-		generator.generateSwords(100);
+		generator.generateSwords(300);
 		
 		// Generate hero agents
 		generator.generateAgents(
