@@ -21,6 +21,11 @@ public class ExperimentEvaluatorConfig extends BidirConfig {
 	 * Wether to attach {@link VisConsole} to all executed simulations.
 	 */
 	public boolean consoleVisualization = false;
+
+	/**
+	 * Alters the timeout for the number of steps. Once an agent executes PARAM*dungeon.#rooms step without reaching the goal, the simulation will timeout.
+	 */
+	public double timeoutMultiplier = 10;
 	
 	public ExperimentEvaluatorConfig() {
 		source.dir = new File("../DarkDungeon4J-Generator/result");

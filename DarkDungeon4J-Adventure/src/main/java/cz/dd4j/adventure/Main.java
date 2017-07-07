@@ -33,7 +33,12 @@ public class Main {
 	private static final String ARG_VIS_CONSOLE_LONG = "vis-console";
 
 	private static final char ARG_MAX_CORES_SHORT = 'c';
+	
 	private static final String ARG_MAX_CORES_LONG = "max-cores";
+	
+	private static final char ARG_TIMEOUT_MULTIPLIER_SHORT = 't';
+	
+	private static final String ARG_TIMEOUT_MULTIPLIER_LONG = "timeout-multiplier";
 		
 	private static JSAP jsap;
 
@@ -56,6 +61,8 @@ public class Main {
 	private static int maxCores;
 	
 	private static boolean headerOutput = false;
+	
+	private static double timeoutMultiplier;
 
 	private static JSAPResult config;
 
@@ -150,6 +157,16 @@ public class Main {
 
 	    jsap.registerParameter(opt6);
 	    
+	    FlaggedOption opt7 = new FlaggedOption(ARG_TIMEOUT_MULTIPLIER_LONG)
+				.setStringParser(JSAP.DOUBLE_PARSER)
+				.setRequired(false)
+				.setDefault("10")
+				.setShortFlag(ARG_TIMEOUT_MULTIPLIER_SHORT)
+				.setLongFlag(ARG_TIMEOUT_MULTIPLIER_LONG);
+	    opt7.setHelp("Alters the timeout for the number of steps. Once an agent executes PARAM*dungeon.#rooms step without reaching the goal, the simulation will timeout. Minimum value is 0.1.");
+
+	    jsap.registerParameter(opt7);
+	    
    	}
 
 	private static void readConfig(String[] args) {
@@ -188,6 +205,8 @@ public class Main {
 		visConsole = config.getBoolean(ARG_VIS_CONSOLE_LONG);
 
 		maxCores = config.getInt(ARG_MAX_CORES_LONG);
+		
+		timeoutMultiplier = config.getDouble(ARG_TIMEOUT_MULTIPLIER_LONG);
 	}
 	
 	private static void sanityChecks() {
@@ -252,6 +271,11 @@ public class Main {
 			System.out.println("-- max-cores specified; using " + maxCores + "cores");
 		}
 		
+		if (timeoutMultiplier < 0.1) {
+			System.out.println("-- timeoutMultiplier specified as " + timeoutMultiplier + " < 0.1, which is too small, setting back to 0.1");
+			timeoutMultiplier = 0.1;
+		}
+		
 	    System.out.println("Sanity checks OK!");
 	}
 	
@@ -271,6 +295,7 @@ public class Main {
 		config.playoutLimit         = playoutLimit;
 		config.consoleVisualization = visConsole;
 		config.maxCores				= maxCores;
+		config.timeoutMultiplier    = timeoutMultiplier;
 		
 		System.out.println("Creating experiment evaluator...");
 		
@@ -300,7 +325,8 @@ public class Main {
 				, "-h", "./data/hero-agents"                                           // directory with heroes
 				, "-r", "./results"                                                    // directory with results	
 //				, "-l", "4"                                                            // limits maximum number of simulations, -1 == no limit
-//				, "-v"                                                                 // console visualization, if commented out, evaluator will not output simulation progresses 
+//				, "-v"                                                                 // console visualization, if commented out, evaluator will not output simulation progresses
+				, "-t", "5"															   // timeout multiplier
 		};
 	}
 	

@@ -239,7 +239,7 @@ public class ExperimentEvaluator {
 
 		config.id = "E" + item.number;
 		config.description = item.toString();		
-		config.state.roundsLeft = 10 * (int)Math.pow(config.state.dungeon.rooms.size(), 2);
+		config.state.roundsLeft = Math.max(1, (int)Math.ceil(config.timeoutMultiplier * config.state.dungeon.rooms.size()));
 		item.config = config;		
 		System.out.println(item.toString() + ": timeout set to " + config.state.roundsLeft + " frames = 10*dungeon.rooms.size()^2 = 10*" + config.state.dungeon.rooms.size() + "^2");
 		

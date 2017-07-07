@@ -35,6 +35,11 @@ public class SimStaticConfig implements IReporting {
 	 */
 	public boolean collectActionStats = true; 
 	
+	/**
+	 * Alters the timeout for the number of steps. Once an agent executes PARAM*dungeon.#rooms step without reaching the goal, the simulation will timeout.
+	 */
+	public double timeoutMultiplier = 10;	
+	
 	// ============
 	// CONFIG STATE
 	// ============
