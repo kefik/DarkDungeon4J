@@ -1,7 +1,10 @@
 package cz.dd4j.agents.heroes.pddl;
 
 import cz.dd4j.agents.commands.Command;
+import cz.dd4j.domain.EElement;
+import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
+import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
@@ -36,18 +39,11 @@ public class Clever04Agent extends PDDLAgentBase {
     @Override
     public Command act() {
 
-        int dng = dang(hero.atRoom);
-        if (dng == 0)
-            return null; //dead-end state
-        if (dng <= threshold) {
+        if (dang(hero.atRoom) == 0) {
+            return null;
+        }
 
-            if (dng == getClosestMonsterDistance(hero.atRoom)) {
-                Monster m = getClosestMonster(hero.atRoom);
-                currentPlan = plan("(and (alive)(has_sword)(not(monster_at " + m.atRoom.id.toString() + ")))");
-            } else {
-                currentPlan = plan("(and (alive)(has_sword))");
-            }
-        } else if (shouldReplan()) {
+        if (shouldReplan()) {
             currentPlan = plan();
         }
 
@@ -56,6 +52,34 @@ public class Clever04Agent extends PDDLAgentBase {
         }
 
         PDDLAction currentAction = currentPlan.remove(0);
+        Command cmd = translateAction(currentAction);
+
+        int dng = dangAfterAction(cmd);
+
+        if (dng <= threshold) {
+            if (cmd.isType(EAction.MOVE) && ((Room)cmd.target).feature != null) { //going to disable the trap, ignore danger
+                return cmd;
+            }
+            List<PDDLAction> safePlan = null;
+            if (cmd.isType(EAction.MOVE)) {
+                Monster m = getClosestMonster((Room)cmd.target);
+                safePlan = plan("(and (alive)(has_sword)(not(monster_at " + m.atRoom.id.toString() + ")))");
+            } else {
+                Monster m = getClosestMonster(hero.atRoom);
+                safePlan = plan("(and (alive)(has_sword)(not(monster_at " + m.atRoom.id.toString() + ")))");
+            }
+            if (safePlan != null) {
+                currentPlan = safePlan;
+            }
+        } else {
+            return cmd;
+        }
+
+        if (currentPlan == null) {
+            return null;
+        }
+
+        currentAction = currentPlan.remove(0);
         return translateAction(currentAction);
     }
 

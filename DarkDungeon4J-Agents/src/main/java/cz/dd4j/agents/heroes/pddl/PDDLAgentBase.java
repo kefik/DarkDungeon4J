@@ -1,6 +1,7 @@
 package cz.dd4j.agents.heroes.pddl;
 
 import java.io.File;
+import java.net.Inet4Address;
 import java.util.*;
 
 import cz.dd4j.agents.heroes.planners.*;
@@ -175,11 +176,11 @@ public class PDDLAgentBase extends HeroAgentBase {
 		// room with trap, anything except disarm is dead-end, disarm is distance to closest monster - 1 (monster can move)
 		if (hero.atRoom.feature != null) {
 			if (cmd.isType(EAction.DISARM)) {
-				// this is technically not correct (see comment above), but leads to always selecting DISARM action
-				return 1;
+				return Math.max(1, getClosestMonsterDistance(hero.atRoom) - 1);
 			}
-			else
+			else {
 				return 0;
+			}
 		}
 
 		// room with monster
@@ -201,7 +202,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 				return hero.hand != null ? Integer.MAX_VALUE : 0;
 			}
 			if (target.feature != null) {
-				return hero.hand != null ? 0 : Integer.MAX_VALUE;
+				return hero.hand != null ? 0 : 1;
 			}
 			return hero.hand != null ? Integer.MAX_VALUE : getClosestMonsterDistance(target) - 1;
 		}

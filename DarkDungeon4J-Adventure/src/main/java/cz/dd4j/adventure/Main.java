@@ -31,6 +31,9 @@ public class Main {
 	private static final char ARG_VIS_CONSOLE_SHORT = 'v';
 	
 	private static final String ARG_VIS_CONSOLE_LONG = "vis-console";
+
+	private static final char ARG_MAX_CORES_SHORT = 'c';
+	private static final String ARG_MAX_CORES_LONG = "max-cores";
 		
 	private static JSAP jsap;
 
@@ -49,6 +52,8 @@ public class Main {
 	private static int playoutLimit;
 	
 	private static boolean visConsole;
+
+	private static int maxCores;
 	
 	private static boolean headerOutput = false;
 
@@ -135,7 +140,15 @@ public class Main {
 	    
 	    jsap.registerParameter(opt4);
 	    
-	    
+	    FlaggedOption opt6 = new FlaggedOption(ARG_MAX_CORES_LONG)
+				.setStringParser(JSAP.INTEGER_PARSER)
+				.setRequired(false)
+				.setDefault("-1")
+				.setShortFlag(ARG_MAX_CORES_SHORT)
+				.setLongFlag(ARG_MAX_CORES_LONG);
+	    opt6.setHelp("Maximum number of CPU cores to use for experiments, -1 == all cores");
+
+	    jsap.registerParameter(opt6);
 	    
    	}
 
@@ -173,6 +186,8 @@ public class Main {
 		playoutLimit = config.getInt(ARG_PLAYOUT_LIMIT_LONG);
 		
 		visConsole = config.getBoolean(ARG_VIS_CONSOLE_LONG);
+
+		maxCores = config.getInt(ARG_MAX_CORES_LONG);
 	}
 	
 	private static void sanityChecks() {
@@ -230,7 +245,12 @@ public class Main {
 		} else {
 			System.out.println("-- VisConsole NOT specified; simulation progeress will NOT be output");
 		}
-		
+
+		if (maxCores == -1) {
+			System.out.println("-- using all available cores");
+		} else {
+			System.out.println("-- max-cores specified; using " + maxCores + "cores");
+		}
 		
 	    System.out.println("Sanity checks OK!");
 	}
@@ -250,6 +270,7 @@ public class Main {
 		config.target.dir           = resultDirFile;
 		config.playoutLimit         = playoutLimit;
 		config.consoleVisualization = visConsole;
+		config.maxCores				= maxCores;
 		
 		System.out.println("Creating experiment evaluator...");
 		
