@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
+import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * Created by Martin on 22-Jun-17.
  */
 @AutoConfig
-public class Clever01Agent extends PDDLAgentBase {
+public class Clever03Agent extends PDDLAgentBase {
 
     @Configurable
     protected int dangerThreshold = 2;
@@ -47,6 +48,8 @@ public class Clever01Agent extends PDDLAgentBase {
         reactiveActionTaken = true;
         List<Command> availableActions = actionsGenerator.generateFor(hero);
 
+        System.out.println("Reactive action");
+
         Command selectedAction = null;
         int bestVal = Integer.MIN_VALUE;
         for (Command c: availableActions) {
@@ -64,11 +67,8 @@ public class Clever01Agent extends PDDLAgentBase {
     public Command act() {
 
         int dng = dang(hero.atRoom);
-        if (dng == 0) //dead-end state
+        if (dng == 0) {
             return null;
-
-        if (dng <= dangerThreshold) {
-            reactiveEscape = true;
         }
 
         if (dng >= safeThreshold) {
@@ -80,17 +80,22 @@ public class Clever01Agent extends PDDLAgentBase {
 
         if (shouldReplan()) {
             currentPlan = plan();
-            if (currentPlan == null) { //planner failed to produce plan
-                return getBestReactiveAction();
-            }
         }
 
-        reactiveActionTaken = false;
+        if (currentPlan == null) { //no plan found in previous step
+            return getBestReactiveAction();
+        }
 
-        PDDLAction currentAction = currentPlan.remove(0);
-        return translateAction(currentAction);
+        Command cmd = translateAction(currentPlan.remove(0));
+        if (evaluateCommand(cmd) <= dangerThreshold) { //this action would lead to danger state
+            reactiveEscape = true;
+            System.out.println("Planned action would be: " + cmd.toString() + "dang: " + evaluateCommand(cmd));
+            return getBestReactiveAction();
+        }
+
+        return cmd;
+
     }
-
     private int evaluateCommand(@NotNull Command cmd) {
 
         return dangAfterAction(cmd);

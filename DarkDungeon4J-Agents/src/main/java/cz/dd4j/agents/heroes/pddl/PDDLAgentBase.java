@@ -154,21 +154,69 @@ public class PDDLAgentBase extends HeroAgentBase {
 
 	protected int dang(Room r) {
 
-		if (r.monster != null && (hero.hand == null || hero.hand.type != EItem.SWORD))
+		if (r.monster != null && hero.hand == null)
 			return 0;
 
-		if (r.feature != null && r.feature.type == EFeature.TRAP) {
-			if (hero.hand != null && hero.hand.type == EItem.SWORD) //in a room with trap with sword -> dead end
+		if (r.feature != null) {
+			if (hero.hand != null) //in a room with trap with sword -> dead end
 				return 0;
 			else
 				return 1;
 		}
 
-		if (hero.hand != null && hero.hand.type == EItem.SWORD) { // have sword -> safe
+		if (hero.hand != null) { // have sword -> safe
 			return Integer.MAX_VALUE;
 		}
 
 		return getClosestMonsterDistance(r);
+	}
+
+	protected int dangAfterAction(Command cmd) {
+		// room with trap, anything except disarm is dead-end, disarm is distance to closest monster - 1 (monster can move)
+		if (hero.atRoom.feature != null) {
+			if (cmd.isType(EAction.DISARM)) {
+				// this is technically not correct (see comment above), but leads to always selecting DISARM action
+				return 1;
+			}
+			else
+				return 0;
+		}
+
+		// room with monster
+		if (hero.atRoom.monster != null) {
+			if (hero.hand == null) {
+				return 0;
+			}
+			Monster m = hero.atRoom.monster;
+			hero.atRoom.monster = null;
+			int val = dangAfterAction(cmd);
+			hero.atRoom.monster = m;
+			return val;
+		}
+
+		//for moves, the value is the distance to closest monster from the target room - 1 (the monsters can move)
+		if (cmd.isType(EAction.MOVE)) {
+			Room target = dungeon.rooms.get(cmd.target.id);
+			if (target.monster != null) {
+				return hero.hand != null ? Integer.MAX_VALUE : 0;
+			}
+			if (target.feature != null) {
+				return hero.hand != null ? 0 : Integer.MAX_VALUE;
+			}
+			return hero.hand != null ? Integer.MAX_VALUE : getClosestMonsterDistance(target) - 1;
+		}
+
+		//for sword dropping, the value is the distance to closest monster from the current room - 1 (monsters move)
+		if (cmd.isType(EAction.DROP)) {
+			return getClosestMonsterDistance(hero.atRoom) - 1;
+		}
+
+		//after picking up sword (in a room without trap), the hero is safe
+		if (cmd.isType(EAction.PICKUP)) {
+			return Integer.MAX_VALUE;
+		}
+
+		return 0;
 	}
 
 	protected int getClosestMonsterDistance(Room r) {
@@ -197,6 +245,40 @@ public class PDDLAgentBase extends HeroAgentBase {
 		}
 
 		return minDist;
+	}
+
+	protected Monster getClosestMonster(Room r) {
+
+		int minDist = Integer.MAX_VALUE;
+		Monster closest = null;
+
+		AStar<Room> astar = new AStar<Room>(new IAStarHeuristic<Room>() {
+			@Override
+			public int getEstimate(Room n1, Room n2) {
+				return 0;
+			}
+		});
+
+		for (Room room: dungeon.rooms.values()) {
+			if (room.monster != null) {
+				Path<Room> path = astar.findPath(room, r, new IAStarView() {
+					@Override
+					public boolean isOpened(Object o) {
+						return ((Room) o).feature == null || !((Room) o).feature.isA(EFeature.TRAP);
+					}
+				});
+				if (path != null) {
+					int dist = path.getDistanceNodes();
+					if (dist < minDist) {
+						minDist = dist;
+						closest = room.monster;
+					}
+				}
+			}
+		}
+
+		return closest;
+
 	}
 
 	protected void processDungeonFull(Dungeon dungeon) {
