@@ -25,6 +25,7 @@ import cz.dd4j.utils.Id;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.ConfigXML;
 import cz.dd4j.utils.config.Configurable;
+import cz.dd4j.utils.csv.CSV;
 import org.apache.commons.io.FileUtils;
 
 @AutoConfig
@@ -82,6 +83,8 @@ public class PDDLAgentBase extends HeroAgentBase {
 	protected String pddlNewLine = Const.NEW_LINE;
 
 	protected PDDLInputGenerator inputGenerator;
+
+	protected int plannerCalls = 0;
 
 	// ================
 	// AGENT LIFE-CYCLE
@@ -377,7 +380,8 @@ public class PDDLAgentBase extends HeroAgentBase {
 
 		try {
 			// we have domainFile and problemFile
-			// => EXECUTE THE PLANNER			
+			// => EXECUTE THE PLANNER
+			plannerCalls++;
 			return execPlanner(inputs.domainFile, inputs.problemFile);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to execute the planner.", e);
@@ -405,6 +409,20 @@ public class PDDLAgentBase extends HeroAgentBase {
 	
 	protected File getWorkingFile(String name) {
 		return new File(agentWorkingDir, name);
+	}
+
+	@Override
+	public List<String> getCSVHeaders() {
+		List<String> headers = super.getCSVHeaders();
+		headers.add("planner_calls");
+		return headers;
+	}
+
+	@Override
+	public CSV.CSVRow getCSVRow() {
+		CSV.CSVRow row = super.getCSVRow();
+		row.add("planner_calls", Integer.toString(plannerCalls));
+		return row;
 	}
 
 }
