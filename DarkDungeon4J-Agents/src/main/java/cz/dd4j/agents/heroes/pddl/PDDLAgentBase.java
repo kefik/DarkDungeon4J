@@ -85,6 +85,8 @@ public class PDDLAgentBase extends HeroAgentBase {
 	protected PDDLInputGenerator inputGenerator;
 
 	protected int plannerCalls = 0;
+	protected int failedPlans = 0;
+	protected int customPlannerCalls = 0;
 
 	// ================
 	// AGENT LIFE-CYCLE
@@ -373,6 +375,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 		if (goal == null) { //no special goal, plan to goal rooms
 			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goalRooms, problemFile, domainFile);
 		} else
+			customPlannerCalls++;
 			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goal, problemFile, domainFile);
 		if (inputs.problemFile == null) {
 			throw new RuntimeException("Failed to genereate problem file!");
@@ -382,7 +385,12 @@ public class PDDLAgentBase extends HeroAgentBase {
 			// we have domainFile and problemFile
 			// => EXECUTE THE PLANNER
 			plannerCalls++;
-			return execPlanner(inputs.domainFile, inputs.problemFile);
+			List<PDDLAction> plan = execPlanner(inputs.domainFile, inputs.problemFile);
+			if (plan == null) {
+				failedPlans++;
+			}
+
+			return plan;
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to execute the planner.", e);
 		} finally {
@@ -415,6 +423,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 	public List<String> getCSVHeaders() {
 		List<String> headers = super.getCSVHeaders();
 		headers.add("planner_calls");
+		headers.add("planner_fails");
 		return headers;
 	}
 
@@ -422,6 +431,8 @@ public class PDDLAgentBase extends HeroAgentBase {
 	public CSV.CSVRow getCSVRow() {
 		CSV.CSVRow row = super.getCSVRow();
 		row.add("planner_calls", Integer.toString(plannerCalls));
+		row.add("planner_fails", Integer.toString(failedPlans));
+		row.add("custom_planner_calls", Integer.toString(customPlannerCalls));
 		return row;
 	}
 

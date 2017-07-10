@@ -7,6 +7,7 @@ import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
+import cz.dd4j.utils.csv.CSV;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public class Clever03Agent extends PDDLAgentBase {
     protected List<PDDLAction> currentPlan;
     private boolean reactiveActionTaken;
     private boolean reactiveEscape = false;
+
+    protected int reactiveActions = 0;
 
     @Override
     public void prepareAgent() {
@@ -45,6 +48,7 @@ public class Clever03Agent extends PDDLAgentBase {
     }
 
     private Command getBestReactiveAction() {
+        reactiveActions++;
         reactiveActionTaken = true;
         List<Command> availableActions = actionsGenerator.generateFor(hero);
 
@@ -99,6 +103,20 @@ public class Clever03Agent extends PDDLAgentBase {
     private int evaluateCommand(@NotNull Command cmd) {
 
         return dangAfterAction(cmd);
+    }
+
+    @Override
+    public List<String> getCSVHeaders() {
+        List<String> headers = super.getCSVHeaders();
+        headers.add("reactive_steps");
+        return headers;
+    }
+
+    @Override
+    public CSV.CSVRow getCSVRow() {
+        CSV.CSVRow row = super.getCSVRow();
+        row.add("reactive_steps", reactiveActions);
+        return row;
     }
 
 }
