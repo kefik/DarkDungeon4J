@@ -78,8 +78,12 @@ public class Clever03Agent extends PDDLAgentBase {
 
         if (reactiveEscape && dng >= safeThreshold) {
             reactiveEscape = false;
-            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s))", dangerousMonster.atRoom.id.name));
+            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s)))", dangerousMonster.atRoom.id.name));
             dangerousMonster = null;
+            if (currentPlan != null && !currentPlan.isEmpty()) {
+                reactiveActionTaken = false;
+                return translateAction(currentPlan.remove(0));
+            }
         }
 
         if (reactiveEscape)

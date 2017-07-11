@@ -41,7 +41,7 @@ public class Clever02Agent extends PDDLAgentBase {
             return null; //dead-end state
         if (dng <= threshold && hero.atRoom.feature == null) { //ignore low dang if we are in a room with a trap
             Monster m = getClosestMonster(hero.atRoom);
-            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s))", m.atRoom.id.name));
+            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s)))", m.atRoom.id.name));
         } else if (shouldReplan()) {
             currentPlan = plan();
         }

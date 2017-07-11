@@ -363,9 +363,9 @@ public class SimStatic {
 		gatherActions();
 
 		sortNonMoveActions();
-		executeNonMoveActions();
-
 		resolveConflictingMoveActions();
+
+		executeNonMoveActions();
 		executeMoveActions();
 	}
 

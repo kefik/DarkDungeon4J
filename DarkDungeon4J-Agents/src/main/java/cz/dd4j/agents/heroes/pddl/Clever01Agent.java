@@ -15,10 +15,10 @@ import java.util.List;
 public class Clever01Agent extends PDDLAgentBase {
 
     @Configurable
-    protected int dangerThreshold = 2;
+    protected int dangerThreshold = 4;
 
     @Configurable
-    protected int safeThreshold = 3;
+    protected int safeThreshold = 5;
 
     protected List<PDDLAction> currentPlan;
     private boolean reactiveActionTaken;
@@ -76,10 +76,14 @@ public class Clever01Agent extends PDDLAgentBase {
             dangerousMonster = getClosestMonster(hero.atRoom);
         }
 
-        if (dng >= safeThreshold) {
+        if (reactiveEscape && dng >= safeThreshold) {
             reactiveEscape = false;
-            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s))", dangerousMonster.atRoom.id.name));
+            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s)))", dangerousMonster.atRoom.id.name));
             dangerousMonster = null;
+            if (currentPlan != null && !currentPlan.isEmpty()) {
+                reactiveActionTaken = false;
+                return translateAction(currentPlan.remove(0));
+            }
         }
 
         if (reactiveEscape)
