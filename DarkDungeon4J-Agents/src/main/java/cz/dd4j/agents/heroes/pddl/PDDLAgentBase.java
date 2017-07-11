@@ -374,9 +374,10 @@ public class PDDLAgentBase extends HeroAgentBase {
 		InputFiles inputs;
 		if (goal == null) { //no special goal, plan to goal rooms
 			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goalRooms, problemFile, domainFile);
-		} else
+		} else {
 			customPlannerCalls++;
 			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goal, problemFile, domainFile);
+		}
 		if (inputs.problemFile == null) {
 			throw new RuntimeException("Failed to genereate problem file!");
 		}

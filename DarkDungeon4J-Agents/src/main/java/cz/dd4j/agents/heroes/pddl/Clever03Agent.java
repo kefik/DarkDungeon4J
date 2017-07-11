@@ -1,6 +1,5 @@
 package cz.dd4j.agents.heroes.pddl;
 
-import com.sun.istack.internal.NotNull;
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
@@ -100,7 +99,7 @@ public class Clever03Agent extends PDDLAgentBase {
         return cmd;
 
     }
-    private int evaluateCommand(@NotNull Command cmd) {
+    private int evaluateCommand(Command cmd) {
 
         return dangAfterAction(cmd);
     }
