@@ -531,7 +531,7 @@ public class SimStatic {
 				continue;
 			}
 			if (entity.isA(EEntity.HERO)) {
-				if (heroesMoveTo.contains(entity.action.target)) {
+				if (((Room) entity.action.target).hero != null || heroesMoveTo.contains(entity.action.target)) {
 					// ACTION CONFLICT
 					// => INVALIDATE
 					invalidateAction(entity);
@@ -540,7 +540,9 @@ public class SimStatic {
 					heroesMoveTo.add((Room) entity.action.target);
 				}
 			} else if (entity.isA(EEntity.MONSTER)) {
-				if (monstersMoveTo.contains(entity.action.target)) {
+				if (((Room) entity.action.target).monster != null ||
+						((Room) entity.action.target).feature != null ||
+						monstersMoveTo.contains(entity.action.target)) {
 					// ACTION CONFLICT
 					// => INVALIDATE
 					invalidateAction(entity);

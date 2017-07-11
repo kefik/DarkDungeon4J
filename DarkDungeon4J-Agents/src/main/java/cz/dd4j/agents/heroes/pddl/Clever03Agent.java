@@ -28,6 +28,8 @@ public class Clever03Agent extends PDDLAgentBase {
 
     protected int reactiveActions = 0;
 
+    protected Monster dangerousMonster = null;
+
     @Override
     public void prepareAgent() {
         super.prepareAgent();
@@ -74,8 +76,10 @@ public class Clever03Agent extends PDDLAgentBase {
             return null;
         }
 
-        if (dng >= safeThreshold) {
+        if (reactiveEscape && dng >= safeThreshold) {
             reactiveEscape = false;
+            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s))", dangerousMonster.atRoom.id.name));
+            dangerousMonster = null;
         }
 
         if (reactiveEscape)
@@ -90,12 +94,17 @@ public class Clever03Agent extends PDDLAgentBase {
         }
 
         Command cmd = translateAction(currentPlan.remove(0));
-        if (evaluateCommand(cmd) <= dangerThreshold) { //this action would lead to danger state
+        if (evaluateCommand(cmd) <= dangerThreshold && !(cmd.isType(EAction.MOVE) && ((Room)cmd.target).feature != null)) { //this action would lead to danger state
             reactiveEscape = true;
-            System.out.println("Planned action would be: " + cmd.toString() + "dang: " + evaluateCommand(cmd));
+            if (cmd.isType(EAction.MOVE))
+                dangerousMonster = getClosestMonster((Room) cmd.target);
+            else
+                dangerousMonster = getClosestMonster(hero.atRoom);
+            System.out.println("Planned action would be: " + cmd.toString() + " dang: " + evaluateCommand(cmd));
             return getBestReactiveAction();
         }
 
+        reactiveActionTaken = false;
         return cmd;
 
     }

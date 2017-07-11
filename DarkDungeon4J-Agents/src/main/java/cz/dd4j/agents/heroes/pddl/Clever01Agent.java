@@ -1,6 +1,7 @@
 package cz.dd4j.agents.heroes.pddl;
 
 import cz.dd4j.agents.commands.Command;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 import cz.dd4j.utils.csv.CSV;
@@ -29,6 +30,8 @@ public class Clever01Agent extends PDDLAgentBase {
     public void prepareAgent() {
         super.prepareAgent();
     }
+
+    private Monster dangerousMonster = null;
 
     protected boolean shouldReplan() {
 
@@ -68,12 +71,15 @@ public class Clever01Agent extends PDDLAgentBase {
         if (dng == 0) //dead-end state
             return null;
 
-        if (dng <= dangerThreshold) {
+        if (dng <= dangerThreshold && hero.atRoom.feature == null) {
             reactiveEscape = true;
+            dangerousMonster = getClosestMonster(hero.atRoom);
         }
 
         if (dng >= safeThreshold) {
             reactiveEscape = false;
+            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s))", dangerousMonster.atRoom.id.name));
+            dangerousMonster = null;
         }
 
         if (reactiveEscape)

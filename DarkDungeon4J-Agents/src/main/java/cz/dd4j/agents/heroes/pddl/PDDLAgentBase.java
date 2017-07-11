@@ -371,6 +371,7 @@ public class PDDLAgentBase extends HeroAgentBase {
 
 	protected List<PDDLAction> plan(String goal) {
 		// GENERATE PROBLEM FILE
+		System.out.println("PLANNER GOAL:" + goal);
 		InputFiles inputs;
 		if (goal == null) { //no special goal, plan to goal rooms
 			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goalRooms, problemFile, domainFile);
