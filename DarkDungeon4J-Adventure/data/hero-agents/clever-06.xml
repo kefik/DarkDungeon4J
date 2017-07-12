@@ -1,8 +1,12 @@
 <agents>
   <agent id="hero1">
-    <agentFQCN>cz.dd4j.agents.heroes.pddl.Clever04Agent</agentFQCN>
+    <agentFQCN>cz.dd4j.agents.heroes.pddl.Clever06Agent</agentFQCN>
     <config>
-        <key>threshold</key>
+        <key>safeThreshold</key>
+        <value>3</value>
+    </config>
+    <config>
+        <key>dangerThreshold</key>
         <value>2</value>
     </config>
     <config>
