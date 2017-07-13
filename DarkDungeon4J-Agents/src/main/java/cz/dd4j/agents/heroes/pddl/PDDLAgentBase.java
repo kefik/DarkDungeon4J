@@ -25,6 +25,7 @@ import cz.dd4j.utils.Id;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.ConfigXML;
 import cz.dd4j.utils.config.Configurable;
+import cz.dd4j.utils.csv.CSV;
 import org.apache.commons.io.FileUtils;
 
 @AutoConfig
@@ -82,6 +83,10 @@ public class PDDLAgentBase extends HeroAgentBase {
 	protected String pddlNewLine = Const.NEW_LINE;
 
 	protected PDDLInputGenerator inputGenerator;
+
+	protected int plannerCalls = 0;
+	protected int failedPlans = 0;
+	protected int customPlannerCalls = 0;
 
 	// ================
 	// AGENT LIFE-CYCLE
@@ -366,19 +371,28 @@ public class PDDLAgentBase extends HeroAgentBase {
 
 	protected List<PDDLAction> plan(String goal) {
 		// GENERATE PROBLEM FILE
+		System.out.println("PLANNER GOAL:" + goal);
 		InputFiles inputs;
 		if (goal == null) { //no special goal, plan to goal rooms
 			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goalRooms, problemFile, domainFile);
-		} else
+		} else {
+			customPlannerCalls++;
 			inputs = inputGenerator.generateFiles(hero, monsters, features, roomsWithSword, goal, problemFile, domainFile);
+		}
 		if (inputs.problemFile == null) {
 			throw new RuntimeException("Failed to genereate problem file!");
 		}
 
 		try {
 			// we have domainFile and problemFile
-			// => EXECUTE THE PLANNER			
-			return execPlanner(inputs.domainFile, inputs.problemFile);
+			// => EXECUTE THE PLANNER
+			plannerCalls++;
+			List<PDDLAction> plan = execPlanner(inputs.domainFile, inputs.problemFile);
+			if (plan == null) {
+				failedPlans++;
+			}
+
+			return plan;
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to execute the planner.", e);
 		} finally {
@@ -405,6 +419,23 @@ public class PDDLAgentBase extends HeroAgentBase {
 	
 	protected File getWorkingFile(String name) {
 		return new File(agentWorkingDir, name);
+	}
+
+	@Override
+	public List<String> getCSVHeaders() {
+		List<String> headers = super.getCSVHeaders();
+		headers.add("planner_calls");
+		headers.add("planner_fails");
+		return headers;
+	}
+
+	@Override
+	public CSV.CSVRow getCSVRow() {
+		CSV.CSVRow row = super.getCSVRow();
+		row.add("planner_calls", Integer.toString(plannerCalls));
+		row.add("planner_fails", Integer.toString(failedPlans));
+		row.add("custom_planner_calls", Integer.toString(customPlannerCalls));
+		return row;
 	}
 
 }

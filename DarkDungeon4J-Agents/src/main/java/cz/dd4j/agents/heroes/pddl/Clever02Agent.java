@@ -1,6 +1,7 @@
 package cz.dd4j.agents.heroes.pddl;
 
 import cz.dd4j.agents.commands.Command;
+import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
@@ -38,8 +39,9 @@ public class Clever02Agent extends PDDLAgentBase {
         int dng = dang(hero.atRoom);
         if (dng == 0)
             return null; //dead-end state
-        if (dng <= threshold) {
-            currentPlan = plan("(and (alive)(has_sword))");
+        if (dng <= threshold && hero.atRoom.feature == null) { //ignore low dang if we are in a room with a trap
+            Monster m = getClosestMonster(hero.atRoom);
+            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s)))", m.atRoom.id.name));
         } else if (shouldReplan()) {
             currentPlan = plan();
         }

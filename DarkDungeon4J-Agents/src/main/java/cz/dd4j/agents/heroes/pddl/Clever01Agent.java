@@ -1,11 +1,10 @@
 package cz.dd4j.agents.heroes.pddl;
 
-import com.sun.istack.internal.NotNull;
 import cz.dd4j.agents.commands.Command;
-import cz.dd4j.simulation.actions.EAction;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
+import cz.dd4j.utils.csv.CSV;
 
 import java.util.List;
 
@@ -16,19 +15,23 @@ import java.util.List;
 public class Clever01Agent extends PDDLAgentBase {
 
     @Configurable
-    protected int dangerThreshold = 2;
+    protected int dangerThreshold = 4;
 
     @Configurable
-    protected int safeThreshold = 3;
+    protected int safeThreshold = 5;
 
     protected List<PDDLAction> currentPlan;
     private boolean reactiveActionTaken;
     private boolean reactiveEscape = false;
 
+    protected int reactiveActions = 0;
+
     @Override
     public void prepareAgent() {
         super.prepareAgent();
     }
+
+    private Monster dangerousMonster = null;
 
     protected boolean shouldReplan() {
 
@@ -44,6 +47,7 @@ public class Clever01Agent extends PDDLAgentBase {
     }
 
     private Command getBestReactiveAction() {
+        reactiveActions++;
         reactiveActionTaken = true;
         List<Command> availableActions = actionsGenerator.generateFor(hero);
 
@@ -67,12 +71,19 @@ public class Clever01Agent extends PDDLAgentBase {
         if (dng == 0) //dead-end state
             return null;
 
-        if (dng <= dangerThreshold) {
+        if (dng <= dangerThreshold && hero.atRoom.feature == null) {
             reactiveEscape = true;
+            dangerousMonster = getClosestMonster(hero.atRoom);
         }
 
-        if (dng >= safeThreshold) {
+        if (reactiveEscape && dng >= safeThreshold) {
             reactiveEscape = false;
+            currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s)))", dangerousMonster.atRoom.id.name));
+            dangerousMonster = null;
+            if (currentPlan != null && !currentPlan.isEmpty()) {
+                reactiveActionTaken = false;
+                return translateAction(currentPlan.remove(0));
+            }
         }
 
         if (reactiveEscape)
@@ -91,9 +102,23 @@ public class Clever01Agent extends PDDLAgentBase {
         return translateAction(currentAction);
     }
 
-    private int evaluateCommand(@NotNull Command cmd) {
+    private int evaluateCommand(Command cmd) {
 
         return dangAfterAction(cmd);
+    }
+
+    @Override
+    public List<String> getCSVHeaders() {
+        List<String> headers = super.getCSVHeaders();
+        headers.add("reactive_steps");
+        return headers;
+    }
+
+    @Override
+    public CSV.CSVRow getCSVRow() {
+        CSV.CSVRow row = super.getCSVRow();
+        row.add("reactive_steps", reactiveActions);
+        return row;
     }
 
 }

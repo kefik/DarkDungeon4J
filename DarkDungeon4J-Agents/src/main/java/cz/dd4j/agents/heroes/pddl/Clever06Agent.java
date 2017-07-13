@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Martin on 22-Jun-17.
  */
 @AutoConfig
-public class Clever03Agent extends PDDLAgentBase {
+public class Clever06Agent extends PDDLAgentBase {
 
     @Configurable
     protected int dangerThreshold = 2;
@@ -25,6 +25,8 @@ public class Clever03Agent extends PDDLAgentBase {
     protected List<PDDLAction> currentPlan;
     private boolean reactiveActionTaken;
     private boolean reactiveEscape = false;
+
+    protected boolean removingDanger;
 
     protected int reactiveActions = 0;
 
@@ -76,12 +78,30 @@ public class Clever03Agent extends PDDLAgentBase {
             return null;
         }
 
+        if (removingDanger && currentPlan != null) {
+            if (currentPlan.isEmpty()) {
+                System.out.println("Danger removed");
+                removingDanger = false;
+            } else {
+                Command act = translateAction(currentPlan.remove(0));
+                if (evaluateCommand(act) > 0) {
+                    return act;
+                } else {
+                    System.out.println("Greater danger found");
+                    dangerousMonster = getClosestMonster(hero.atRoom);
+                    reactiveEscape = true;
+                    removingDanger = false;
+                }
+            }
+        }
+
         if (reactiveEscape && dng >= safeThreshold) {
             reactiveEscape = false;
             currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s)))", dangerousMonster.atRoom.id.name));
             dangerousMonster = null;
             if (currentPlan != null && !currentPlan.isEmpty()) {
                 reactiveActionTaken = false;
+                removingDanger = true;
                 return translateAction(currentPlan.remove(0));
             }
         }
@@ -91,6 +111,7 @@ public class Clever03Agent extends PDDLAgentBase {
 
         if (shouldReplan()) {
             currentPlan = plan();
+            removingDanger = false;
         }
 
         if (currentPlan == null) { //no plan found in previous step

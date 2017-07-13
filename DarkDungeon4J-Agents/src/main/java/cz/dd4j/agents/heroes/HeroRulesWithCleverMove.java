@@ -9,6 +9,7 @@ import cz.dd4j.simulation.data.dungeon.Dungeon;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.astar.AStar;
 import cz.dd4j.utils.astar.IAStarHeuristic;
+import cz.dd4j.utils.astar.IAStarView;
 import cz.dd4j.utils.astar.Path;
 
 import java.util.*;
@@ -35,9 +36,23 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 
 		int minDist = Integer.MAX_VALUE;
 		for (Room r: swordRooms) {
-			Path<Room> p = astar.findPath(from, r);
+			Path<Room> p = astar.findPath(from, r, new IAStarView() {
+				@Override
+				public boolean isOpened(Object o) {
+					return ((Room) o).monster == null;
+				}
+			});
 			if (p != null) {
 				minDist = Math.min(minDist, p.getDistanceNodes());
+			}
+		}
+
+		if (minDist == Integer.MAX_VALUE) { //monster block the way to all the swords, ignore them
+			for (Room r : swordRooms) {
+				Path<Room> p = astar.findPath(from, r);
+				if (p != null) {
+					minDist = Math.min(minDist, p.getDistanceNodes());
+				}
 			}
 		}
 
