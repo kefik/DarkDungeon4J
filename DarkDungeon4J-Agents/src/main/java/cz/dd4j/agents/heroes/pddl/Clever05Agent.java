@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Martin on 22-Jun-17.
  */
 @AutoConfig
-public class Clever03Agent extends PDDLAgentBase {
+public class Clever05Agent extends PDDLAgentBase {
 
     @Configurable
     protected int dangerThreshold = 2;
@@ -22,18 +22,26 @@ public class Clever03Agent extends PDDLAgentBase {
     @Configurable
     protected int safeThreshold = 3;
 
+    protected boolean destroyingDanger = false;
+
     protected List<PDDLAction> currentPlan;
     private boolean reactiveActionTaken;
     private boolean reactiveEscape = false;
 
     protected int reactiveActions = 0;
 
-    protected Monster dangerousMonster = null;
-
     @Override
     public void prepareAgent() {
         super.prepareAgent();
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        destroyingDanger = false;
+    }
+
+    private Monster dangerousMonster = null;
 
     protected boolean shouldReplan() {
 
@@ -53,8 +61,6 @@ public class Clever03Agent extends PDDLAgentBase {
         reactiveActionTaken = true;
         List<Command> availableActions = actionsGenerator.generateFor(hero);
 
-        System.out.println("Reactive action");
-
         Command selectedAction = null;
         int bestVal = Integer.MIN_VALUE;
         for (Command c: availableActions) {
@@ -72,8 +78,30 @@ public class Clever03Agent extends PDDLAgentBase {
     public Command act() {
 
         int dng = dang(hero.atRoom);
-        if (dng == 0) {
+        if (dng == 0) //dead-end state
             return null;
+
+        if (destroyingDanger && currentPlan != null) {
+
+            if (currentPlan.isEmpty()) {
+                destroyingDanger = false;
+            } else {
+                Command act = translateAction(currentPlan.remove(0));
+                if (act.isType(EAction.MOVE) && ((Room)act.target).monster != null && hero.hand == null) {
+                    reactiveEscape = true;
+                    destroyingDanger = false;
+                    dangerousMonster = getClosestMonster((Room)act.target);
+                } else {
+                    return act;
+                }
+            }
+
+        }
+
+        if (dng <= dangerThreshold && hero.atRoom.feature == null) {
+            reactiveEscape = true;
+            destroyingDanger = false;
+            dangerousMonster = getClosestMonster(hero.atRoom);
         }
 
         if (reactiveEscape && dng >= safeThreshold) {
@@ -81,6 +109,7 @@ public class Clever03Agent extends PDDLAgentBase {
             currentPlan = plan(String.format("(and (alive)(has_sword)(not(monster_at %s)))", dangerousMonster.atRoom.id.name));
             dangerousMonster = null;
             if (currentPlan != null && !currentPlan.isEmpty()) {
+                destroyingDanger = true;
                 reactiveActionTaken = false;
                 return translateAction(currentPlan.remove(0));
             }
@@ -91,27 +120,17 @@ public class Clever03Agent extends PDDLAgentBase {
 
         if (shouldReplan()) {
             currentPlan = plan();
-        }
-
-        if (currentPlan == null) { //no plan found in previous step
-            return getBestReactiveAction();
-        }
-
-        Command cmd = translateAction(currentPlan.remove(0));
-        if (evaluateCommand(cmd) <= dangerThreshold && !(cmd.isType(EAction.MOVE) && ((Room)cmd.target).feature != null)) { //this action would lead to danger state
-            reactiveEscape = true;
-            if (cmd.isType(EAction.MOVE))
-                dangerousMonster = getClosestMonster((Room) cmd.target);
-            else
-                dangerousMonster = getClosestMonster(hero.atRoom);
-            System.out.println("Planned action would be: " + cmd.toString() + " dang: " + evaluateCommand(cmd));
-            return getBestReactiveAction();
+            if (currentPlan == null) { //planner failed to produce plan
+                return getBestReactiveAction();
+            }
         }
 
         reactiveActionTaken = false;
-        return cmd;
 
+        PDDLAction currentAction = currentPlan.remove(0);
+        return translateAction(currentAction);
     }
+
     private int evaluateCommand(Command cmd) {
 
         return dangAfterAction(cmd);

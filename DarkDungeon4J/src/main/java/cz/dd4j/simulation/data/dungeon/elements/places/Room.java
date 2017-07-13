@@ -64,5 +64,23 @@ public class Room extends Place implements INode<Room> {
 	public Collection<ILink<Room>> getLinks() {
 		return (List<ILink<Room>>)(List)corridors;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (o == null)
+			return false;
+
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof Room)) {
+			return false;
+		}
+
+		Room other = (Room) o;
+		return other.id.name.equals(this.id.name);
+	}
 	
 }

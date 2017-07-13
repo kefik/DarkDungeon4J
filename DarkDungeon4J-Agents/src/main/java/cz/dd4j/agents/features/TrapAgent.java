@@ -18,7 +18,7 @@ public class TrapAgent extends FeatureAgentBase {
 	public Command act(Feature feature) {
 		if (feature.atRoom == null) return null;
 		if (feature.atRoom.hero == null) return null;
-		if (feature.atRoom.hero.action != null && feature.atRoom.hero.action.type != EAction.DISARM) {
+		if (feature.atRoom.hero.action == null || feature.atRoom.hero.action.type != EAction.DISARM) {
 			// SPRING!
 			return new Command(EAction.ATTACK, feature.atRoom.hero);
 		}
