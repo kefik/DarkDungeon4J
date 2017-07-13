@@ -1,5 +1,10 @@
 package cz.dd4j.agents.heroes;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import cz.dd4j.agents.HeroAgentBase;
 import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.agents.commands.Command;
@@ -10,8 +15,6 @@ import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.astar.AStar;
 import cz.dd4j.utils.astar.IAStarHeuristic;
 import cz.dd4j.utils.astar.Path;
-
-import java.util.*;
 
 /**
  * Using rules for determining in what state it should enter the room.
