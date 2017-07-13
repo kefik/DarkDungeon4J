@@ -54,6 +54,11 @@ public class Clever04Agent extends PDDLAgentBase {
         PDDLAction currentAction = currentPlan.remove(0);
         Command cmd = translateAction(currentAction);
 
+        if (cmd == null) { //the first planned action is invalid, just skip it (can happen if the planner wants to pick
+                           //up sword but the agent already has it
+            return null;
+        }
+
         int dng = dangAfterAction(cmd);
 
         if (dng <= threshold) {
@@ -68,9 +73,8 @@ public class Clever04Agent extends PDDLAgentBase {
                 Monster m = getClosestMonster(hero.atRoom);
                 safePlan = plan("(and (alive)(has_sword)(not(monster_at " + m.atRoom.id.toString() + ")))");
             }
-            if (safePlan != null) {
-                currentPlan = safePlan;
-            }
+            currentPlan = safePlan;
+
         } else {
             return cmd;
         }
