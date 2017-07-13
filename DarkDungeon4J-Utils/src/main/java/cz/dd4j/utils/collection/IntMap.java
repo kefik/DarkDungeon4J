@@ -37,4 +37,12 @@ public class IntMap<K> extends HashMap<K, Integer> {
 		return dec(key, 1);
 	}
 	
+	public int sum() {
+		int result = 0;
+		for (Integer value : values()) {
+			result += value;
+		}
+		return result;
+	}
+	
 }

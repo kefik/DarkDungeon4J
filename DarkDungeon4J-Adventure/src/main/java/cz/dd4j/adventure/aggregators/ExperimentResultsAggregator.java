@@ -1,4 +1,4 @@
-package cz.dd4j.adventure;
+package cz.dd4j.adventure.aggregators;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class ExperimentResultsAggregator {
 	private File outputDir;
 
 	private CSV results;
-	private CSV dungeonDesc;
+	private CSV simstateDesc;
 	
 	public ExperimentResultsAggregator(File resultsDir, File outputDir) {
 		this.resultsDir = resultsDir;
@@ -21,28 +21,34 @@ public class ExperimentResultsAggregator {
 	}
 	
 	public void aggregate() {
+		ResultsAggregator resultsAggregator = new ResultsAggregator(resultsDir, outputDir);
+		resultsAggregator.aggregate();
+		
+		AdventureDescriptorAggregator simstateAggregator = new AdventureDescriptorAggregator(resultsDir, outputDir);
+		simstateAggregator.aggregate();
+		
 		System.out.println("Aggregating results...");
 		
 		results = new CSV();
 		results.keys = new ArrayList<String>();
 		
-		dungeonDesc = new CSV();
-		dungeonDesc.keys = new ArrayList<String>();
+		simstateDesc = new CSV();
+		simstateDesc.keys = new ArrayList<String>();
 		
 		for (File file : resultsDir.listFiles()) {
 			if (file.getName().endsWith("-result.csv")) {
 				processResultFile(file);
 			} else
-			if (file.getName().endsWith("-dungeon_descriptor.csv")) {
+			if (file.getName().endsWith("-simstate_descriptor.csv")) {
 				processDescriptorFile(file);
 			}
 		}
 	
-		dungeonDesc.keys.remove(Playout.CSV_ID);
-		dungeonDesc.keys.remove(Playout.CSV_HERO);
+		simstateDesc.keys.remove(Playout.CSV_ID);
+		simstateDesc.keys.remove(Playout.CSV_HERO);
 		
 		results.toFile(new File(outputDir, "aggregated-results.csv"));		
-		dungeonDesc.toFile(new File(outputDir, "aggregated-dungeon_descriptors.csv"));
+		simstateDesc.toFile(new File(outputDir, "aggregated-simstate_descriptors.csv"));
 	}
 
 	private void processResultFile(File file) {
@@ -70,19 +76,19 @@ public class ExperimentResultsAggregator {
 		}
 		
 		for (String key : csv.keys) {
-			if (dungeonDesc.keys.contains(key)) continue;
-			dungeonDesc.keys.add(key);
+			if (simstateDesc.keys.contains(key)) continue;
+			simstateDesc.keys.add(key);
 		}
 		
 		for (CSVRow newRow : csv.rows) {
 			boolean add = true;
-			for (CSVRow existingRow : dungeonDesc.rows) {
+			for (CSVRow existingRow : simstateDesc.rows) {
 				if (existingRow.getString(Playout.CSV_ADVENTURE).equals(newRow.getString(Playout.CSV_ADVENTURE))) {
 					add = false;
 					break;				
 				}
 			}
-			if (add) dungeonDesc.rows.add(newRow);
+			if (add) simstateDesc.rows.add(newRow);
 		}		
 	}
 	

@@ -20,6 +20,36 @@ import cz.dd4j.utils.reporting.IReporting;
 public class DungeonDescriptor implements IReporting {
 
 	/**
+	 * How many rooms are within the dungeon.
+	 */
+	public int roomsCount;
+	
+	/**
+	 * How many monsters are within the dungeon.
+	 */
+	public int monstersCount;
+	
+	/**
+	 * How many features are within the dungeon.
+	 */
+	public int featuresCount;
+	
+	/**
+	 * Rooms containing a monster.
+	 */
+	public Set<Room> monsterRooms;
+
+	/**
+	 * Rooms containing a feature.
+	 */
+	public Set<Room> featureRooms;
+
+	/**
+	 * Rooms containing a sword;
+	 */
+	public Set<Room> swordRooms;
+	
+	/**
 	 * Minimum distance between the hero and the goal room, not accounting for traps and monsters.
 	 */
 	public int goalDistance;
@@ -44,7 +74,7 @@ public class DungeonDescriptor implements IReporting {
 	 * VALUE == number of threats (the shortest paths between a monster and a hero)
 	 */
 	public IntMap<Integer> danger = new IntMap<Integer>();
-	
+
 	public static DungeonDescriptor describe(DungeonXML dungeonXML, IAStarHeuristic<Room> heuristic) {
 		DungeonLoaderXML loader = new DungeonLoaderXML();
 		Dungeon dungeon = loader.loadDungeon(dungeonXML);
@@ -52,21 +82,35 @@ public class DungeonDescriptor implements IReporting {
 	}
 	
 	public static DungeonDescriptor describe(Dungeon dungeon, IAStarHeuristic<Room> heuristic) {
-		
 		DungeonDescriptor result = new DungeonDescriptor();
+		describe(dungeon, heuristic, result);
+		return result;
+	}
 		
+	public static void describe(Dungeon dungeon, IAStarHeuristic<Room> heuristic, DungeonDescriptor result) {
+		if (result == null) {
+			throw new RuntimeException("result == null, invalid, initialize it by yourself first!");
+		}
+				
 		// CHECK THE DUNGEON
 		Room heroRoom = null;		
 		Room goalRoom = null;		
-		Set<Room> monsterRooms = new HashSet<Room>();
-		Set<Room> swordRooms = new HashSet<Room>();
+		result.monsterRooms = new HashSet<Room>();
+		result.featureRooms = new HashSet<Room>();
+		result.swordRooms = new HashSet<Room>();
 		
 		for (Room room : dungeon.rooms.values()) {
 			if (room.isGoalRoom()) goalRoom = room;
 			if (room.hero != null) heroRoom = room;
-			if (room.monster != null) monsterRooms.add(room);
-			if (room.item != null && room.item.isA(EItem.SWORD)) swordRooms.add(room);
+			if (room.monster != null) result.monsterRooms.add(room);
+			if (room.feature != null) result.featureRooms.add(room);
+			if (room.item != null && room.item.isA(EItem.SWORD)) result.swordRooms.add(room);
 		}
+		
+		// ROOMS COUNT
+		result.roomsCount = dungeon.rooms.size();
+		result.monstersCount = result.monsterRooms.size();
+		result.featuresCount = result.featureRooms.size(); 
 		
 		// CONSTRUCT PATHS
 		DungeonPaths paths = new DungeonPaths(dungeon);
@@ -92,7 +136,7 @@ public class DungeonDescriptor implements IReporting {
 		// FIND DANGEROUSNESS
 		result.lowestDanger = -1;
 		
-		for (Room monsterRoom : monsterRooms) {
+		for (Room monsterRoom : result.monsterRooms) {
 			path = paths.findPath(monsterRoom, heroRoom, DungeonPaths.ASTAR_NO_TRAPS_VIEW);
 			if (path == null) continue;
 			result.danger.inc(path.getDistanceNodes());
@@ -102,15 +146,13 @@ public class DungeonDescriptor implements IReporting {
 		// FIND THE NEAREST SWORD		
 		result.nearestSwordDistance = -1;
 		
-		for (Room swordRoom : swordRooms) {
+		for (Room swordRoom : result.swordRooms) {
 			path = paths.findPath(heroRoom, swordRoom, DungeonPaths.ASTAR_NO_MONSTERS_VIEW);
 			if (path == null) continue;
 			if (result.nearestSwordDistance < 0 || result.nearestSwordDistance > path.getDistanceNodes()) result.nearestSwordDistance = path.getDistanceNodes();
 		}
 		
 		// WE'RE DONE
-		
-		return result;
 	}
 	
 	@Override
@@ -147,6 +189,9 @@ public class DungeonDescriptor implements IReporting {
 	// REPORTING
 	// =========
 	
+	public static final String CSV_ROOMS_COUNT = "DESC-rooms_count";
+	public static final String CSV_MONSTERS_COUNT = "DESC-monsters_count";
+	public static final String CSV_FEATURES_COUNT = "DESC-features_count";	
 	public static final String CSV_GOAL_DISTANCE = "DESC-goal_distance";
 	public static final String CSV_GOAL_DISTANCE_NON_MONSTER = "DESC-goal_distance_non_monster";
 	public static final String CSV_NEAREST_SWORD_DISTANCE = "DESC-nearest_sword_distance";
@@ -155,6 +200,10 @@ public class DungeonDescriptor implements IReporting {
 	@Override
 	public List<String> getCSVHeaders() {
 		List<String> result = new ArrayList<String>();
+		
+		result.add(CSV_ROOMS_COUNT);
+		result.add(CSV_MONSTERS_COUNT);
+		result.add(CSV_FEATURES_COUNT);
 		
 		result.add(CSV_GOAL_DISTANCE);
 		result.add(CSV_GOAL_DISTANCE_NON_MONSTER);
@@ -167,6 +216,10 @@ public class DungeonDescriptor implements IReporting {
 	@Override
 	public CSVRow getCSVRow() {
 		CSVRow result = new CSVRow();
+		
+		result.add(CSV_ROOMS_COUNT, roomsCount);
+		result.add(CSV_MONSTERS_COUNT, monstersCount);
+		result.add(CSV_FEATURES_COUNT, featuresCount);
 		
 		result.add(CSV_GOAL_DISTANCE, goalDistance);
 		result.add(CSV_GOAL_DISTANCE_NON_MONSTER, goalDistanceNonMonster);

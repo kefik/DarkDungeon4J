@@ -13,9 +13,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import cz.dd4j.adventure.aggregators.ExperimentResultsAggregator;
 import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.descriptor.DungeonDescriptor;
 import cz.dd4j.descriptor.DungeonPaths;
+import cz.dd4j.descriptor.AdventureDescriptor;
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.loader.agents.AgentsLoader;
 import cz.dd4j.loader.simstate.SimStateLoader;
@@ -59,7 +61,7 @@ public class ExperimentEvaluator {
 		// ============================
 		
 		public SimStaticConfig config;
-		public DungeonDescriptor descriptor;
+		public AdventureDescriptor descriptor;
 		public SimStaticStats stats;
 		
 		Playout(File dungeonDir, File heroFile) {
@@ -250,7 +252,7 @@ public class ExperimentEvaluator {
 		
 		// CREATE DESCRIPTOR FOR THE DUNGEON
 		System.out.println(item.toString() + ": creating dungeon descriptor");		
-		DungeonDescriptor descriptor = DungeonDescriptor.describe(config.state.dungeon, DungeonPaths.ASTAR_NO_HEURISTIC);
+		AdventureDescriptor descriptor = AdventureDescriptor.describe(item.adventureFile);
 		item.descriptor = descriptor;
 		
 		// FIRE THE SIMULATION		
@@ -278,7 +280,7 @@ public class ExperimentEvaluator {
 		File resultFile = config.target.getFile(item.toFileName("-result.csv"));
 		new Reporting(item, item.stats.config, item.stats.simulationResult, item.config.state.heroes.values().iterator().next().mind).reportToFile(resultFile);
 		
-		File descriptorFile = config.target.getFile(item.toFileName("-dungeon_descriptor.csv"));
+		File descriptorFile = config.target.getFile(item.toFileName("-adventure_descriptor.csv"));
 		new Reporting(item, item.descriptor).reportToFile(descriptorFile);
 		
 		File statsFile = config.target.getFile(item.toFileName("-stats.csv"));

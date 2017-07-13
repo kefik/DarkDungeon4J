@@ -22,11 +22,17 @@ public abstract class AdventureGeneratorBase<CONFIG extends AdventureGeneratorCo
 	
 	public static final Pattern ROOMS_PATTERN = Pattern.compile("Requires: Rooms([0-9]*)\\.xml"); 
 	
-	public static final Pattern MONSTER_AGENT_PATTERN = Pattern.compile("monster[0-9]*-([^.]*)\\.xml$");
+	public static final String MONSTER_AGENT_TYPE_PATTERN_STR = "monster[0-9]*-([^.]*)\\.xml";
 	
-	public static final Pattern TRAP_AGENT_PATTERN = Pattern.compile("trap[0-9]*-([^.]*)\\.xml$");
+	public static final Pattern MONSTER_AGENT_TYPE_PATTERN = Pattern.compile(MONSTER_AGENT_TYPE_PATTERN_STR + "$");
 	
-	public static final Pattern ITEM_PATTERN = Pattern.compile("([a-zA-Z_]*)[0-9]*-Room[0-9]*\\.xml$");
+	public static final String TRAP_AGENT_TYPE_PATTERN_STR = "trap[0-9]*-([^.]*)\\.xml";
+	
+	public static final Pattern TRAP_AGENT_TYPE_PATTERN = Pattern.compile(TRAP_AGENT_TYPE_PATTERN_STR + "$");
+	
+	public static final String ITEM_TYPE_PATTERN_STR = "([a-zA-Z_]*)[0-9]*-Room[0-9]*\\.xml";
+	
+	public static final Pattern ITEM_TYPE_PATTERN = Pattern.compile(ITEM_TYPE_PATTERN_STR + "$");
 	
 	protected AdventureContext ctx = new AdventureContext();	
 	
@@ -48,19 +54,19 @@ public abstract class AdventureGeneratorBase<CONFIG extends AdventureGeneratorCo
 	protected void probeMonsterTypes() {
 		ctx.allMonsterTypes.clear();
 		File dir = config.target.getDir(config.agentMonstersDir);
-		probeTypes(MONSTER_AGENT_PATTERN, 1, dir, ctx.allMonsterTypes);
+		probeTypes(MONSTER_AGENT_TYPE_PATTERN, 1, dir, ctx.allMonsterTypes);
 	}
 
 	protected void probeTrapTypes() {
 		ctx.allTrapTypes.clear();
 		File agentTrapsDir = config.target.getDir(config.agentTrapsDir);
-		probeTypes(TRAP_AGENT_PATTERN, 1, agentTrapsDir, ctx.allTrapTypes);
+		probeTypes(TRAP_AGENT_TYPE_PATTERN, 1, agentTrapsDir, ctx.allTrapTypes);
 	}
 	
 	protected void probeItemTypes() {
 		ctx.allItemTypes.clear();
 		File dir = config.target.getDir(config.itemsDir);
-		probeTypes(ITEM_PATTERN, 1, dir, ctx.allItemTypes);
+		probeTypes(ITEM_TYPE_PATTERN, 1, dir, ctx.allItemTypes);
 	}
 	
 	protected void probeTypes(final Pattern pattern, final int typeInMatcherGroup, File rootDir, final List<String> output) {
