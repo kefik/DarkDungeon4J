@@ -1,0 +1,31 @@
+<!--
+    #Rooms: 25
+    Room id format: room1, room2, ..., room25
+ -->
+<dungeon>
+  <room id="room1"/>
+  <room id="room2"/>
+  <room id="room3"/>
+  <room id="room4"/>
+  <room id="room5"/>
+  <room id="room6"/>
+  <room id="room7"/>
+  <room id="room8"/>
+  <room id="room9"/>
+  <room id="room10"/>
+  <room id="room11"/>
+  <room id="room12"/>
+  <room id="room13"/>
+  <room id="room14"/>
+  <room id="room15"/>
+  <room id="room16"/>
+  <room id="room17"/>
+  <room id="room18"/>
+  <room id="room19"/>
+  <room id="room20"/>
+  <room id="room21"/>
+  <room id="room22"/>
+  <room id="room23"/>
+  <room id="room24"/>
+  <room id="room25"/>
+</dungeon>

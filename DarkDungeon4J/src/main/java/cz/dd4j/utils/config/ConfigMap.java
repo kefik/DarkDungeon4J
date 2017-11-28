@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import cz.dd4j.domain.ELabel;
 import cz.dd4j.utils.Const;
 import cz.dd4j.utils.Convert;
 
@@ -37,6 +38,14 @@ public class ConfigMap extends HashMap<String, Object> {
 		return (this == Policy.INSTANCE ? null : Policy.INSTANCE.get(key));		
 	}
 	
+	public int getInt(ELabel key) { 
+		return getInt(key.id.name);
+	}
+	
+	public int getInt(ELabel key, int defaultValue) { 
+		return getInt(key.id.name, defaultValue);
+	}
+	
 	public int getInt(String key) { 
 		return getInt(key, 0);
 	}
@@ -50,17 +59,33 @@ public class ConfigMap extends HashMap<String, Object> {
 		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getInt(key, defaultValue));
 	}
 	
+	public long getLong(ELabel key) { 
+		return getLong(key.id.name);
+	}
+	
+	public long getLong(ELabel key, long defaultValue) { 
+		return getLong(key.id.name, defaultValue);
+	}
+	
 	public long getLong(String key) { 
 		return getLong(key, 0);
 	}
 	
-	public long getLong(String key, int defaultValue) {
+	public long getLong(String key, long defaultValue) {
 		if (containsKey(key)) {
 			Long value = Convert.toLong(get(key));
 			if (value == null) return defaultValue;
 			return value;
 		}
 		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getLong(key, defaultValue));
+	}
+	
+	public double getDouble(ELabel key) { 
+		return getDouble(key.id.name);
+	}
+	
+	public double getDouble(ELabel key, double defaultValue) { 
+		return getDouble(key.id.name, defaultValue);
 	}
 	
 	public double getDouble(String key) {
@@ -76,6 +101,14 @@ public class ConfigMap extends HashMap<String, Object> {
 		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getDouble(key, defaultValue));
 	}
 	
+	public float getFloat(ELabel key) { 
+		return getFloat(key.id.name);
+	}
+	
+	public float getFloat(ELabel key, float defaultValue) { 
+		return getFloat(key.id.name, defaultValue);
+	}
+	
 	public float getFloat(String key) {
 		return getFloat(key, 0);
 	}
@@ -87,6 +120,14 @@ public class ConfigMap extends HashMap<String, Object> {
 			return value;
 		}
 		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getFloat(key, defaultValue));
+	}
+	
+	public String getString(ELabel key) { 
+		return getString(key.id.name);
+	}
+	
+	public String getString(ELabel key, String defaultValue) { 
+		return getString(key.id.name, defaultValue);
 	}
 	
 	public String getString(String key) {
@@ -102,6 +143,14 @@ public class ConfigMap extends HashMap<String, Object> {
 		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getString(key, defaultValue));
 	}
 	
+	public boolean getBoolean(ELabel key) { 
+		return getBoolean(key.id.name);
+	}
+	
+	public boolean getBoolean(ELabel key, boolean defaultValue) { 
+		return getBoolean(key.id.name, defaultValue);
+	}
+	
 	public boolean getBoolean(String key) {
 		return getBoolean(key, false);
 	}
@@ -109,6 +158,14 @@ public class ConfigMap extends HashMap<String, Object> {
 	public boolean getBoolean(String key, boolean defaultValue) {
 		if (containsKey(key)) return Convert.toBoolean(get(key));
 		return (this == Policy.INSTANCE ? defaultValue : Policy.INSTANCE.getBoolean(key, defaultValue));
+	}
+	
+	public File getFile(ELabel key) { 
+		return getFile(key.id.name);
+	}
+	
+	public File getFile(ELabel key, File defaultValue) { 
+		return getFile(key.id.name, defaultValue);
 	}
 	
 	public File getFile(String key) {

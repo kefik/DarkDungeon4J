@@ -1,0 +1,7 @@
+<!--
+    GOAL
+    Requires room: room25
+ -->
+<dungeon>
+  <room id="room25" label="ERoomLabel.GOAL"/>
+</dungeon>

@@ -1,10 +1,11 @@
-
+.settings
 .idea/
 *.iml
 target/
 temp/
 /NPlan/
 /PDDL/
+/_ATTIC
 
 /.metadata
 /.recommenders

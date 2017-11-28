@@ -20,7 +20,7 @@ import cz.dd4j.utils.ExceptionToString;
 
 public class VisConsole implements ISimEvents {
 
-	public final String WHO_SIMULATOR = "Simulator";
+	public final static String WHO_SIMULATOR = "Simulator";
 	
 	protected final PrintStream out;
 	

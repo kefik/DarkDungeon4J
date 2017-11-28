@@ -1,0 +1,9 @@
+<!--
+    Sword19
+    Requires room: room19
+ -->
+<dungeon>
+  <room id="room19">
+    <item id="sword19" name="Sword19" type="EItem.SWORD"/>
+  </room>
+</dungeon>

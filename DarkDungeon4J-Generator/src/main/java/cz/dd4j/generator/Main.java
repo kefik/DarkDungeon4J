@@ -75,7 +75,7 @@ public class Main {
 			"monsters", // sub-directory
 			100,        // monsters count
 			new AgentXML("AStatic",     StaticMonsterAgent.class.getName()),
-			new AgentXML("Dynamic000",   DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.0d)),
+			new AgentXML("Dynamic000",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.0d)),
 			new AgentXML("Dynamic010",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.1d)),
 			new AgentXML("Dynamic020",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.2d)),
 			new AgentXML("Dynamic030",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.3d)),
@@ -85,8 +85,8 @@ public class Main {
 			new AgentXML("Dynamic070",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.7d)),
 			new AgentXML("Dynamic080",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.8d)),
 			new AgentXML("Dynamic090",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 0.9d)),
-			new AgentXML("Dynamic100", DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 1.0d)),
-			new AgentXML("Killer000",    KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.0d)),
+			new AgentXML("Dynamic100",  DynamicMonsterAgent.class.getName(), new ConfigXML("movementProbability", 1.0d)),
+			new AgentXML("Killer000",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.0d)),
 			new AgentXML("Killer010",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.1d)),
 			new AgentXML("Killer020",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.2d)),
 			new AgentXML("Killer030",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.3d)),
@@ -96,7 +96,7 @@ public class Main {
 			new AgentXML("Killer070",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.7d)),
 			new AgentXML("Killer080",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.8d)),
 			new AgentXML("Killer090",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 0.9d)),
-			new AgentXML("Killer100",  KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 1.0d))
+			new AgentXML("Killer100",   KillerMonsterAgent.class.getName(),  new ConfigXML("movementProbability", 1.0d))
 		);
 		
 		// Generate trap agents

@@ -3,14 +3,14 @@ package cz.dd4j.generator.dungeon.corridors;
 import java.io.File;
 import java.util.ArrayList;
 
+import cz.dd4j.domain.EDungeonLabel;
 import cz.dd4j.generator.GeneratorBase;
 import cz.dd4j.generator.dungeon.GeneratorUtils;
 import cz.dd4j.loader.dungeon.impl.xml.CorridorXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
-import cz.dd4j.loader.dungeon.impl.xml.RoomXML;
 import cz.dd4j.utils.Const;
-import cz.dd4j.utils.Id;
+import cz.dd4j.utils.config.ConfigXML;
 
 public class TorusCorridorsGenerator extends GeneratorBase<CorridorsGeneratorConfig> {
 
@@ -36,10 +36,16 @@ public class TorusCorridorsGenerator extends GeneratorBase<CorridorsGeneratorCon
 		
 		DungeonXML dungeon = new DungeonXML();
 		dungeon.corridors = new ArrayList<CorridorXML>();
+		dungeon.labels = new ArrayList<ConfigXML>();
 		
 		// GENERATE GRID
 		int width = (int)Math.ceil(Math.sqrt(roomCount));
 		int height = (roomCount % width == 0 ? roomCount / width : roomCount / width + 1);
+		
+		dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_TYPE, EDungeonLabel.TOPOLOGY_TYPE_VALUE_TORUS));
+		dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_ROOMS_COUNT, roomCount));
+		dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_ROOMS_WIDTH, width));
+		dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_ROOMS_HEIGHT, height));
 		
 		int currRoom = 1;
 		for (int j = 1; j <= height; ++j) {

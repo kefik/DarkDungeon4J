@@ -1,0 +1,10 @@
+<!--
+    Agent: Trap
+    FQCN:  cz.dd4j.agents.features.TrapAgent
+    Requires agent: trap3
+ -->
+<agents>
+  <agent id="trap3" name="Trap">
+    <agentFQCN>cz.dd4j.agents.features.TrapAgent</agentFQCN>
+  </agent>
+</agents>

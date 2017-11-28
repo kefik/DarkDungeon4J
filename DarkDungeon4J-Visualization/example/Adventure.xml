@@ -1,0 +1,34 @@
+<!--
+    ADVENTURE
+    ~~~~~~~~~~~~~~~~~
+    #Rooms:        25
+    Corridors:     corridors/maze/Maze-5x5-V0-EJ2.xml
+    #Items:        1
+    Item types:    Sword in room19
+    #Traps:        3
+    Trap types:    Trap in room18, Trap in room10, Trap in room8
+    #Monsters:     3
+    Monster types: Killer020 in room9, Killer020 in room2, Killer020 in room7
+ -->
+<simstate>
+  <dungeon path="Rooms25.xml"/>
+  <dungeon path="Maze-5x5-V0-EJ2.xml"/>
+  <dungeon path="Goal-Room25.xml"/>
+  <dungeon path="Hero1-Room1.xml"/>
+  <dungeon path="Sword6-Room6.xml"/>
+  <dungeon path="Sword19-Room19.xml"/>
+  <dungeon path="Trap1-Room18.xml"/>
+  <dungeon path="Trap2-Room10.xml"/>
+  <dungeon path="Trap3-Room8.xml"/>
+  <dungeon path="Trap4-Room2.xml"/>
+  <dungeon path="Monster1-Room9.xml"/>
+  <dungeon path="Monster2-Room2.xml"/>
+  <dungeon path="Monster3-Room7.xml"/>
+  <agents path="trap1-Trap.xml"/>
+  <agents path="trap2-Trap.xml"/>
+  <agents path="trap3-Trap.xml"/>
+  <agents path="trap4-Trap.xml"/>
+  <agents path="monster1-Dynamic020.xml"/>
+  <agents path="monster2-Dynamic020.xml"/>
+  <agents path="monster3-Dynamic020.xml"/>
+</simstate>

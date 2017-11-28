@@ -168,6 +168,9 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 				blend(target, targetRoom, entry.getValue());
 			}
 		}
+		for (Map.Entry<String, Object> entry : append.labels.entrySet()) {
+			target.labels.put(entry.getKey(), entry.getValue());		
+		}
 	}
 	
 	private static void blend(Dungeon dungeon, Room targetRoom, Room append) {

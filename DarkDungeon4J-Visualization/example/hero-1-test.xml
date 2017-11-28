@@ -1,0 +1,11 @@
+<agents>
+  <agent id="hero1">
+    <agentFQCN>cz.dd4j.ui.gui.MockHero1</agentFQCN>
+    <!--
+    <config>
+        <key>sumthingKey</key>
+        <value>sumthingValue</value>
+    </config>
+    -->
+  </agent>
+</agents>

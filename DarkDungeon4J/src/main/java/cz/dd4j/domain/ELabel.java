@@ -14,6 +14,9 @@ public class ELabel extends EElement {
 	@AsEnumObject(childClass=ERoomLabel.class)
 	public static final ELabel ROOM_LABEL = new ELabel("ELRoomLabel");
 	
+	@AsEnumObject(childClass=EDungeonLabel.class)
+	public static final ELabel DUNGEON_LABEL = new ELabel("ELDungeonLabel");
+	
 	// =================
 	// ENUM CONSTRUCTORS
 	// =================

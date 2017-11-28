@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import cz.dd4j.domain.EDungeonLabel;
 import cz.dd4j.generator.GeneratorBase;
 import cz.dd4j.generator.dungeon.GeneratorUtils;
 import cz.dd4j.loader.dungeon.impl.xml.CorridorXML;
@@ -13,6 +14,7 @@ import cz.dd4j.loader.dungeon.impl.xml.DungeonLoaderXML;
 import cz.dd4j.loader.dungeon.impl.xml.DungeonXML;
 import cz.dd4j.utils.Const;
 import cz.dd4j.utils.collection.Tuple2;
+import cz.dd4j.utils.config.ConfigXML;
 
 /**
  * Maze can be generated only for full rectangles!
@@ -68,6 +70,12 @@ public class MazeGenerator extends GeneratorBase<MazeGeneratorConfig> {
 			
 			DungeonXML dungeon = new DungeonXML();
 			dungeon.corridors = new ArrayList<CorridorXML>();
+			dungeon.labels = new ArrayList<ConfigXML>();
+			
+			dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_TYPE, EDungeonLabel.TOPOLOGY_TYPE_VALUE_GRID));
+			dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_ROOMS_COUNT, width * height));
+			dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_ROOMS_WIDTH, width));
+			dungeon.labels.add(new ConfigXML(EDungeonLabel.TOPOLOGY_ROOMS_HEIGHT, height));
 			
 			// COUNT REQUIRED ROOMS
 			Map<Tuple2<Integer, Integer>, Integer> rooms = new HashMap<Tuple2<Integer, Integer>, Integer>();		

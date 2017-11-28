@@ -1,4 +1,11 @@
 <dungeon>
+    <!-- DUNGEON META DATA, see EDungeonLabel.java -->
+    <label><key>TOPOLOGY_TYPE</key>        <value>Grid</value></label>
+    <label><key>TOPOLOGY_ROOMS_WIDTH</key> <value>4</value>   </label>
+    <label><key>TOPOLOGY_ROOMS_HEIGHT</key><value>1</value>   </label>
+    <label><key>TOPOLOGY_ROOMS_COUNT</key> <value>4</value>   </label>
+
+    <!-- DUNGEON GRAPH DEFINITION -->
     <room id="room1" />    
     <room id="room2" />    
     <room id="room3" />    

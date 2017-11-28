@@ -1,0 +1,9 @@
+<!--
+    Trap3
+    Requires room: room8
+ -->
+<dungeon>
+  <room id="room8">
+    <feature id="trap3" name="Trap3" type="EFeature.TRAP"/>
+  </room>
+</dungeon>

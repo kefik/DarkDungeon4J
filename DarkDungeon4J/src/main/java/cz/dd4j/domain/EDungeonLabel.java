@@ -6,20 +6,32 @@ import cz.cuni.amis.utils.eh4j.Enums;
 @AsEnumClass
 public class EDungeonLabel extends ELabel {
 
-	// ==========================================
-	// KEYS FOR VALUES FOR EDugneonLabel.TOPOLOGY
-	// ==========================================
-	
-	public static final String TOPOLOGY_TYPE = "type";
-	public static final String TOPOLOGY_ROOMS_WIDTH = "rooms-width";
-	public static final String TOPOLOGY_ROOMS_HEIGHT = "rooms-height";
-	public static final String TOPOLOGY_ROOMS_COUNT = "rooms-count";
-	
 	// ==============
 	// ENUM INSTANCES
 	// ==============
 	
-	public static final EDungeonLabel TOPOLOGY = new EDungeonLabel("EDLTopology");
+	/**
+	 * Values are of a string type.
+	 */
+	public static final EDungeonLabel TOPOLOGY_TYPE = new EDungeonLabel("TOPOLOGY_TYPE");
+	
+	public static final String TOPOLOGY_TYPE_VALUE_GRID = "Grid";
+	public static final String TOPOLOGY_TYPE_VALUE_TORUS = "Torus";
+	
+	/**
+	 * Values are of an int type.
+	 */
+	public static final EDungeonLabel TOPOLOGY_ROOMS_WIDTH = new EDungeonLabel("TOPOLOGY_ROOMS_WIDTH");
+	
+	/**
+	 * Values are of an int type.
+	 */
+	public static final EDungeonLabel TOPOLOGY_ROOMS_HEIGHT = new EDungeonLabel("TOPOLOGY_ROOMS_HEIGHT");
+	
+	/**
+	 * Values are of an int type.\
+	 */
+	public static final EDungeonLabel TOPOLOGY_ROOMS_COUNT = new EDungeonLabel("TOPOLOGY_ROOMS_COUNT");
 	
 	// =================
 	// ENUM CONSTRUCTORS

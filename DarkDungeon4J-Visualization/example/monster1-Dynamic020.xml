@@ -1,0 +1,14 @@
+<!--
+    Agent: Dynamic020
+    FQCN:  cz.dd4j.agents.monsters.DynamicMonsterAgent
+    Requires agent: monster1
+ -->
+<agents>
+  <agent id="monster1" name="Dynamic020">
+    <agentFQCN>cz.dd4j.agents.monsters.DynamicMonsterAgent</agentFQCN>
+    <config>
+      <key>movementProbability</key>
+      <value>0.2</value>
+    </config>
+  </agent>
+</agents>

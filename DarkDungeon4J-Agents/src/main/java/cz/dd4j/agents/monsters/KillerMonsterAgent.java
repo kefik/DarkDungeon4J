@@ -9,8 +9,10 @@ import cz.dd4j.utils.astar.AStar;
 import cz.dd4j.utils.astar.IAStarHeuristic;
 import cz.dd4j.utils.astar.IAStarView;
 import cz.dd4j.utils.astar.Path;
+import cz.dd4j.utils.config.AutoConfig;
 import cz.dd4j.utils.config.Configurable;
 
+@AutoConfig
 public class KillerMonsterAgent extends MonsterAgentBase {
 
 	@Configurable

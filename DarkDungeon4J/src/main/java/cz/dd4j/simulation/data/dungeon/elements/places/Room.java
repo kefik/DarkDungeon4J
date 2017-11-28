@@ -11,6 +11,7 @@ import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
 import cz.dd4j.simulation.data.dungeon.elements.items.Item;
+import cz.dd4j.utils.Id;
 import cz.dd4j.utils.astar.graph.ILink;
 import cz.dd4j.utils.astar.graph.INode;
 
@@ -58,6 +59,18 @@ public class Room extends Place implements INode<Room> {
 	@Override
 	public String toString() {
 		return "Room[id=" + id + "]";
+	}
+	
+	/**
+	 * Whether we can get from this room to room having 'roomId'.
+	 * @param roomId
+	 * @return
+	 */
+	public boolean hasCorridorTo(Id roomId) {
+		for (Corridor corridor : corridors) {
+			if (corridor.leadsTo(roomId)) return true;
+		}
+		return false;
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package cz.dd4j.loader.dungeon.impl.xml;
 import java.io.File;
 import java.util.HashMap;
 
+import cz.cuni.amis.utils.eh4j.shortcut.EH;
+import cz.dd4j.domain.EDungeonLabel;
 import cz.dd4j.domain.EEntity;
 import cz.dd4j.domain.EFeature;
 import cz.dd4j.loader.LoaderXML;
@@ -16,6 +18,7 @@ import cz.dd4j.simulation.data.dungeon.elements.items.Item;
 import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 import cz.dd4j.utils.Id;
+import cz.dd4j.utils.config.ConfigXML;
 
 public class DungeonLoaderXML extends LoaderXML<DungeonXML> implements IDungeonLoaderImpl {
 
@@ -41,6 +44,15 @@ public class DungeonLoaderXML extends LoaderXML<DungeonXML> implements IDungeonL
 		if (dungeonXML.corridors != null) {
 			for (CorridorXML corridor : dungeonXML.corridors) {
 				createCorridor(result, corridor);
+			}
+		}
+		if (dungeonXML.labels != null) {
+			for (ConfigXML config : dungeonXML.labels) {
+				EDungeonLabel label = EH.getAsForName(config.key, EDungeonLabel.class);
+				if (label == null) {
+					throw new RuntimeException("Invalid EDungeonLabel id '" + config.key + "', misspelling? See EDungeonLabel entries.");
+				}
+				result.labels.put(config.key, config.value);
 			}
 		}
 		

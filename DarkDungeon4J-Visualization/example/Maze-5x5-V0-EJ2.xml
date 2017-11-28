@@ -1,0 +1,48 @@
+<!--
+    Maze (Width x Height): 5 x 5
+    Extra junctions: 2
+               
+     R-R-R-R-R 
+     |   |   | 
+     R R-R R R 
+     |   | |   
+     R-R-R-R-R 
+       | | | | 
+     R R R R R 
+     | |     | 
+     R-R-R-R-R 
+               
+    Requires: Rooms25.xml
+ -->
+<dungeon>
+  <label><key>TOPOLOGY_TYPE</key>        <value>Grid</value></label>
+  <label><key>TOPOLOGY_ROOMS_WIDTH</key> <value>5</value>   </label>
+  <label><key>TOPOLOGY_ROOMS_HEIGHT</key><value>5</value>   </label>
+  <label><key>TOPOLOGY_ROOMS_COUNT</key> <value>25</value>  </label>
+  <corridor room1Id="room1" room2Id="room2" note="room1 == [1,1] -- link RIGHT -- [2,1] == room2"/>
+  <corridor room1Id="room1" room2Id="room6" note="room1 == [1,1] -- link DOWN -- [1,2] == room6"/>
+  <corridor room1Id="room2" room2Id="room3" note="room2 == [2,1] -- link RIGHT -- [3,1] == room3"/>
+  <corridor room1Id="room3" room2Id="room4" note="room3 == [3,1] -- link RIGHT -- [4,1] == room4"/>
+  <corridor room1Id="room3" room2Id="room8" note="room3 == [3,1] -- link DOWN -- [3,2] == room8"/>
+  <corridor room1Id="room4" room2Id="room5" note="room4 == [4,1] -- link RIGHT -- [5,1] == room5"/>
+  <corridor room1Id="room5" room2Id="room10" note="room5 == [5,1] -- link DOWN -- [5,2] == room10"/>
+  <corridor room1Id="room6" room2Id="room11" note="room6 == [1,2] -- link DOWN -- [1,3] == room11"/>
+  <corridor room1Id="room7" room2Id="room8" note="room7 == [2,2] -- link RIGHT -- [3,2] == room8"/>
+  <corridor room1Id="room8" room2Id="room13" note="room8 == [3,2] -- link DOWN -- [3,3] == room13"/>
+  <corridor room1Id="room9" room2Id="room14" note="room9 == [4,2] -- link DOWN -- [4,3] == room14"/>
+  <corridor room1Id="room11" room2Id="room12" note="room11 == [1,3] -- link RIGHT -- [2,3] == room12"/>
+  <corridor room1Id="room12" room2Id="room13" note="room12 == [2,3] -- link RIGHT -- [3,3] == room13"/>
+  <corridor room1Id="room12" room2Id="room17" note="room12 == [2,3] -- link DOWN -- [2,4] == room17"/>
+  <corridor room1Id="room13" room2Id="room14" note="room13 == [3,3] -- link RIGHT -- [4,3] == room14"/>
+  <corridor room1Id="room13" room2Id="room18" note="room13 == [3,3] -- link DOWN -- [3,4] == room18"/>
+  <corridor room1Id="room14" room2Id="room15" note="room14 == [4,3] -- link RIGHT -- [5,3] == room15"/>
+  <corridor room1Id="room14" room2Id="room19" note="room14 == [4,3] -- link DOWN -- [4,4] == room19"/>
+  <corridor room1Id="room15" room2Id="room20" note="room15 == [5,3] -- link DOWN -- [5,4] == room20"/>
+  <corridor room1Id="room16" room2Id="room21" note="room16 == [1,4] -- link DOWN -- [1,5] == room21"/>
+  <corridor room1Id="room17" room2Id="room22" note="room17 == [2,4] -- link DOWN -- [2,5] == room22"/>
+  <corridor room1Id="room20" room2Id="room25" note="room20 == [5,4] -- link DOWN -- [5,5] == room25"/>
+  <corridor room1Id="room21" room2Id="room22" note="room21 == [1,5] -- link RIGHT -- [2,5] == room22"/>
+  <corridor room1Id="room22" room2Id="room23" note="room22 == [2,5] -- link RIGHT -- [3,5] == room23"/>
+  <corridor room1Id="room23" room2Id="room24" note="room23 == [3,5] -- link RIGHT -- [4,5] == room24"/>
+  <corridor room1Id="room24" room2Id="room25" note="room24 == [4,5] -- link RIGHT -- [5,5] == room25"/>
+</dungeon>

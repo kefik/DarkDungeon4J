@@ -28,6 +28,7 @@ import cz.dd4j.simulation.data.agents.Agents;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.simulation.result.SimResult;
 import cz.dd4j.ui.console.VisConsole;
+import cz.dd4j.ui.gui.VisGUI;
 
 public class ExampleDungeon {
 
@@ -53,9 +54,9 @@ public class ExampleDungeon {
 		// CREATE THE HERO!
 
 		// WARNING: this assumes use of Eclipse of NetBeans that starts the code within the project folder itself!		
-		File heroesFile = new File("./data/hero-agents/hero-random.xml");
+		//File heroesFile = new File("./data/hero-agents/hero-random.xml");
 		//File heroesFile = new File("./data/hero-agents/hero-semi-random.xml");
-		//File heroesFile = new File("./data/hero-agents/hero-rules-with-random-move.xml");
+		File heroesFile = new File("./data/hero-agents/hero-rules-with-random-move.xml");
 		//File heroesFile = new File("./data/hero-agents/nplan-cygwin.xml");
 		
 		AgentsLoader<IHeroAgent> heroesLoader = new AgentsLoader<IHeroAgent>();
@@ -75,7 +76,8 @@ public class ExampleDungeon {
 
 		// BIND THE CONSOLE VISUALIZATION
 
-		simulation.getEvents().addHandler(new VisConsole());
+		//simulation.getEvents().addHandler(new VisConsole());
+		simulation.getEvents().addHandler(new VisGUI());
 
 		// FIRE THE SIMULATION!
 		SimStaticStats result = simulation.simulate();

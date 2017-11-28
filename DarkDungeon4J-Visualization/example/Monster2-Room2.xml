@@ -1,0 +1,9 @@
+<!--
+    Monster2
+    Requires room: room2
+ -->
+<dungeon>
+  <room id="room2">
+    <monster id="monster2" name="Monster2" type="EEntity.MONSTER"/>
+  </room>
+</dungeon>
