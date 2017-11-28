@@ -34,6 +34,10 @@ Windows (from cmd; assuming you have mvn on path):
 Linux (from bash, assuming you have mvn on path):
 
     mvn package
+    
+## SCREENSHOT
+
+![DD4J GUI](DarkDungeon4J-Visualization/DD4J-Example.png)
 
 ## MAVEN [REPOSITORY](http://diana.ms.mff.cuni.cz:8081/artifactory)
 
