@@ -21,6 +21,8 @@ into favourite IDE of yours (preferably Eclipse), open Dungeon01 file and run it
 
 **DarkDungeon4J-Utils** -> Various utilities used by other projects.
 
+**DarkDungeon4J-Visualization** -> Contains graphical representation of grid-based DD adventures; uses pure Java-based [Clear2D](https://github.com/kefik/Clear2D) framework.
+
 ## COMPILATION
 
 Compile any of DarkDungeon4J projects from within its directory by issuing:
