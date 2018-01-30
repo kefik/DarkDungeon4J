@@ -30,6 +30,7 @@ import cz.dd4j.ui.gui.view.HeroView;
 import cz.dd4j.ui.gui.view.MonsterView;
 import cz.dd4j.ui.gui.view.RoomView;
 import cz.dd4j.ui.gui.view.TrapView;
+import cz.dd4j.ui.log.VisFile;
 import cz.dd4j.utils.Const;
 import cz.dd4j.utils.ExceptionToString;
 
@@ -49,8 +50,23 @@ public class VisGUI implements ISimEvents {
 	
 	protected DD4JVis vis;
 	
+	protected boolean autoCloseOnSimulationEnd = true;
+	
+	/**
+	 * Auto-close visualization frame after the simulation ends.
+	 */
 	public VisGUI() {
-		out = System.out;
+		this(true);
+	}
+	
+	/**
+	 * Whether to automatically close the visualization frame when the simulation ends.
+	 * @param autoCloseOnSimulationEnd
+	 */
+	public VisGUI(boolean autoCloseOnSimulationEnd) {
+		//out = System.out;
+		out = null;
+		this.autoCloseOnSimulationEnd = true;
 	}
 	
 	public VisGUI(PrintStream out) {
@@ -332,6 +348,11 @@ public class VisGUI implements ISimEvents {
 	public void simulationEnd(SimResult result, SimStaticStats stats) {
 		log(WHO_SIMULATOR, "SimEnd", "Simulation ended in frame " + result.frameNumber + ", time " + result.simTimeMillis + "ms.");
 		log(WHO_SIMULATOR, "SimEndResult", getResultDescription(result));
+		
+		if (autoCloseOnSimulationEnd) {
+			vis.die();
+			Clear2D.engine.stop();
+		}
 	}
 
 	private String getResultDescription(SimResult result) {

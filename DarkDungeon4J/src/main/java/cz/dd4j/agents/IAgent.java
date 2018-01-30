@@ -1,6 +1,5 @@
 package cz.dd4j.agents;
 
-import java.util.Map;
 import java.util.Random;
 
 import cz.dd4j.domain.EEntity;

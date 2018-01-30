@@ -44,7 +44,7 @@ public class Test14_SimStatic {
 		File dungeonFile = new File("./example/Adventure.xml");
 
 		SimStateLoader loader = new SimStateLoader();
-		SimState simState = loader.loadSimState(dungeonFile);
+		SimState simState = loader.loadSimState(dungeonFile, true);
 
 		config.bindSimState(simState);
 

@@ -12,7 +12,7 @@ public class Test04_RoomsView {
 	public static void main(String[] args) {
 		// STATE LOAD
 		SimStateLoader loader = new SimStateLoader();
-		SimState simState = loader.loadSimState(new File("./example/Adventure.xml"));
+		SimState simState = loader.loadSimState(new File("./example/Adventure.xml"), false);
 		
 		// ENGINE INIT
 		Ctx.init();

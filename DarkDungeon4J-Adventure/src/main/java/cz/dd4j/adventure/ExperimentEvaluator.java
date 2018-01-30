@@ -231,7 +231,7 @@ public class ExperimentEvaluator {
 		System.out.println(item.toString() + ": loading simulation state");
 		
 		// FINISH THE CONFIGURATION
-		SimState simState = new SimStateLoader().loadSimState(item.adventureFile);
+		SimState simState = new SimStateLoader().loadSimState(item.adventureFile, true);
 		config.bindSimState(simState);
 
 		System.out.println(item.toString() + ": loading hero agent");

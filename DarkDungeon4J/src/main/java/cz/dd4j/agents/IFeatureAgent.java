@@ -12,6 +12,6 @@ public interface IFeatureAgent extends IAgent {
 	 * 
 	 * @return
 	 */
-	public Command act(Feature feature);
+	public Command act(Feature featureBody);
 	
 }

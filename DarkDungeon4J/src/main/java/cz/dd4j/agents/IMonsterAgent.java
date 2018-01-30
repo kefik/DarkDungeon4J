@@ -9,11 +9,11 @@ public interface IMonsterAgent extends IAgent {
 	/**
 	 * Monster's body update.
 	 * 
-	 * @param monster
+	 * @param monsterBody
 	 * @param currentTickMillis 
 	 * @return
 	 */
-	public void observeBody(Monster monster, long currentTickMillis);
+	public void observeBody(Monster monsterBody, long currentTickMillis);
 	
 	/**
 	 * Information update about the dungeon.

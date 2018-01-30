@@ -29,7 +29,7 @@ public class Test08_Attack {
 	public static void main(String[] args) {
 		// STATE LOAD
 		SimStateLoader loader = new SimStateLoader();
-		SimState simState = loader.loadSimState(new File("./example/Adventure.xml"));
+		SimState simState = loader.loadSimState(new File("./example/Adventure.xml"), true);
 		
 		// ENGINE INIT
 		Ctx.init();

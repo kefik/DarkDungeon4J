@@ -18,9 +18,9 @@ public interface IHeroAgent extends IAgent {
 	
 	/**
 	 * Hero's body update.
-	 * @param hero
+	 * @param heroBody
 	 */
-	public void observeBody(Hero hero, long timestampMillis);
+	public void observeBody(Hero heroBody, long timestampMillis);
 	
 	/**
 	 * Information update about the dungeon.

@@ -34,17 +34,17 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 	}
 
 	@Override
-	public SimState loadSimState(File xmlFile) {
+	public SimState loadSimState(File xmlFile, boolean loadAgents) {
 		SimStateXML simStateXML = load(xmlFile);
 
 		if (simStateXML.dungeons.size() == 0) {
 			throw new RuntimeException("SimState does not contain any dungeon definition! File: " + xmlFile.getAbsolutePath());
 		}
 		
-		return loadSimState(new File(xmlFile.getParent()), simStateXML);
+		return loadSimState(new File(xmlFile.getParent()), simStateXML, loadAgents);
 	}
 	
-	public SimState loadSimState(File xmlFileDir, SimStateXML simStateXML) {
+	public SimState loadSimState(File xmlFileDir, SimStateXML simStateXML, boolean loadAgents) {
 		List<File> dungeonXMLFiles = new ArrayList<File>(simStateXML.dungeons == null ? 0 : simStateXML.dungeons.size());
 		List<File> agentsXMLFiles = new ArrayList<File>(simStateXML.agents == null ? 0 : simStateXML.agents.size());
 		
@@ -54,16 +54,18 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 			}
 		}
 		
-		if (simStateXML.agents != null) {
-			for (FileXML agents : simStateXML.agents) {
-				agentsXMLFiles.add(new File(xmlFileDir, agents.path));			
+		if (loadAgents) {
+			if (simStateXML.agents != null) {
+				for (FileXML agents : simStateXML.agents) {
+					agentsXMLFiles.add(new File(xmlFileDir, agents.path));			
+				}
 			}
 		}
 		
-		return loadSimState(dungeonXMLFiles, agentsXMLFiles);
+		return loadSimState(dungeonXMLFiles, agentsXMLFiles, loadAgents);
 	}
 	
-	public SimState loadSimState(List<File> dungeonXMLFiles, List<File> agentsXMLFiles) {
+	public SimState loadSimState(List<File> dungeonXMLFiles, List<File> agentsXMLFiles, boolean loadAgents) {
 		
 		Dungeon dungeon = new Dungeon();
 		Agents<IMonsterAgent> monsters = new Agents<IMonsterAgent>();
@@ -136,7 +138,7 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 				monster.body = room.monster;
 				monster.body.atRoom = room;
 				monster.mind = monsters.agents.get(monster.body.id);
-				if (monster.mind == null) {
+				if (loadAgents && monster.mind == null) {
 					throw new RuntimeException("Monster agent not specified for the Monster[id=" + monster.body.id +"].");
 				}
 				state.monsters.put(monster.body.id, monster);					
@@ -147,7 +149,7 @@ public class SimStateLoaderXML extends LoaderXML<SimStateXML> implements ISimSta
 				feature.body = room.feature;
 				feature.body.atRoom = room;
 				feature.mind = features.agents.get(feature.body.id);
-				if (feature.mind == null) {
+				if (loadAgents && feature.mind == null) {
 					throw new RuntimeException("Feature agent not specified for the Feature[id=" + feature.body.id +"].");
 				}
 				state.features.put(feature.body.id, feature);	

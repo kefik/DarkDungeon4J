@@ -63,7 +63,7 @@ public class AdventureDescriptor extends DungeonDescriptor {
 		SimStateLoaderXML loader = new SimStateLoaderXML();
 		SimStateXML simStateXML = loader.load(xmlSimStateFile);
 		
-		SimState simState = loader.loadSimState(xmlSimStateFile.getParentFile(), simStateXML);		
+		SimState simState = loader.loadSimState(xmlSimStateFile.getParentFile(), simStateXML, true);		
 		
 		AdventureDescriptor result = new AdventureDescriptor();
 		DungeonDescriptor.describe(simState.dungeon, heuristic, result);

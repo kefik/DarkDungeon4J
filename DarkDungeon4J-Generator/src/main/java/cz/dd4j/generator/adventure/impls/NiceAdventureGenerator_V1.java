@@ -160,7 +160,7 @@ public class NiceAdventureGenerator_V1 extends AdventureGeneratorBase<NiceAdvent
 		simStateXML.dungeons.add(newFileXML(ctx.corridorsFile));
 		
 		SimStateLoaderXML simStateLoader = new SimStateLoaderXML();
-		SimState simState = simStateLoader.loadSimState(config.target.dir, simStateXML);
+		SimState simState = simStateLoader.loadSimState(config.target.dir, simStateXML, true);
 		
 		Room heroRoom = simState.dungeon.rooms.get(Id.get("room1"));
 		

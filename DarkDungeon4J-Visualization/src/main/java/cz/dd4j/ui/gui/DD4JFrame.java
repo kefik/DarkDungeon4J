@@ -49,7 +49,7 @@ public class DD4JFrame extends JFrame {
 
 		setTitle("DarkDungeon4J");
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		
 		int frameWidth = c2dWidth;
 		if (c2dWidth < 800) frameWidth = 800;

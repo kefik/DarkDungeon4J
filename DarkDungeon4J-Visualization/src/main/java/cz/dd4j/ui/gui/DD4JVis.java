@@ -2,8 +2,11 @@ package cz.dd4j.ui.gui;
 
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.SwingUtilities;
 
 import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.agents.IMonsterAgent;
@@ -80,7 +83,15 @@ public class DD4JVis {
 	public void die() {
 		if (frame != null) {
 			frame.die();
-			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			frame = null;
 		}
 	}

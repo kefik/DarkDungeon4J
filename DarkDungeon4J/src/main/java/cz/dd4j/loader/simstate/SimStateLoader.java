@@ -8,10 +8,10 @@ import cz.dd4j.simulation.data.state.SimState;
 
 public class SimStateLoader {
 
-	public SimState loadSimState(File xmlFile) {
+	public SimState loadSimState(File xmlFile, boolean includeAgents) {
 		MetaInfo meta = MetaInfoLoader.getInstance().loadMetaFor(xmlFile);
 		ISimStateLoaderImpl loader = createSimStateLoaderImpl(meta.loaderFQCN);
-		return loader.loadSimState(xmlFile);
+		return loader.loadSimState(xmlFile, includeAgents);
 	}
 	
 	public ISimStateLoaderImpl createSimStateLoaderImpl(String fqcn) {
