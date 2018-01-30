@@ -10,6 +10,11 @@ import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Switch;
 
+/**
+ * Console-app frontend for the {@link ExperimentEvaluator}.
+ * 
+ * @author Jimmy
+ */
 public class Main {
 	
 	private static final char ARG_ADVENTURES_DIR_SHORT = 'a';
@@ -31,6 +36,10 @@ public class Main {
 	private static final char ARG_VIS_CONSOLE_SHORT = 'v';
 	
 	private static final String ARG_VIS_CONSOLE_LONG = "vis-console";
+	
+	private static final char ARG_VIS_FILE_SHORT = 'r';
+	
+	private static final String ARG_VIS_FILE_LONG = "vis-file";
 
 	private static final char ARG_MAX_CORES_SHORT = 'c';
 	
@@ -57,6 +66,8 @@ public class Main {
 	private static int playoutLimit;
 	
 	private static boolean visConsole;
+	
+	private static boolean visFile;
 
 	private static int maxCores;
 	
@@ -147,6 +158,14 @@ public class Main {
 	    
 	    jsap.registerParameter(opt4);
 	    
+	    Switch opt44 = new Switch(ARG_VIS_FILE_LONG)
+		    	.setDefault("false")
+		    	.setShortFlag(ARG_VIS_FILE_SHORT)
+		    	.setLongFlag(ARG_VIS_FILE_LONG);    
+		opt44.setHelp("If specified, attaches VisFill to all simulations outputting their zipped replay files into the result directory.");
+		    
+		jsap.registerParameter(opt44);
+	    
 	    FlaggedOption opt6 = new FlaggedOption(ARG_MAX_CORES_LONG)
 				.setStringParser(JSAP.INTEGER_PARSER)
 				.setRequired(false)
@@ -203,6 +222,8 @@ public class Main {
 		playoutLimit = config.getInt(ARG_PLAYOUT_LIMIT_LONG);
 		
 		visConsole = config.getBoolean(ARG_VIS_CONSOLE_LONG);
+		
+		visFile = config.getBoolean(ARG_VIS_FILE_LONG);
 
 		maxCores = config.getInt(ARG_MAX_CORES_LONG);
 		
@@ -294,6 +315,7 @@ public class Main {
 		config.target.dir           = resultDirFile;
 		config.playoutLimit         = playoutLimit;
 		config.consoleVisualization = visConsole;
+		config.storeReplays         = visFile;
 		config.maxCores				= maxCores;
 		config.timeoutMultiplier    = timeoutMultiplier;
 		
@@ -326,6 +348,7 @@ public class Main {
 				, "-r", "./results"                                                    // directory with results	
 //				, "-l", "4"                                                            // limits maximum number of simulations, -1 == no limit
 //				, "-v"                                                                 // console visualization, if commented out, evaluator will not output simulation progresses
+				, "-r"                                                                 // generate zipped replay files
 				, "-t", "5"															   // timeout multiplier
 		};
 	}

@@ -16,10 +16,10 @@ import cz.dd4j.ui.gui.VisGUI;
 import cz.dd4j.ui.log.VisFile;
 
 /**
- * To be run after you run {@link ExampleDungeon#main(String[])} that produces 'example-dungeon-run.zip' file that is than used as "the replay"
+ * To be run after you run {@link ExampleAdventure#main(String[])} that produces 'example-dungeon-run.zip' file that is than used as "the replay"
  * @author Jimmy
  */
-public class ExampleDungeonReplay {
+public class ExampleAdventureReplay {
 
 	public static void main(String[] args) {
 		runDungeon();

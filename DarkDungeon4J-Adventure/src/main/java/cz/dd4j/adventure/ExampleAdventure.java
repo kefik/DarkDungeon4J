@@ -14,7 +14,7 @@ import cz.dd4j.ui.console.VisConsole;
 import cz.dd4j.ui.gui.VisGUI;
 import cz.dd4j.ui.log.VisFile;
 
-public class ExampleDungeon {
+public class ExampleAdventure {
 
 	public static void main(String[] args) {
 		runDungeon();

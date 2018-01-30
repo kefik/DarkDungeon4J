@@ -38,6 +38,7 @@ import cz.dd4j.simulation.actions.instant.impl.MonsterMoveInstant;
 import cz.dd4j.simulation.data.agents.Agents;
 import cz.dd4j.simulation.data.state.SimState;
 import cz.dd4j.ui.console.VisConsole;
+import cz.dd4j.ui.log.VisFile;
 import cz.dd4j.utils.ExceptionToString;
 import cz.dd4j.utils.csv.CSV.CSVRow;
 import cz.dd4j.utils.files.DirCrawler;
@@ -265,6 +266,11 @@ public class ExperimentEvaluator {
 			visConsole.outputPrefix = item.toString() + " -> ";
 			simulation.getEvents().addHandler(visConsole);
 		}
+		if (this.config.storeReplays) {
+			System.out.println(item.toString() + ": attaching VisFile to the simulation");
+			VisFile visFile = new VisFile(this.config.target.getFile(item.toFileName(".replay.zip")), true);
+			simulation.getEvents().addHandler(visFile);
+		}
 		
 		System.out.println(item.toString() + ": running the simulation");
 		
@@ -316,6 +322,7 @@ public class ExperimentEvaluator {
 			
 			config.playoutLimit = 4;
 			config.consoleVisualization = true;
+			config.storeReplays = true;
 			
 			// TODO: parse args to extract experiment & result dirs + continue/restart flag
 			new ExperimentEvaluator(config).run();

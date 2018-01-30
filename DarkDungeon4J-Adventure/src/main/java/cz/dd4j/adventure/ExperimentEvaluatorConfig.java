@@ -18,9 +18,14 @@ public class ExperimentEvaluatorConfig extends BidirConfig {
 	public int maxCores = -1;
 	
 	/**
-	 * Wether to attach {@link VisConsole} to all executed simulations.
+	 * Whether to attach {@link VisConsole} to all executed simulations.
 	 */
 	public boolean consoleVisualization = false;
+	
+	/**
+	 * Whether to generate zipped replay files.
+	 */
+	public boolean storeReplays = true;
 
 	/**
 	 * Alters the timeout for the number of steps. Once an agent executes PARAM*dungeon.#rooms step without reaching the goal, the simulation will timeout.
