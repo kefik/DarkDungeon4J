@@ -137,6 +137,8 @@ public class SimStatic {
 	}
 
 	private void prepareSimulation() {
+		config.state.initIds();
+		
 		stats = new SimStaticStats();
 		stats.config = config;
 		
@@ -762,8 +764,8 @@ public class SimStatic {
 
 	private SimResult newSimResult() {
 		SimResult result = new SimResult();
-		result.frameNumber = stats.frameNumber;
-		result.simTimeMillis = System.currentTimeMillis() - stats.simulationStartMillis;
+		result.frameNumber = (stats == null ? 0 : stats.frameNumber);
+		result.simTimeMillis = (stats == null ? 0 : System.currentTimeMillis() - stats.simulationStartMillis);
 		return result;
 	}
 

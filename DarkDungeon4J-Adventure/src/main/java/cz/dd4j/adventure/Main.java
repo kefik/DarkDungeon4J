@@ -37,7 +37,7 @@ public class Main {
 	
 	private static final String ARG_VIS_CONSOLE_LONG = "vis-console";
 	
-	private static final char ARG_VIS_FILE_SHORT = 'r';
+	private static final char ARG_VIS_FILE_SHORT = 'p';
 	
 	private static final String ARG_VIS_FILE_LONG = "vis-file";
 
@@ -341,14 +341,26 @@ public class Main {
 	// TEST ARGUMENTS
 	// ==============
 	
-	public static String[] getTestArgs() {
+	public static String[] getTestArgs1() {
+		return new String[] {
+				  "-a", "./data/dungeons/dungeon-example"                              // directory with adventures
+				, "-h", "./data/hero-agents"                                           // directory with heroes
+				, "-r", "./results"                                                    // directory with results	
+//				, "-l", "4"                                                            // limits maximum number of simulations, -1 == no limit
+				, "-v"                                                                 // console visualization, if commented out, evaluator will not output simulation progresses
+				, "-p"                                                                 // generate zipped replay files
+				, "-t", "5"															   // timeout multiplier
+		};
+	}
+	
+	public static String[] getTestArgs2() {
 		return new String[] {
 				  "-a", "../DarkDungeon4J-Generator/result/adventures/2017/june/test"  // directory with adventures
 				, "-h", "./data/hero-agents"                                           // directory with heroes
 				, "-r", "./results"                                                    // directory with results	
 //				, "-l", "4"                                                            // limits maximum number of simulations, -1 == no limit
 //				, "-v"                                                                 // console visualization, if commented out, evaluator will not output simulation progresses
-				, "-r"                                                                 // generate zipped replay files
+				, "-p"                                                                 // generate zipped replay files
 				, "-t", "5"															   // timeout multiplier
 		};
 	}
@@ -357,7 +369,7 @@ public class Main {
 		// -----------
 		// FOR TESTING
 		// -----------
-		//args = getTestArgs();		
+		args = getTestArgs1();		
 
 		// --------------
 		// IMPLEMENTATION

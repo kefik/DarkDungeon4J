@@ -13,6 +13,7 @@ import cz.dd4j.simulation.data.dungeon.Dungeon;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Feature;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
 import cz.dd4j.simulation.data.dungeon.elements.entities.Monster;
+import cz.dd4j.simulation.events.ISimEvents;
 import cz.dd4j.utils.Id;
 
 /**
@@ -41,6 +42,19 @@ public class SimState {
 	public Map<Id, AgentMindBody<Monster, IMonsterAgent>> monsters = new HashMap<Id, AgentMindBody<Monster, IMonsterAgent>>();
 	public Map<Id, AgentMindBody<Hero,    IHeroAgent>>    heroes   = new HashMap<Id, AgentMindBody<Hero,    IHeroAgent>>();
 	public Map<Id, AgentMindBody<Feature, IFeatureAgent>> features = new HashMap<Id, AgentMindBody<Feature, IFeatureAgent>>();
+	
+	// ===
+	// IDs
+	// ===
+	
+	/**
+	 * Guaranteed to be initialized before the {@link SimStatic} is run, i.e., before {@link ISimEvents#simulationBegin(SimState, cz.dd4j.simulation.SimStaticStats)} is called.
+	 */
+	public SimStateIds ids;
+	
+	public void initIds() {		
+		ids = new SimStateIds(this);
+	}
 	
 	// =======
 	// TIMEOUT
