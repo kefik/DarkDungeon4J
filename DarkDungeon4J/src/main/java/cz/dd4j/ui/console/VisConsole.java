@@ -1,6 +1,7 @@
 package cz.dd4j.ui.console;
 
 import java.io.PrintStream;
+import java.util.logging.Level;
 
 import cz.dd4j.agents.IFeatureAgent;
 import cz.dd4j.agents.IHeroAgent;
@@ -137,6 +138,15 @@ public class VisConsole implements ISimEvents {
 		log(WHO_SIMULATOR, "SimEndResult", getResultDescription(result));
 	}
 
+	@Override
+	public void simulationLog(Element who, Level level, String message) {
+		if (who == null) {
+			log(WHO_SIMULATOR, "Log", "[" + level + "] " + message);
+		} else {
+			log(getName(who), "Log", "[" + level + "] " + message);
+		}
+	}
+	
 	private String getResultDescription(SimResult result) {
 		switch (result.resultType) {
 		case AGENT_EXCEPTION: return result.resultType + "[Agent code exception.]" + Const.NEW_LINE + ExceptionToString.process(result.exception);
@@ -147,9 +157,6 @@ public class VisConsole implements ISimEvents {
 			return result.resultType + "[UNKNOWN RESULT]";
 		}
 	}
-
-	
-
 	
 
 }

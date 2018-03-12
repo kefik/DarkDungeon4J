@@ -18,7 +18,6 @@ import cz.dd4j.simulation.data.state.SimStateIds;
  * 
  * When storing a reference, we represent it using 10 bits only.
  * 
- * 
  * @author Jimmy
  */
 public class SlimState implements Cloneable {
@@ -97,6 +96,10 @@ public class SlimState implements Cloneable {
 		return result;
 	}
 	
+	@Override
+	public String toString() {
+		return "SlimState[#rooms=" + rooms.length + ", #monsters=" + monsters.length + ", #heroes=" + heroes.length + "]";
+	}
 	
 	
 }

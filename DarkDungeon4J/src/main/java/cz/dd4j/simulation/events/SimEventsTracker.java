@@ -2,6 +2,7 @@ package cz.dd4j.simulation.events;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.SimStaticStats;
@@ -97,6 +98,13 @@ public class SimEventsTracker {
 			for (ISimEvents handler : handlers) {
 				handler.simulationEnd(result, stats);
 			}
+		}
+
+		@Override
+		public void simulationLog(Element who, Level level, String message) {
+			for (ISimEvents handler : handlers) {
+				handler.simulationLog(who, level, message);
+			}	
 		}
 		
 	}

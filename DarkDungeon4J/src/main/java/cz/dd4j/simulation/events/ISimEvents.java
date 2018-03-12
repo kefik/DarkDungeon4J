@@ -1,5 +1,7 @@
 package cz.dd4j.simulation.events;
 
+import java.util.logging.Level;
+
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.simulation.SimStaticStats;
 import cz.dd4j.simulation.data.dungeon.Element;
@@ -87,5 +89,13 @@ public interface ISimEvents {
 	 * @param result
 	 */
 	public void simulationEnd(SimResult result, SimStaticStats stats);
+	
+	/**
+	 * Log message.
+	 * @param who
+	 * @param level
+	 * @param message
+	 */
+	public void simulationLog(Element who, Level level, String message);
 	
 }

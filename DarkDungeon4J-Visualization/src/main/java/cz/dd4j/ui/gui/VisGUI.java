@@ -1,6 +1,7 @@
 package cz.dd4j.ui.gui;
 
 import java.io.PrintStream;
+import java.util.logging.Level;
 
 import cz.cuni.amis.clear2d.Clear2D;
 import cz.cuni.amis.clear2d.engine.tween.pos.TweenPos;
@@ -355,6 +356,15 @@ public class VisGUI implements ISimEvents {
 		}
 	}
 
+	@Override
+	public void simulationLog(Element who, Level level, String message) {
+		if (who == null) {
+			log(WHO_SIMULATOR, "Log", "[" + level + "] " + message);
+		} else {
+			log(getName(who), "Log", "[" + level + "] " + message);
+		}
+	}
+	
 	private String getResultDescription(SimResult result) {
 		switch (result.resultType) {
 		case AGENT_EXCEPTION: return result.resultType + "[Agent code exception.]" + Const.NEW_LINE + ExceptionToString.process(result.exception);

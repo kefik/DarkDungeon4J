@@ -1,17 +1,13 @@
 package cz.dd4j.agents.heroes;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.logging.Level;
 
 import cz.dd4j.agents.HeroAgentBase;
 import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EItem;
 import cz.dd4j.simulation.actions.EAction;
-import cz.dd4j.simulation.data.dungeon.Dungeon;
-import cz.dd4j.simulation.data.dungeon.elements.entities.Hero;
-import cz.dd4j.simulation.data.dungeon.elements.places.Corridor;
 import cz.dd4j.simulation.data.dungeon.elements.places.Room;
 
 /**
@@ -31,7 +27,7 @@ public class HeroRulesWithRandomMove extends HeroAgentBase implements IHeroAgent
 	public Command act() {
 		if (hero.atRoom.monster != null && hero.hand != null && hero.hand.type == EItem.SWORD) return actions.attack();
 		if (hero.atRoom.feature != null && hero.hand == null) return actions.disarm();		
-		if (moveIntention == null && hero.atRoom.item != null) return actions.pickup();
+		if (moveIntention == null && hero.atRoom.item != null && hero.hand == null) return actions.pickup();
 		
 		// ALL POSSIBLE MOVE ACTIONS
 		List<Command> moveActions = actionsGenerator.generateFor(hero, EAction.MOVE);

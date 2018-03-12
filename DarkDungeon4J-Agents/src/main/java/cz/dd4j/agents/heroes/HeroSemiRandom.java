@@ -65,7 +65,7 @@ public class HeroSemiRandom extends HeroAgentBase {
 		}
 		
 		// PICKUP
-		if (hero.atRoom.item != null) {
+		if (hero.atRoom.item != null && hero.hand == null) {
 			result.add(actions.pickup());
 		}
 		

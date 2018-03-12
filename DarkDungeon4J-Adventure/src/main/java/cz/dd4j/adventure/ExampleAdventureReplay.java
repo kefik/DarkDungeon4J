@@ -33,14 +33,16 @@ public class ExampleAdventureReplay {
 
 		// LOAD SIM STATE
 
-		File dungeonFile = new File("./data/dungeons/dungeon-example/dungeon-01.xml");
+		//File dungeonFile = new File("./data/dungeons/dungeon-example/dungeon-01.xml");
+		File dungeonFile = new File("d:\\Workspaces\\MFF\\GACR\\GIT-DD4J\\_ATTIC\\Replays\\adventures\\DarkDungeon4J\\DarkDungeon4J-Generator\\result\\adventures\\2017\\june\\full\\Adventure4057.xml");
 
 		SimStateLoader loader = new SimStateLoader();
 		SimState simState = loader.loadSimState(dungeonFile, false); // false == do not load agents, these are needless for the replay
 		
 		// LOAD REPLAY
 		
-		Replay replay = new Replay(simState, "example-dungeon-run.zip"); // reads the replay + injects feature/monster agents there
+		//Replay replay = new Replay(simState, "example-dungeon-run.zip"); // reads the replay + injects feature/monster agents there
+		Replay replay = new Replay(simState, "d:\\Workspaces\\MFF\\GACR\\GIT-DD4J\\_ATTIC\\Replays\\reactive\\E103-Adventure4057-hero-rules-with-clever-move.replay.zip"); // reads the replay + injects feature/monster agents there
 
 		// BIND SIM STATE TO THE CONFIG
 		

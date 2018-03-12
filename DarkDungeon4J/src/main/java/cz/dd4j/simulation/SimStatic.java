@@ -9,8 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
 
 import cz.cuni.amis.utils.eh4j.shortcut.EH;
+import cz.dd4j.agents.IAgentLog;
 import cz.dd4j.agents.IFeatureAgent;
 import cz.dd4j.agents.IHeroAgent;
 import cz.dd4j.agents.IMonsterAgent;
@@ -239,6 +241,17 @@ public class SimStatic {
 			} catch (Exception e) {
 				throw new AgentException(hero, hero + " setRandom() failed.", e);
 			}
+			try {
+				final Hero body = hero.body;
+				hero.mind.setLog(new IAgentLog() {
+					@Override
+					public void log(Level level, String msg) {
+						eventsTracker.event().simulationLog(body, level, msg);
+					}
+				});
+			} catch (Exception e) {
+				throw new AgentException(hero, hero + " setLog() failed.", e);
+			}
 		}
 		for (AgentMindBody<Monster, IMonsterAgent> monster : monsters) {
 			try {
@@ -256,6 +269,17 @@ public class SimStatic {
 			} catch (Exception e) {
 				throw new AgentException(monster, monster + " setRandom() failed.", e);
 			}
+			try {
+				final Monster body = monster.body;
+				monster.mind.setLog(new IAgentLog() {
+					@Override
+					public void log(Level level, String msg) {
+						eventsTracker.event().simulationLog(body, level, msg);
+					}
+				});
+			} catch (Exception e) {
+				throw new AgentException(monster, monster + " setLog() failed.", e);
+			}
 		}
 		for (AgentMindBody<Feature, IFeatureAgent> feature : features) {
 			try {
@@ -272,6 +296,17 @@ public class SimStatic {
 				feature.mind.setRandom(new Random(config.random.nextInt()));
 			} catch (Exception e) {
 				throw new AgentException(feature, feature + " setRandom() failed.", e);
+			}
+			try {
+				final Feature body = feature.body;
+				feature.mind.setLog(new IAgentLog() {
+					@Override
+					public void log(Level level, String msg) {
+						eventsTracker.event().simulationLog(body, level, msg);
+					}
+				});
+			} catch (Exception e) {
+				throw new AgentException(feature, feature + " setLog() failed.", e);
 			}
 		}
 	}

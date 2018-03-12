@@ -66,7 +66,7 @@ public class HeroRulesWithCleverMove extends HeroAgentBase implements IHeroAgent
 	public Command act() {
 		if (hero.atRoom.monster != null && hero.hand != null && hero.hand.type == EItem.SWORD) return actions.attack();
 		if (hero.atRoom.feature != null && hero.hand == null) return actions.disarm();
-		if (moveIntention == null && hero.atRoom.item != null) return actions.pickup();
+		if (moveIntention == null && hero.atRoom.item != null && hero.hand == null) return actions.pickup();
 
 		needSword = monsterCount > 0 && (hero.hand == null || hero.hand.type != EItem.SWORD);
 		final List<Room> swordRooms = new ArrayList<Room>();

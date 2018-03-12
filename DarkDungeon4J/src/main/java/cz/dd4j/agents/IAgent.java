@@ -47,6 +47,12 @@ public interface IAgent extends IReporting {
 	 */
 	public void setActionValidator(IActionsValidator actionValidator);
 	
+	/**
+	 * Logger injected by the simulation.
+	 * @param log
+	 */
+	public void setLog(IAgentLog log);
+	
 	// =====================
 	// SIMULATION LIFE-CYCLE
 	// =====================
@@ -73,6 +79,6 @@ public interface IAgent extends IReporting {
 	 * 
 	 * WARNING: exception thrown by this method are ignored and not logged!
 	 */
-	public void simulationEnded();
+	public void simulationEnded();	
 	
 }

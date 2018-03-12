@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -266,6 +267,10 @@ public class Replay implements ISimEvents {
 			replayInput.close();
 		} catch (Exception e) {			
 		}
+	}
+
+	@Override
+	public void simulationLog(Element who, Level level, String message) {
 	}
 	
 }

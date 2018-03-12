@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -198,6 +199,15 @@ public class VisFile implements ISimEvents {
 		try {
 			fileOut.close();
 		} catch (Exception e) {
+		}
+	}
+	
+	@Override
+	public void simulationLog(Element who, Level level, String message) {
+		if (who == null) {
+			log(WHO_SIMULATOR, "Log", "[" + level + "] " + message);
+		} else {
+			log(getName(who), "Log", "[" + level + "] " + message);
 		}
 	}
 

@@ -1,10 +1,9 @@
 package cz.dd4j.agents;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import cz.dd4j.agents.commands.Command;
 import cz.dd4j.domain.EEntity;
@@ -24,6 +23,7 @@ public class AgentBase implements IAgent, IConfigurable {
 	protected Random random;
 	protected IActionsGenerator actionsGenerator;
 	protected IActionsValidator actionValidator;
+	protected IAgentLog log;
 	
 
 	public AgentBase(EEntity agentType) {
@@ -52,6 +52,11 @@ public class AgentBase implements IAgent, IConfigurable {
 	@Override
 	public void setActionValidator(IActionsValidator actionValidator) {
 		this.actionValidator = actionValidator;
+	}
+	
+	@Override
+	public void setLog(IAgentLog log) {
+		this.log = log;
 	}
 	
 	@Override
@@ -138,6 +143,15 @@ public class AgentBase implements IAgent, IConfigurable {
 	@Override
 	public CSVRow getCSVRow() {
 		return new CSVRow();
+	}
+	
+	/**
+	 * Report agent-custom log.
+	 * @param level
+	 * @param msg
+	 */
+	public void log(Level level, String msg) {
+		if (log != null) log.log(level, msg);
 	}
 
 }
